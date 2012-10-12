@@ -1,0 +1,39 @@
+Authors
+=======
+
+As of 12 October 2012, the GLSLPlanet Developers are:
+
+* Andrew Copland
+* Pioneer Developers (https://github.com/pioneerspacesim/pioneer)
+
+Licensing
+=========
+
+Copyright © 2008-2012 Andrew Copland
+
+GLSLPlanet's core code and extension modules are licensed under the terms of the
+GNU General Public License version 3. See licenses/GPL-3.txt for details.
+
+GLSLPlanet includes the following third-party software:
+
+  noise_lib.glsl (see also heightmap.frag)
+  License : Copyright (C) 2011 Ashima Arts. All rights reserved.
+  Distributed under the MIT License. See LICENSE file.
+  https://github.com/ashima/webgl-noise
+  
+  vcacheopt.h
+  Copyright (C) 2009, Michael Georgoulpoulos
+  Licensed under the MIT licence (see contrib/vcacheopt/vcacheopt.h)
+
+Acknowledgements
+================
+
+The GLSLPlanet Developer(s) would like to acknowledge the following products
+and services, without which GLSLPlanet would not be possible:
+
+  PioneerSpaceSim	https://github.com/pioneerspacesim/pioneer
+  GLFW          	http://www.glfw.org/
+  GLM				http://sourceforge.net/projects/ogl-math/
+
+  GitHub        	https://github.com/
+  SourceForge   	https://sourceforge.net/
