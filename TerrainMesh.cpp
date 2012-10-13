@@ -16,7 +16,11 @@
 using namespace glm;
 
 #define GEOPATCH_SUBDIVIDE_AT_CAMDIST	2.0f	//1.5f
+#if 0
 #define GEOPATCH_MAX_DEPTH  10
+#else
+#define GEOPATCH_MAX_DEPTH  1
+#endif
 
 class GeoPatchContext
 {
@@ -601,7 +605,7 @@ public:
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mContext.mFBO.Width(), mContext.mFBO.Height(), 0, GL_LUMINANCE, GL_FLOAT, heightmap_);
 		checkGLError();
 		
-#if 1
+#if 0
 		// Good filtering needed
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -717,11 +721,15 @@ public:
 
 	void Render()
 	{
+#if 0
 		if (kids[0]) {
 			for (int i=0; i<4; i++) {
 				kids[i]->Render();
 			}
-		} else {
+		} 
+		else 
+#endif
+		{
 #if 1
 			//glm::vec4 patchColour(float(mDepth+1) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 0.0f, float(GEOPATCH_MAX_DEPTH-mDepth) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 1.0f);
 			static const glm::vec4 faceColours[6] = {
@@ -896,10 +904,10 @@ static const int geo_sphere_edge_friends[6][4] = {
 void GeoSphere::BuildFirstPatches()
 {
 	assert(nullptr==mGeoPatchContext);
-#if 1
+#if 0
 	mGeoPatchContext = new GeoPatchContext(33);
 #else
-	mGeoPatchContext = new GeoPatchContext(5);//33);
+	mGeoPatchContext = new GeoPatchContext(3);//33);
 #endif
 	assert(nullptr!=mGeoPatchContext);
 

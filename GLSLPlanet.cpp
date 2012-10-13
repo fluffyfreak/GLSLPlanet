@@ -76,7 +76,8 @@ int main()
 	// Set color and depth clear value
     glClearDepth(1.0f);
 	// Dark blue background
-	glClearColor(0.0f, 0.05f, 0.1f, 0.0f);
+	//glClearColor(0.0f, 0.05f, 0.1f, 0.0f);
+	glClearColor(100/255.f, 149/255.f, 237/255.f, 0.0f);
 	checkGLError();
 
 	// Enable depth test
