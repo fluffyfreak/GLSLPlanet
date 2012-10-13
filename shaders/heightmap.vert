@@ -3,8 +3,12 @@
 
 // Input vertex data, different for all executions of this shader.
 in vec3 vertexPos;
+in vec2 vertexUVs;
+
+varying vec2 uv;
 
 void main()
 {
+	uv = vertexUVs;
 	gl_Position = vec4(vertexPos,1.0);
 } 
