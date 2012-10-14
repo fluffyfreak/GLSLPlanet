@@ -946,8 +946,50 @@ public:
 			we_are[i] = edgeFriend[i]->GetEdgeIdxOf(this);
 		}
 
+		const int faceIdx = getPatchFaceIdx();
 		for (int i=0; i<4; i++) {
 			const GeoPatch *e = edgeFriend[i];
+
+			if(faceIdx==0 && i==1) {
+				printf("");
+			}
+
+			// this is me attempting to figure out if the edges match up correctly
+			// this test isn't really valid yet!
+			bool badCornerMatch = false;
+			if(faceIdx==0) {
+				switch(i)
+				{
+				case 0:					badCornerMatch = (mV0 != e->mV1) || (mV1 != e->mV0);					break;
+				case 1:					badCornerMatch = (mV1 != e->mV1) || (mV2 != e->mV0);					break;
+				case 2:					badCornerMatch = (mV2 != e->mV1) || (mV3 != e->mV0);					break;
+				case 3:					badCornerMatch = (mV3 != e->mV1) || (mV0 != e->mV0);					break;
+				}
+			} else if(faceIdx==1) {
+				switch(i)
+				{
+				case 0:					badCornerMatch = (mV0 != e->mV3) || (mV1 != e->mV2);					break;
+				case 1:					badCornerMatch = (mV1 != e->mV3) || (mV2 != e->mV2);					break;
+				case 2:					badCornerMatch = (mV2 != e->mV3) || (mV3 != e->mV2);					break;
+				case 3:					badCornerMatch = (mV3 != e->mV3) || (mV0 != e->mV2);					break;
+				}
+			} else if(faceIdx==2) {
+				switch(i)
+				{
+				case 0:					badCornerMatch = (mV0 != e->mV0) || (mV1 != e->mV3);					break;
+				case 1:					badCornerMatch = (mV1 != e->mV0) || (mV2 != e->mV3);					break;
+				case 2:					badCornerMatch = (mV2 != e->mV0) || (mV3 != e->mV3);					break;
+				case 3:					badCornerMatch = (mV3 != e->mV0) || (mV0 != e->mV3);					break;
+				}
+			} else if(faceIdx==3) {
+				switch(i)
+				{
+				case 0:					badCornerMatch = (mV0 != e->mV2) || (mV1 != e->mV1);					break;
+				case 1:					badCornerMatch = (mV1 != e->mV2) || (mV2 != e->mV1);					break;
+				case 2:					badCornerMatch = (mV2 != e->mV2) || (mV3 != e->mV1);					break;
+				case 3:					badCornerMatch = (mV3 != e->mV2) || (mV0 != e->mV1);					break;
+				}
+			}
 
 			////////////////////////////////////////////////////////////////
 			// populate the position map for the edgeFriend[i] quad
@@ -980,12 +1022,10 @@ public:
 				assert(false && "this shouldn't happen");	
 				break;
 			}
-
-			const int faceIdx = getPatchFaceIdx();
+			
 			// performed on our data
 			// compares neighbours data (in pEf) to our own edge data
 			bool badPos = false;
-			bool badCornerMatch = false;
 			switch(i)
 			{
 			case 0:
@@ -996,8 +1036,6 @@ public:
 					if(badPos) 
 						printf("%f, ", b-a);
 				}
-				if(faceIdx==0)
-					badCornerMatch = (mV0 != e->mV1) || (mV1 != e->mV0);
 				break;
 			case 1:
 				x = texDim-1;
@@ -1027,9 +1065,6 @@ public:
 					if(badPos) 
 						printf("%f, ", b-a);
 				}
-				break;
-			default: 
-				assert(false && "this shouldn't happen");	
 				break;
 			}
 
