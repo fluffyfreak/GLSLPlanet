@@ -592,7 +592,7 @@ public:
 	}
 
 	// in patch surface coords, [0,1]
-	glm::vec3 GetSpherePoint(const float x, const float y) {
+	inline glm::vec3 GetSpherePoint(const float x, const float y) const {
 		return glm::normalize((mV0 + x*(1.0f-y)*(mV1-mV0) + x*y*(mV2-mV0) + (1.0f-x)*y*(mV3-mV0)));
 	}
 
@@ -602,16 +602,16 @@ public:
 
 		{
 			////////////////////////////////////////////////////////////////
-			// create a dummy set of verts, the UVs are the only important part
+			// 
 			glm::vec3 *vts = mContext.vertexs();
 			assert(nullptr!=vts);
-			const double fracStep = 1.0f/double(mContext.edgeLen()-2);
+			const float fracStep = 1.0f/float(mContext.edgeLen()-2);
 			for (uint32_t y=0; y<mContext.edgeLen()-1; y++) {
 				for (uint32_t x=0; x<mContext.edgeLen()-1; x++) {
-					const double xfrac = double(x) * fracStep;
-					const double yfrac = double(y) * fracStep;
+					const float xfrac = float(x) * fracStep;
+					const float yfrac = float(y) * fracStep;
 					assert(xfrac<=1.0f && yfrac<=1.0f);
-					const glm::vec3 p = GetSpherePoint(float(xfrac), float(yfrac));
+					const glm::vec3 p = GetSpherePoint(xfrac, yfrac);
 					*(vts++) = p;
 				}
 			}
@@ -687,28 +687,22 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		////////////////////////////////////////////////////////////////
-		// create a dummy set of verts, the UVs are the only important part
+		// Create the base mesh that the heightmap will modify
 		glm::vec3 *vts = mContext.vertexs();
 		GLfloat *pUV = mContext.uvs();
 		assert(nullptr!=vts);
 		const float fracStep = 1.0f/float(mContext.edgeLen()-1);
-		float xfrac = 0.0f;
-		float yfrac = 0.0f;
 		for (uint32_t y=0; y<mContext.edgeLen(); y++) {
-			xfrac = 0.0f;
 			for (uint32_t x=0; x<mContext.edgeLen(); x++) {
-				assert(xfrac<=1.0f && yfrac<=1.0f);
+				const float xfrac = float(x) * fracStep;
+				const float yfrac = float(y) * fracStep;
+				assert(xfrac<=1.0 && yfrac<=1.0);
 				const glm::vec3 p = GetSpherePoint(xfrac, yfrac);
 				*(vts++) = p;
 
 				*(pUV++) = xfrac;
 				*(pUV++) = yfrac;
-
-				// next increment
-				xfrac += fracStep;
 			}
-			// next increment
-			yfrac += fracStep;
 		}
 		assert(vts == &mContext.vertexs()[mContext.NUM_MESH_VERTS()]);
 		assert(pUV == &mContext.uvs()[mContext.NUM_MESH_VERTS()*2]);
@@ -772,108 +766,148 @@ public:
 	}
 
 #ifdef _DEBUG
-	#pragma optimize( "", off )
-	void CheckEdgeFriendEdges() const {
-		static float *heightmapA = nullptr;
-		static float *heightmapB = nullptr;
-		static float *ev = nullptr;
-		static const uint32_t edgeLen = (mContext.edgeLen()-1);
-		if(nullptr==heightmapA) {
-			heightmapA = new float[edgeLen*edgeLen];
-			heightmapB = new float[edgeLen*edgeLen];
-			ev = new float[edgeLen];
-			for(uint32_t i=0;i<edgeLen;i++) {
-				for(uint32_t j=0;j<edgeLen;j++) {
-					heightmapA[i + (j*edgeLen)] = -1.0f;
-					heightmapB[i + (j*edgeLen)] = -2.0f;
-				}
-				ev[i] = -5.0f;
+	// in patch surface coords, [0,1]
+	inline glm::vec3 GetSpherePointDebug(const float x, const float y,
+		const glm::vec3 &V0, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3) const 
+	{
+		return glm::normalize((V0 + x*(1.0f-y)*(V1-V0) + x*y*(V2-V0) + (1.0f-x)*y*(V3-V0)));
+	}
+
+	inline glm::vec3 AltGetSpherePointDebug(const float x, const float y,
+		const glm::vec3 &V0, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3) const 
+	{
+		// lerp ( a + t * (b - a) )
+		const glm::vec3 A = V0+x*(V1-V0);
+		const glm::vec3 B = V3+x*(V2-V3);
+		const glm::vec3 C = A+y*(B-A);
+		return glm::normalize(C);
+	}
+
+	static void PopulateNormalisedPosMap(const GeoPatch* e, glm::vec3 *posMap, const uint32_t texDim)
+	{
+		////////////////////////////////////////////////////////////////
+		glm::vec3 *vts = &posMap[0];
+		assert(nullptr!=vts);
+		const float fracStep = 1.0f/float(texDim-1);
+		for (uint32_t y=0; y<texDim; y++) {
+			for (uint32_t x=0; x<texDim; x++) {
+				const float xfrac = float(x) * fracStep;
+				const float yfrac = float(y) * fracStep;
+				assert(xfrac<=1.0f && yfrac<=1.0f);
+				const glm::vec3 p = e->GetSpherePoint(xfrac, yfrac);
+				*(vts++) = p;
 			}
 		}
-		
+		assert(vts == &posMap[texDim*texDim]);
+	}
+
+	static void GetHeightmapData(const GLuint texID, float *dataOut)
+	{
+		glBindTexture(GL_TEXTURE_2D, texID);
+		checkGLError();
+		glGetTexImage(GL_TEXTURE_2D,0,GL_LUMINANCE,GL_FLOAT,&dataOut[0]);
+		checkGLError();
+		glBindTexture(GL_TEXTURE_2D, 0);
+		checkGLError();
+	}
+
+	void CheckEdgeFriendsEdges() const {
+		////////////////////////////////////////////////////////////////
+		// useful debugging stuff and one-time initialisation
+		static float *heightmapA = nullptr;
+		static float *heightmapB = nullptr;
+		static float *pEf = nullptr;
+		static const uint32_t texDim = (mContext.edgeLen()-1);
+		if(nullptr==heightmapA) {
+			heightmapA = new float[texDim*texDim];
+			heightmapB = new float[texDim*texDim];
+			pEf = new float[texDim];
+			for(uint32_t i=0;i<texDim;i++) {
+				for(uint32_t j=0;j<texDim;j++) {
+					heightmapA[i + (j*texDim)] = -1.0f;
+					heightmapB[i + (j*texDim)] = -2.0f;
+				}
+				pEf[i] = -5.0f;
+			}
+		}
+			
+		////////////////////////////////////////////////////////////////
+		//
 		int we_are[4];
 		for (int i=0; i<4; i++) {
 			we_are[i] = edgeFriend[i]->GetEdgeIdxOf(this);
 		}
 
 		// get heightmapA's data
-		glBindTexture(GL_TEXTURE_2D, getHeightmapID());
-		checkGLError();
-		glGetTexImage(GL_TEXTURE_2D,0,GL_LUMINANCE,GL_FLOAT,&heightmapA[0]);
-		checkGLError();
-		glBindTexture(GL_TEXTURE_2D, 0);
-		checkGLError();
+		GetHeightmapData(getHeightmapID(),heightmapA);
 
 		for (int i=0; i<4; i++) {
+			const GeoPatch *e = edgeFriend[i];
+
 			// get heightmapB's data
-			glBindTexture(GL_TEXTURE_2D, edgeFriend[i]->getHeightmapID());
-			checkGLError();
-			glGetTexImage(GL_TEXTURE_2D,0,GL_LUMINANCE,GL_FLOAT,&heightmapB[0]);
-			checkGLError();
-			glBindTexture(GL_TEXTURE_2D, 0);
-			checkGLError();
+			GetHeightmapData(e->getHeightmapID(),heightmapB);
 
 			// performed on neighbours data
-			// copies neighbours data into ev
+			// copies neighbours data into pEf
 			uint32_t x, y;
 			switch(we_are[i])
 			{
 			case 0:
-				for (x=0; x<edgeLen; x++) 
-					ev[(edgeLen-1)-x] = heightmapB[x];
+				for (x=0; x<texDim; x++)
+					pEf[(texDim-1)-x] = heightmapB[x];
 				break;
 			case 1:
-				x = edgeLen-1;
-				for (y=0; y<edgeLen; y++) 
-					ev[(edgeLen-1)-y] = heightmapB[x + y*edgeLen];
+				x = texDim-1;
+				for (y=0; y<texDim; y++) 
+					pEf[(texDim-1)-y] = heightmapB[x + y*texDim];
 				break;
 			case 2:
-				y = edgeLen-1;
-				for (x=0; x<edgeLen; x++) 
-					ev[(edgeLen-1)-x] = heightmapB[(edgeLen-1)-x + y*edgeLen];
+				y = texDim-1;
+				for (x=0; x<texDim; x++) 
+					pEf[(texDim-1)-x] = heightmapB[(texDim-1)-x + y*texDim];
 				break;
 			case 3:
-				for (y=0; y<edgeLen; y++) 
-					ev[(edgeLen-1)-y] = heightmapB[1 + ((edgeLen-1)-y)*edgeLen];
+				for (y=0; y<texDim; y++) 
+					pEf[(texDim-1)-y] = heightmapB[1 + ((texDim-1)-y)*texDim];
 				break;
 			default: 
 				assert(false && "this shouldn't happen");	
 				break;
 			}
 
-			// performed on our data
-			// compares neighbours data (in ev) to our own edge data
 			const int faceIdx = getPatchFaceIdx();
+			// performed on our data
+			// compares neighbours data (in pEf) to our own edge data
 			bool badVerts = false;
 			switch(i)
 			{
 			case 0:
-				for (x=0; x<edgeLen; x++) {
-					const float a = ev[x];
+				for (x=0; x<texDim; x++) {
+					const float a = pEf[x];
 					const float b = heightmapA[x];
 					badVerts = ( a!=b );
 				}
 				break;
 			case 1:
-				x = edgeLen-1;
-				for (y=0; y<edgeLen; y++) {
-					const float a = heightmapA[x + y*edgeLen];
-					const float b = ev[y];
+				x = texDim-1;
+				for (y=0; y<texDim; y++) {
+					const float a = heightmapA[x + y*texDim];
+					const float b = pEf[y];
 					badVerts = ( a!=b );
 				}
 				break;
 			case 2:
-				y = edgeLen-1;
-				for (x=0; x<edgeLen; x++) {
-					const float a = heightmapA[x + y*edgeLen];
-					const float b = ev[(edgeLen-1)-x];
+				y = texDim-1;
+				for (x=0; x<texDim; x++) {
+					const float a = heightmapA[x + y*texDim];
+					const float b = pEf[(texDim-1)-x];
 					badVerts = ( a!=b );
 				}
 				break;
 			case 3:
-				for (y=0; y<edgeLen; y++) {
-					const float a = ev[(edgeLen-1)-y];
-					const float b = heightmapA[0 + y*edgeLen];
+				for (y=0; y<texDim; y++) {
+					const float a = pEf[(texDim-1)-y];
+					const float b = heightmapA[0 + y*texDim];
 					badVerts = ( a!=b );
 				}
 				break;
@@ -883,7 +917,124 @@ public:
 			}
 
 			if( badVerts ) {
-				printf("faceIdx %i, depth %u, edge %i wrong\n",faceIdx, mDepth,i);
+				printf("badVerts: faceIdx %i, depth %u, edge %i wrong\n",faceIdx, mDepth,i);
+			}
+		}
+	}
+
+	void CheckEdgeFriendsEdgePositions() const {
+		////////////////////////////////////////////////////////////////
+		// useful debugging stuff and one-time initialisation
+		static glm::vec3 *posMapA = nullptr;
+		static glm::vec3 *posMapB = nullptr;
+		static glm::vec3 *pEv = nullptr;
+		static const uint32_t texDim = (mContext.edgeLen()-1);
+		if(nullptr==posMapA) {
+			posMapA = new glm::vec3[texDim*texDim];
+			posMapB = new glm::vec3[texDim*texDim];
+			pEv = new glm::vec3[texDim];
+		}
+
+		////////////////////////////////////////////////////////////////
+		// populate the position map for THIS quad
+		PopulateNormalisedPosMap(this, posMapA, texDim);
+			
+		////////////////////////////////////////////////////////////////
+		//
+		int we_are[4];
+		for (int i=0; i<4; i++) {
+			we_are[i] = edgeFriend[i]->GetEdgeIdxOf(this);
+		}
+
+		for (int i=0; i<4; i++) {
+			const GeoPatch *e = edgeFriend[i];
+
+			////////////////////////////////////////////////////////////////
+			// populate the position map for the edgeFriend[i] quad
+			PopulateNormalisedPosMap(e, posMapB, texDim);
+
+			// performed on neighbours data
+			// copies neighbours data into pEf
+			uint32_t x, y;
+			switch(we_are[i])
+			{
+			case 0:
+				for (x=0; x<texDim; x++)
+					pEv[(texDim-1)-x] = posMapB[x];
+				break;
+			case 1:
+				x = texDim-1;
+				for (y=0; y<texDim; y++)
+					pEv[(texDim-1)-y] = posMapB[x + y*texDim];
+				break;
+			case 2:
+				y = texDim-1;
+				for (x=0; x<texDim; x++) 
+					pEv[(texDim-1)-x] = posMapB[(texDim-1)-x + y*texDim];
+				break;
+			case 3:
+				for (y=0; y<texDim; y++) 
+					pEv[(texDim-1)-y] = posMapB[1 + ((texDim-1)-y)*texDim];
+				break;
+			default: 
+				assert(false && "this shouldn't happen");	
+				break;
+			}
+
+			const int faceIdx = getPatchFaceIdx();
+			// performed on our data
+			// compares neighbours data (in pEf) to our own edge data
+			bool badPos = false;
+			bool badCornerMatch = false;
+			switch(i)
+			{
+			case 0:
+				for (x=0; x<texDim; x++) {
+					const glm::vec3 a = pEv[x];
+					const glm::vec3 b = posMapA[x];
+					badPos = ( a!=b );
+					if(badPos) 
+						printf("%f, ", b-a);
+				}
+				if(faceIdx==0)
+					badCornerMatch = (mV0 != e->mV1) || (mV1 != e->mV0);
+				break;
+			case 1:
+				x = texDim-1;
+				for (y=0; y<texDim; y++) {
+					const glm::vec3 a = posMapA[x + y*texDim];
+					const glm::vec3 b = pEv[y];
+					badPos = ( a!=b );
+					if(badPos) 
+						printf("%f, ", b-a);
+				}
+				break;
+			case 2:
+				y = texDim-1;
+				for (x=0; x<texDim; x++) {
+					const glm::vec3 a = posMapA[x + y*texDim];
+					const glm::vec3 b = pEv[(texDim-1)-x];
+					badPos = ( a!=b );
+					if(badPos) 
+						printf("%f, ", b-a);
+				}
+				break;
+			case 3:
+				for (y=0; y<texDim; y++) {
+					const glm::vec3 a = pEv[(texDim-1)-y];
+					const glm::vec3 b = posMapA[0 + y*texDim];
+					badPos = ( a!=b );
+					if(badPos) 
+						printf("%f, ", b-a);
+				}
+				break;
+			default: 
+				assert(false && "this shouldn't happen");	
+				break;
+			}
+
+			if( badPos ) {
+				printf("\nbadPos: faceIdx %i, depth %u, edge %i wrong\n",faceIdx, mDepth,i);
 			}
 		}
 	}
@@ -965,11 +1116,11 @@ public:
 
 		if (canSplit) {
 			if (!kids[0]) {
-				const glm::vec3 v01 = glm::normalize(mV0+mV1);
-				const glm::vec3 v12 = glm::normalize(mV1+mV2);
-				const glm::vec3 v23 = glm::normalize(mV2+mV3);
-				const glm::vec3 v30 = glm::normalize(mV3+mV0);
-				const glm::vec3 cn = glm::normalize(mCentroid);
+				const glm::vec3 v01	= glm::normalize(mV0+mV1);
+				const glm::vec3 v12	= glm::normalize(mV1+mV2);
+				const glm::vec3 v23	= glm::normalize(mV2+mV3);
+				const glm::vec3 v30	= glm::normalize(mV3+mV0);
+				const glm::vec3 cn	= glm::normalize(mCentroid);
 				//const glm::vec3 cn = glm::normalize((v01+v12)+(v23+v30));
 				const int newDepth = mDepth+1;
 				kids[0] = new GeoPatch(mContext, mpGeoSphere, mV0, v01, cn, v30, newDepth, calculateNextPatchID(newDepth,0));
@@ -1001,8 +1152,9 @@ public:
 				for (int i=0; i<4; i++) {
 					edgeFriend[i]->NotifyEdgeFriendSplit(this);
 				}
-#ifdef _DEBUG
-				CheckEdgeFriendEdges();
+#if defined(_DEBUG) && TEST_CASE
+				CheckEdgeFriendsEdges();
+				CheckEdgeFriendsEdgePositions();
 #endif
 			} else {
 				for (int i=0; i<4; i++) {
