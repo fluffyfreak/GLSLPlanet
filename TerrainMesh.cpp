@@ -15,6 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
+#define TEST_CASE 0
 #define TEST_CASE 1
 
 #define GEOPATCH_SUBDIVIDE_AT_CAMDIST	2.0f	//1.5f
@@ -101,7 +102,7 @@ public:
 	// constructor
 	GeoPatchContext(const uint32_t edgeLen) : 
 		mEdgeLen(edgeLen), mHalfEdgeLen(edgeLen>>1), 
-		mFBO((edgeLen-1),(edgeLen-1)), mQuad(false, true), mNormalisedPosMap(0)//, mVBO(nullptr)
+		mFBO(edgeLen,edgeLen), mQuad(false, true), mNormalisedPosMap(0)//, mVBO(nullptr)
 	{
 		mVertexs = new glm::vec3[NUM_MESH_VERTS()];
 		mNormals = new glm::vec3[NUM_MESH_VERTS()];
@@ -413,7 +414,7 @@ public:
 	GLuint quadHeightmapNormalisedPosMapID()	const { return quad_normalisedPosMap; }
 	GLuint quadHeightmapNormalisedPosMap()		const { return mNormalisedPosMap; }
 	void UpdateNormalisedPosMap(GLvoid *data) const {
-		const GLsizei dims = mEdgeLen-1;
+		const GLsizei dims = mEdgeLen;
 		glBindTexture(GL_TEXTURE_2D, mNormalisedPosMap);
 		checkGLError();
 		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dims, dims, GL_RGB, GL_FLOAT, data);
@@ -429,8 +430,8 @@ private:
 			delete [] s_pHeightmapData_;
 			s_pHeightmapData_ = nullptr;
 		}
-		s_pHeightmapData_ = new float[(int)((edgeLen()-1) * (edgeLen()-1))];
-		memset(s_pHeightmapData_,0,sizeof(float)*(int)((edgeLen()-1) * (edgeLen()-1)));
+		s_pHeightmapData_ = new float[(int)(edgeLen() * edgeLen())];
+		memset(s_pHeightmapData_,0,sizeof(float)*(int)(edgeLen() * edgeLen()));
 	}
 public:
 	float *getHeightmapData() const {
@@ -605,9 +606,9 @@ public:
 			// 
 			glm::vec3 *vts = mContext.vertexs();
 			assert(nullptr!=vts);
-			const float fracStep = 1.0f/float(mContext.edgeLen()-2);
-			for (uint32_t y=0; y<mContext.edgeLen()-1; y++) {
-				for (uint32_t x=0; x<mContext.edgeLen()-1; x++) {
+			const float fracStep = 1.0f/float(mContext.edgeLen()-1);
+			for (uint32_t y=0; y<mContext.edgeLen(); y++) {
+				for (uint32_t x=0; x<mContext.edgeLen(); x++) {
 					const float xfrac = float(x) * fracStep;
 					const float yfrac = float(y) * fracStep;
 					assert(xfrac<=1.0f && yfrac<=1.0f);
@@ -615,7 +616,7 @@ public:
 					*(vts++) = p;
 				}
 			}
-			assert(vts == &mContext.vertexs()[(mContext.edgeLen()-1)*(mContext.edgeLen()-1)]);
+			assert(vts == &mContext.vertexs()[mContext.edgeLen()*mContext.edgeLen()]);
 			mContext.UpdateNormalisedPosMap(mContext.vertexs());
 		}
 
@@ -640,7 +641,7 @@ public:
 			glUniform3fv(mContext.quadHeightmapV1ID(),		1, &mV1[0]);
 			glUniform3fv(mContext.quadHeightmapV2ID(),		1, &mV2[0]);
 			glUniform3fv(mContext.quadHeightmapV3ID(),		1, &mV3[0]);
-			const float reciprocalFBOWidth = 1.0f/float(mContext.mFBO.Width()-1);
+			const float reciprocalFBOWidth = 1.0f/float(mContext.mFBO.Width());
 			glUniform1f(mContext.quadHeightmapFracStepID(), reciprocalFBOWidth);
 			glUniform1i(mContext.quadHeightmapNormalisedPosMapID(), 0); //Texture unit 0
 
@@ -863,7 +864,7 @@ public:
 		static float *heightmapA = nullptr;
 		static float *heightmapB = nullptr;
 		static float *pEf = nullptr;
-		static const uint32_t texDim = (mContext.edgeLen()-1);
+		static const uint32_t texDim = mContext.edgeLen();
 		if(nullptr==heightmapA) {
 			heightmapA = new float[texDim*texDim];
 			heightmapB = new float[texDim*texDim];
@@ -974,7 +975,7 @@ public:
 		static glm::vec3 *posMapA = nullptr;
 		static glm::vec3 *posMapB = nullptr;
 		static glm::vec3 *pEv = nullptr;
-		static const uint32_t texDim = (mContext.edgeLen()-1);
+		static const uint32_t texDim = mContext.edgeLen();
 		if(nullptr==posMapA) {
 			posMapA = new glm::vec3[texDim*texDim];
 			posMapB = new glm::vec3[texDim*texDim];
@@ -1270,9 +1271,9 @@ void GeoSphere::BuildFirstPatches()
 {
 	assert(nullptr==mGeoPatchContext);
 #if TEST_CASE
-	mGeoPatchContext = new GeoPatchContext(5);//33);
+	mGeoPatchContext = new GeoPatchContext(3);
 #else
-	mGeoPatchContext = new GeoPatchContext(33);
+	mGeoPatchContext = new GeoPatchContext(17);//33);
 #endif
 	assert(nullptr!=mGeoPatchContext);
 
