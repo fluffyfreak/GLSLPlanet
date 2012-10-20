@@ -9,7 +9,7 @@
 
 #include <vector>
 
-#define TEST_CASE 1
+#define TEST_CASE 0
 
 #include "shader_heightmap.h"
 
