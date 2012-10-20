@@ -24,6 +24,35 @@ using namespace glm;
 #include "shaderHelper.h"
 #include "TerrainMesh.h"
 
+namespace NKeyboard {
+	enum EKeyStates {
+		eKeyUnset=0,
+		eKeyPressed,
+		eKeyHeld,
+		eKeyReleased
+	};
+	#define NUM_KEYS 256
+	EKeyStates g_keys[NUM_KEYS] = {eKeyUnset};
+	EKeyStates g_keysPrev[NUM_KEYS] = {eKeyUnset};
+	void UpdateKeyStates() {
+		for( int k=0; k<NUM_KEYS; k++ ) 
+		{
+			g_keysPrev[k] = g_keys[k];
+			g_keys[k] = (glfwGetKey(k)==GLFW_PRESS) ? eKeyPressed : eKeyReleased;
+		}
+	}
+	EKeyStates GetKeyState( const uint8_t c )
+	{
+		switch(g_keys[c]) {
+		case eKeyUnset:		return eKeyUnset;
+		case eKeyPressed:	return g_keysPrev[c]==eKeyPressed ? eKeyHeld : eKeyPressed;
+		case eKeyReleased:	return g_keysPrev[c]==eKeyReleased ? eKeyUnset : eKeyReleased;
+		default: assert(false && "this shouldn't happen!"); break;
+		}
+		return eKeyUnset;
+	}
+};
+
 int main()
 {
 	const int screen_width = 800;
@@ -71,7 +100,6 @@ int main()
 	// Ensure we can capture the escape key being pressed below
 	glfwEnable( GLFW_STICKY_KEYS );
 	glfwSetMousePos(screen_width/2, screen_height/2);
-	checkGLError();
 
 	// Set color and depth clear value
     glClearDepth(1.0f);
@@ -120,6 +148,8 @@ int main()
 	float zoomDist = -15.0f;
 	const float geoSphereRadius = 25.0f;
 
+	bool bUseWireframe = false;
+
 	do {
 		////////////////////////////////////////////////////////////////
 		// handle resizing the screen/window
@@ -161,6 +191,10 @@ int main()
 #endif
 			}
 		}
+		
+		if( NKeyboard::GetKeyState('W') == NKeyboard::eKeyPressed ) {
+			bUseWireframe = !bUseWireframe;
+		}
 
 		////////////////////////////////////////////////////////////////
 		// Compute the MVP matrix from keyboard and mouse input
@@ -197,14 +231,13 @@ int main()
 		
 		////////////////////////////////////////////////////////////////
 		// render the bloody sphere here
-#define DRAW_SPHERE_WIREFRAME 0
-#if DRAW_SPHERE_WIREFRAME
-		glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-#endif
+		if(bUseWireframe) {
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+		}
 		pSphere->Render(ViewMatrix,ModelMatrix,MVP);
-#if DRAW_SPHERE_WIREFRAME
-		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-#endif
+		if(bUseWireframe) {
+			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+		}
 
 		glUseProgram(0);
 		checkGLError();
@@ -223,6 +256,8 @@ int main()
 		// Swap buffers
 		glfwSwapBuffers();
 		checkGLError();
+
+		NKeyboard::UpdateKeyStates();
 
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
