@@ -16,11 +16,10 @@
 using namespace glm;
 
 #define TEST_CASE 0
-#define TEST_CASE 1
 
 #define GEOPATCH_SUBDIVIDE_AT_CAMDIST	2.0f	//1.5f
 #if TEST_CASE
-#define GEOPATCH_MAX_DEPTH  1
+#define GEOPATCH_MAX_DEPTH  4
 #else
 #define GEOPATCH_MAX_DEPTH  10
 #endif
@@ -102,7 +101,7 @@ public:
 	// constructor
 	GeoPatchContext(const uint32_t edgeLen) : 
 		mEdgeLen(edgeLen), mHalfEdgeLen(edgeLen>>1), 
-		mFBO(edgeLen,edgeLen), mQuad(false, true), mNormalisedPosMap(0)//, mVBO(nullptr)
+		mFBO(edgeLen,edgeLen), mQuad(false, true)//, mVBO(nullptr)
 	{
 		mVertexs = new glm::vec3[NUM_MESH_VERTS()];
 		mNormals = new glm::vec3[NUM_MESH_VERTS()];
@@ -290,28 +289,6 @@ public:
 		// temporary buffer where we'll retrieve the generated textures data into
 		createHeightmapData();
 
-		// Now we need to create the texture which will contain the heightmap. 
-		glGenTextures(1, &mNormalisedPosMap);
-		checkGLError();
- 
-		// Bind the newly created texture : all future texture functions will modify this texture
-		glBindTexture(GL_TEXTURE_2D, mNormalisedPosMap);
-		checkGLError();
-
-		// Give the heightmap values to OpenGL ( the last parameter )
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, mFBO.Width(), mFBO.Height(), 0, GL_RGB, GL_FLOAT, 0);
-		checkGLError();
-
-		// Bad filtering needed
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		checkGLError();
-
-		// release the texture binding
-		glBindTexture(GL_TEXTURE_2D, 0);
-
 		////////////////////////////////////////////////////////////////
 		// load the quad terrain shader
 		LoadShader(quad_heightmap_prog, "heightmap", "heightmap");
@@ -320,7 +297,6 @@ public:
 		quad_heightmap_v2		= glGetUniformLocation(quad_heightmap_prog, "v2");
 		quad_heightmap_v3		= glGetUniformLocation(quad_heightmap_prog, "v3");
 		quad_heightmap_fracStep	= glGetUniformLocation(quad_heightmap_prog, "fracStep");
-		quad_normalisedPosMap	= glGetUniformLocation(quad_heightmap_prog, "normalisedPosMap");
 		checkGLError();
 
 		////////////////////////////////////////////////////////////////
@@ -394,10 +370,6 @@ private:
 	GLuint quad_heightmap_v2;
 	GLuint quad_heightmap_v3;
 	GLuint quad_heightmap_fracStep;
-	GLuint quad_normalisedPosMap;
-	
-	// handle for texture map containing normalised positions
-	GLuint mNormalisedPosMap;
 public:
 	void renderQuad() const
 	{
@@ -411,18 +383,6 @@ public:
 	GLuint quadHeightmapV2ID()					const { return quad_heightmap_v2; }
 	GLuint quadHeightmapV3ID()					const { return quad_heightmap_v3; }
 	GLuint quadHeightmapFracStepID()			const { return quad_heightmap_fracStep; }
-	GLuint quadHeightmapNormalisedPosMapID()	const { return quad_normalisedPosMap; }
-	GLuint quadHeightmapNormalisedPosMap()		const { return mNormalisedPosMap; }
-	void UpdateNormalisedPosMap(GLvoid *data) const {
-		const GLsizei dims = mEdgeLen;
-		glBindTexture(GL_TEXTURE_2D, mNormalisedPosMap);
-		checkGLError();
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, dims, dims, GL_RGB, GL_FLOAT, data);
-		checkGLError();
-		glBindTexture(GL_TEXTURE_2D, 0);
-		checkGLError();
-	}
-	
 
 private:
 	void createHeightmapData() {
@@ -601,25 +561,6 @@ public:
 	void GenerateMesh() {
 		mCentroid = glm::normalize(mClipCentroid);
 
-		{
-			////////////////////////////////////////////////////////////////
-			// 
-			glm::vec3 *vts = mContext.vertexs();
-			assert(nullptr!=vts);
-			const float fracStep = 1.0f/float(mContext.edgeLen()-1);
-			for (uint32_t y=0; y<mContext.edgeLen(); y++) {
-				for (uint32_t x=0; x<mContext.edgeLen(); x++) {
-					const float xfrac = float(x) * fracStep;
-					const float yfrac = float(y) * fracStep;
-					assert(xfrac<=1.0f && yfrac<=1.0f);
-					const glm::vec3 p = GetSpherePoint(xfrac, yfrac);
-					*(vts++) = p;
-				}
-			}
-			assert(vts == &mContext.vertexs()[mContext.edgeLen()*mContext.edgeLen()]);
-			mContext.UpdateNormalisedPosMap(mContext.vertexs());
-		}
-
 		// render the heightmap to a framebuffer
 		{
 			// bind the framebuffer
@@ -641,14 +582,8 @@ public:
 			glUniform3fv(mContext.quadHeightmapV1ID(),		1, &mV1[0]);
 			glUniform3fv(mContext.quadHeightmapV2ID(),		1, &mV2[0]);
 			glUniform3fv(mContext.quadHeightmapV3ID(),		1, &mV3[0]);
-			const float reciprocalFBOWidth = 1.0f/float(mContext.mFBO.Width());
+			const float reciprocalFBOWidth = 1.0f/float(mContext.mFBO.Width()-1);
 			glUniform1f(mContext.quadHeightmapFracStepID(), reciprocalFBOWidth);
-			glUniform1i(mContext.quadHeightmapNormalisedPosMapID(), 0); //Texture unit 0
-
-			// bind the heightmap texture
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, mContext.quadHeightmapNormalisedPosMap());
-			checkGLError();
 
 			// rendering our quad now should fill the render texture with the heightmap shaders output
 			mContext.renderQuad();
@@ -767,22 +702,22 @@ public:
 	}
 
 #ifdef _DEBUG
-	// in patch surface coords, [0,1]
-	inline glm::vec3 GetSpherePointDebug(const float x, const float y,
-		const glm::vec3 &V0, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3) const 
-	{
-		return glm::normalize((V0 + x*(1.0f-y)*(V1-V0) + x*y*(V2-V0) + (1.0f-x)*y*(V3-V0)));
-	}
+	//// in patch surface coords, [0,1]
+	//inline glm::vec3 GetSpherePointDebug(const float x, const float y,
+	//	const glm::vec3 &V0, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3) const 
+	//{
+	//	return glm::normalize((V0 + x*(1.0f-y)*(V1-V0) + x*y*(V2-V0) + (1.0f-x)*y*(V3-V0)));
+	//}
 
-	inline glm::vec3 AltGetSpherePointDebug(const float x, const float y,
-		const glm::vec3 &V0, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3) const 
-	{
-		// lerp ( a + t * (b - a) )
-		const glm::vec3 A = V0+x*(V1-V0);
-		const glm::vec3 B = V3+x*(V2-V3);
-		const glm::vec3 C = A+y*(B-A);
-		return glm::normalize(C);
-	}
+	//inline glm::vec3 AltGetSpherePointDebug(const float x, const float y,
+	//	const glm::vec3 &V0, const glm::vec3 &V1, const glm::vec3 &V2, const glm::vec3 &V3) const 
+	//{
+	//	// lerp ( a + t * (b - a) )
+	//	const glm::vec3 A = V0+x*(V1-V0);
+	//	const glm::vec3 B = V3+x*(V2-V3);
+	//	const glm::vec3 C = A+y*(B-A);
+	//	return glm::normalize(C);
+	//}
 
 	static void PopulateNormalisedPosMap(const GeoPatch* e, glm::vec3 *posMap, const uint32_t texDim)
 	{
@@ -1083,18 +1018,16 @@ public:
 
 	void Render()
 	{
-#if !TEST_CASE
 		if (kids[0]) {
 			for (int i=0; i<4; i++) {
 				kids[i]->Render();
 			}
 		} 
 		else 
-#endif
 		{
 #if TEST_CASE
 			//glm::vec4 patchColour(float(mDepth+1) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 0.0f, float(GEOPATCH_MAX_DEPTH-mDepth) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 1.0f);
-			static const glm::vec4 faceColours[6] = {
+			static const glm::vec4 patchColour[6] = {
 				glm::vec4(1.0f, 0.0f, 0.0f, 1.0f),	// problem child - red (meets purple & cyan)
 				glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),	// green
 				glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),	// blue
@@ -1102,9 +1035,11 @@ public:
 				glm::vec4(0.0f, 1.0f, 1.0f, 1.0f),	// cyan
 				glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)	// problem child - yellow (meets purple & blue)
 			};
-			glUniform4fv(mContext.patchColourID(), 1, &faceColours[getPatchFaceIdx()][0]);
+			glUniform4fv(mContext.patchColourID(), 1, &patchColour[getPatchFaceIdx()][0]);
 #else
-			glUniform4fv(mContext.patchColourID(), 1, &glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)[0]);
+			glm::vec4 patchColour(float(mDepth+1) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 0.0f, float(GEOPATCH_MAX_DEPTH-mDepth) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 1.0f);
+			//glm::vec4 patchColour(1.0f, 1.0f, 1.0f, 1.0f);
+			glUniform4fv(mContext.patchColourID(), 1, &patchColour[0]);
 #endif
 			glUniform3fv(mContext.patchV0ID(), 1, &mV0[0]);
 			glUniform3fv(mContext.patchV1ID(), 1, &mV1[0]);
@@ -1195,7 +1130,7 @@ public:
 				}
 #if defined(_DEBUG) && TEST_CASE
 				//CheckEdgeFriendsHeightmaps();
-				CheckEdgeFriendsEdgePositions();
+				//CheckEdgeFriendsEdgePositions();
 #endif
 			} else {
 				for (int i=0; i<4; i++) {
@@ -1271,7 +1206,7 @@ void GeoSphere::BuildFirstPatches()
 {
 	assert(nullptr==mGeoPatchContext);
 #if TEST_CASE
-	mGeoPatchContext = new GeoPatchContext(3);
+	mGeoPatchContext = new GeoPatchContext(5);
 #else
 	mGeoPatchContext = new GeoPatchContext(17);//33);
 #endif

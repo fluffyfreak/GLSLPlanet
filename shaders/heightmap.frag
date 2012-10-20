@@ -4,7 +4,6 @@ uniform vec3 v1;
 uniform vec3 v2;
 uniform vec3 v3;
 uniform float fracStep;
-uniform sampler2D normalisedPosMap;
 
 varying vec2 uv;
 
@@ -201,20 +200,15 @@ float billow_octavenoise(in int octaves, in float roughness, in float lacunarity
 
 // in patch surface coords, [0,1]
 // v[0] to v[3] are the corner vertices
-//vec3 GetSpherePoint(const float x, const float y) {
-//	return normalize(v0 + x*(1.0-y)*(v1-v0) + x*y*(v2-v0) + (1.0-x)*y*(v3-v0));
-//}
+vec3 GetSpherePoint(const float x, const float y) {
+	return normalize(v0 + x*(1.0-y)*(v1-v0) + x*y*(v2-v0) + (1.0-x)*y*(v3-v0));
+}
 
 void main()
 {
-	//vec2 uvfrac = texture2D(normalisedPosMap, uv).rg;	// floating point texture
-	//vec3 p = GetSpherePoint(uvfrac.x, uvfrac.y);
-
-	//float xfrac = (gl_FragCoord.x-0.5) * fracStep;
-	//float yfrac = (gl_FragCoord.y-0.5) * fracStep;
-	//vec3 p = GetSpherePoint(xfrac, yfrac);
-
-	vec3 p = texture2D(normalisedPosMap, uv).rgb;	// floating point texture
+	float xfrac = (gl_FragCoord.x-0.5) * fracStep;
+	float yfrac = (gl_FragCoord.y-0.5) * fracStep;
+	vec3 p = GetSpherePoint(xfrac, yfrac);
 
 	//smaller numbers give a larger feature size
 	float feature_size = 1.0;
