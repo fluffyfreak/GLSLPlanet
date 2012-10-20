@@ -1,11 +1,25 @@
 
-uniform vec3 v0;
-uniform vec3 v1;
-uniform vec3 v2;
-uniform vec3 v3;
-uniform float fracStep;
+#include "shader_heightmap.h"
 
-varying vec2 uv;
+// Include GLM
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+using namespace glm;
+
+vec3 v0;
+vec3 v1;
+vec3 v2;
+vec3 v3;
+float fracStep;
+
+void setUniforms(const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const float fracStep_)
+{
+	v0 =		v0_;
+	v1 =		v1_;
+	v2 =		v2_;
+	v3 =		v3_;
+	fracStep =	fracStep_;
+}
 
 //
 // Description : Array and textureless GLSL 2D/3D/4D simplex
@@ -47,12 +61,17 @@ float taylorInvSqrt(float r)
 vec4 grad4(float j, vec4 ip)
 {
     const vec4 ones = vec4(1.0, 1.0, 1.0, -1.0);
+	const vec3 one3 = vec3(1.0, 1.0, 1.0);
     vec4 p,s;
+	vec3 t;
 
-    p.xyz = floor( fract (vec3(j) * ip.xyz) * 7.0) * ip.z - 1.0;
-    p.w = 1.5 - dot(abs(p.xyz), ones.xyz);
+    t = floor( fract (vec3(j) * vec3(ip)) * 7.0f) * ip.z - 1.0f;
+    p.w = 1.5 - dot(abs(t), one3);
     s = vec4(lessThan(p, vec4(0.0)));
-    p.xyz = p.xyz + (s.xyz*2.0 - 1.0) * s.www;
+    t = t + (vec3(s)*2.0f - 1.0f) * s.w;
+	p.x = t.x;
+	p.y = t.y;
+	p.z = t.z;
 
     return p;
 }
@@ -69,20 +88,28 @@ float snoise(vec4 v)
 
 	// First corner
     vec4 i  = floor(v + dot(v, vec4(F4)) );
-    vec4 x0 = v -   i + dot(i, C.xxxx);
+    vec4 x0 = v -   i + dot(i, vec4(C.x));
 
 	// Other corners
 
 	// Rank sorting originally contributed by Bill Licea-Kane, AMD (formerly ATI)
     vec4 i0;
-    vec3 isX = step( x0.yzw, x0.xxx );
-    vec3 isYZ = step( x0.zww, x0.yyz );
+	const vec3 x0yzw = vec3(x0.y,x0.z,x0.w);
+	const vec3 x0zww = vec3(x0.z,x0.w,x0.w);
+	const vec3 x0yyz = vec3(x0.y,x0.y,x0.z);
+    vec3 isX = step( x0yzw, vec3(x0.x) );
+    vec3 isYZ = step( x0zww, x0yyz );
 	//  i0.x = dot( isX, vec3( 1.0 ) );
     i0.x = isX.x + isX.y + isX.z;
-    i0.yzw = 1.0 - isX;
+	const vec3 oneMinisX = 1.0f - isX;
+    i0.y = oneMinisX.x;
+	i0.z = oneMinisX.y;
+	i0.w = oneMinisX.z;
 	//  i0.y += dot( isYZ.xy, vec2( 1.0 ) );
     i0.y += isYZ.x + isYZ.y;
-    i0.zw += 1.0 - isYZ.xy;
+	const vec2 oneMinisYZ = 1.0f - vec2(isYZ);
+    i0.z += oneMinisYZ.x;
+	i0.w += oneMinisYZ.y;
     i0.z += isYZ.z;
     i0.w += 1.0 - isYZ.z;
 
@@ -96,10 +123,10 @@ float snoise(vec4 v)
     //  x2 = x0 - i2  + 2.0 * C.xxxx
     //  x3 = x0 - i3  + 3.0 * C.xxxx
     //  x4 = x0 - 1.0 + 4.0 * C.xxxx
-    vec4 x1 = x0 - i1 + C.xxxx;
-    vec4 x2 = x0 - i2 + C.yyyy;
-    vec4 x3 = x0 - i3 + C.zzzz;
-    vec4 x4 = x0 + C.wwww;
+    vec4 x1 = x0 - i1 + vec4(C.x);
+    vec4 x2 = x0 - i2 + vec4(C.y);
+    vec4 x3 = x0 - i3 + vec4(C.z);
+    vec4 x4 = x0 + vec4(C.w);
 
 	// Permutations
     i = mod289(i);
@@ -129,15 +156,15 @@ float snoise(vec4 v)
     p4 *= taylorInvSqrt(dot(p4,p4));
 
 	// Mix contributions from the five corners
-    vec3 m0 = max(0.6 - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0);
-    vec2 m1 = max(0.6 - vec2(dot(x3,x3), dot(x4,x4)            ), 0.0);
+    vec3 m0 = max(0.6f - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0f);
+    vec2 m1 = max(0.6f - vec2(dot(x3,x3), dot(x4,x4)            ), 0.0f);
     m0 = m0 * m0;
     m1 = m1 * m1;
     return 49.0 * ( dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))
                     + dot(m1*m1, vec2( dot( p3, x3 ), dot( p4, x4 ) ) ) ) ;
 }
 
-float octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float octavenoise(int octaves, float roughness, float lacunarity, vec3 p, float jizm, float time)
 {
     float n = 0.0;
     float octaveAmplitude = 1.0/(1.0-pow(roughness,(float(octaves))));
@@ -149,7 +176,7 @@ float octavenoise(in int octaves, in float roughness, in float lacunarity, in ve
     return (n+1.0)*0.5;
 }
 
-float combo_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float combo_octavenoise(int octaves, float roughness, float lacunarity, vec3 p, float jizm, float time)
 {
     float n = 0.0;
     float n1 = 0.0;
@@ -169,7 +196,7 @@ float combo_octavenoise(in int octaves, in float roughness, in float lacunarity,
     return n1;
 }
 
-float ridged_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float ridged_octavenoise(int octaves, float roughness, float lacunarity, vec3 p, float jizm, float time)
 {
     float n = 0.0;
     float octaveAmplitude = 1.0/(1.0-pow(roughness,(float(octaves))));
@@ -183,7 +210,7 @@ float ridged_octavenoise(in int octaves, in float roughness, in float lacunarity
     return(n*n);
 }
 
-float billow_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float billow_octavenoise(int octaves, float roughness, float lacunarity, vec3 p, float jizm, float time)
 {
     float n = 0.0;
     float octaveAmplitude = 1.0/(1.0-pow(roughness,(float(octaves))));
@@ -201,22 +228,22 @@ float billow_octavenoise(in int octaves, in float roughness, in float lacunarity
 // in patch surface coords, [0,1]
 // v[0] to v[3] are the corner vertices
 vec3 GetSpherePoint(const float x, const float y) {
-	return normalize(v0 + x*(1.0-y)*(v1-v0) + x*y*(v2-v0) + (1.0-x)*y*(v3-v0));
+	return normalize(v0 + x*(1.0f-y)*(v1-v0) + x*y*(v2-v0) + (1.0f-x)*y*(v3-v0));
 }
 
-void main()
+float shader_heightmap_frag(const glm::vec2 &gl_FragCoord)
 {
-	float xfrac = (gl_FragCoord.x-0.5) * fracStep;
-	float yfrac = (gl_FragCoord.y-0.5) * fracStep;
+	float xfrac = (gl_FragCoord.x-0.5f) * fracStep;
+	float yfrac = (gl_FragCoord.y-0.5f) * fracStep;
 	vec3 p = GetSpherePoint(xfrac, yfrac);
 
 	//smaller numbers give a larger feature size
-	float feature_size = 1.0;
-	float poo = octavenoise(3, 0.95, 2.0, p, feature_size, 1.0)/4.0;
-	poo *= ridged_octavenoise(3, 0.95, 2.0, p, feature_size*2.5, 0.25)/4.0;
-	poo += billow_octavenoise(3, 0.575, 2.0, p, feature_size*0.5, 1.333)/4.0;
-	poo += combo_octavenoise(3, 0.7, 2.0, p, feature_size*5.675, 3.0)/4.0;
+	float feature_size = 1.0f;
+	float poo = octavenoise(3, 0.95f, 2.0f, p, feature_size, 1.0f)/4.0f;
+	poo *= ridged_octavenoise(3, 0.95f, 2.0f, p, feature_size*2.5f, 0.25f)/4.0f;
+	poo += billow_octavenoise(3, 0.575f, 2.0f, p, feature_size*0.5f, 1.333f)/4.0f;
+	poo += combo_octavenoise(3, 0.7f, 2.0f, p, feature_size*5.675f, 3.0f)/4.0f;
 
-	float height = clamp(0.25+poo, 0.0, 1.0);
-	gl_FragColor = vec4(height, 0.0, 0.0, 1.0);
+	float height = clamp(0.25f+poo, 0.0f, 1.0f);
+	return height;
 } 
