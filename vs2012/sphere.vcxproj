@@ -21,6 +21,7 @@
     <ClCompile Include="..\GLSLPlanet.cpp" />
     <ClCompile Include="..\GLvbo.cpp" />
     <ClCompile Include="..\shaderHelper.cpp" />
+    <ClCompile Include="..\shader_heightmap.cpp" />
     <ClCompile Include="..\TerrainMesh.cpp" />
     <ClCompile Include="..\textfile.cpp" />
     <ClCompile Include="..\utils.cpp" />
@@ -31,6 +32,7 @@
     <ClInclude Include="..\GLprimitives.h" />
     <ClInclude Include="..\GLvbo.h" />
     <ClInclude Include="..\shaderHelper.h" />
+    <ClInclude Include="..\shader_heightmap.h" />
     <ClInclude Include="..\TerrainMesh.h" />
     <ClInclude Include="..\textfile.h" />
     <ClInclude Include="..\utils.h" />

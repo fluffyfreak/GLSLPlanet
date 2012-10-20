@@ -15,7 +15,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-#define TEST_CASE 0
+#define TEST_CASE 1
+
+#include "shader_heightmap.h"
 
 #define GEOPATCH_SUBDIVIDE_AT_CAMDIST	2.0f	//1.5f
 #if TEST_CASE
@@ -362,6 +364,8 @@ public:
 	inline uint32_t edgeLen() const { return mEdgeLen; }
 	inline uint32_t halfEdgeLen() const { return mHalfEdgeLen; }
 	
+	inline float meshLerpStep() const		{ return 1.0f/float(mEdgeLen-1); }
+	inline float textureLerpStep() const	{ return 1.0f/float(mEdgeLen-1); }
 
 private:
 	GLuint quad_heightmap_prog;// = 0;
@@ -432,7 +436,7 @@ public:
 		glUniformMatrix4fv(patch_ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
 		glUniformMatrix4fv(patch_ViewMatrixID,	1, GL_FALSE, &ViewMatrix[0][0]);
 
-		const float fracStep = 1.0f/float(edgeLen()-1);
+		const float fracStep = textureLerpStep();
 		glUniform1f(patch_fracStep, fracStep);
 		glUniform1f(patch_radius, 25.0f);
 		checkGLError();
@@ -582,7 +586,7 @@ public:
 			glUniform3fv(mContext.quadHeightmapV1ID(),		1, &mV1[0]);
 			glUniform3fv(mContext.quadHeightmapV2ID(),		1, &mV2[0]);
 			glUniform3fv(mContext.quadHeightmapV3ID(),		1, &mV3[0]);
-			const float reciprocalFBOWidth = 1.0f/float(mContext.mFBO.Width()-1);
+			const float reciprocalFBOWidth = mContext.textureLerpStep();
 			glUniform1f(mContext.quadHeightmapFracStepID(), reciprocalFBOWidth);
 
 			// rendering our quad now should fill the render texture with the heightmap shaders output
@@ -627,7 +631,7 @@ public:
 		glm::vec3 *vts = mContext.vertexs();
 		GLfloat *pUV = mContext.uvs();
 		assert(nullptr!=vts);
-		const float fracStep = 1.0f/float(mContext.edgeLen()-1);
+		const float fracStep = mContext.meshLerpStep();
 		for (uint32_t y=0; y<mContext.edgeLen(); y++) {
 			for (uint32_t x=0; x<mContext.edgeLen(); x++) {
 				const float xfrac = float(x) * fracStep;
@@ -748,7 +752,7 @@ public:
 				const float yfrac = float(y) * fracStep;
 				assert(xfrac>=0.0f && yfrac>=0.0f);
 				assert(xfrac<=1.0f && yfrac<=1.0f);
-				pEv[(texDim-1)-x] = e->GetSpherePoint(xfrac, yfrac);//posMapB[x];
+				pEv[(texDim-1)-x] = e->GetSpherePoint(xfrac, yfrac);
 			}
 			break;
 		case 1:
@@ -758,7 +762,7 @@ public:
 				const float yfrac = float(y) * fracStep;
 				assert(xfrac>=0.0f && yfrac>=0.0f);
 				assert(xfrac<=1.0f && yfrac<=1.0f);
-				pEv[(texDim-1)-y] = e->GetSpherePoint(xfrac, yfrac);//posMapB[x + y*texDim];
+				pEv[(texDim-1)-y] = e->GetSpherePoint(xfrac, yfrac);
 			}
 			break;
 		case 2:
@@ -768,7 +772,7 @@ public:
 				const float yfrac = float(y) * fracStep;
 				assert(xfrac>=0.0f && yfrac>=0.0f);
 				assert(xfrac<=1.0f && yfrac<=1.0f);
-				pEv[(texDim-1)-x] = e->GetSpherePoint(xfrac, yfrac);//posMapB[(texDim-1)-x + y*texDim];
+				pEv[(texDim-1)-x] = e->GetSpherePoint(xfrac, yfrac);
 			}
 			break;
 		case 3:
@@ -777,7 +781,7 @@ public:
 				const float yfrac = float((texDim-1)-y) * fracStep;
 				assert(xfrac>=0.0f && yfrac>=0.0f);
 				assert(xfrac<=1.0f && yfrac<=1.0f);
-				pEv[(texDim-1)-y] = e->GetSpherePoint(xfrac, yfrac);//posMapB[1 + ((texDim-1)-y)*texDim];
+				pEv[(texDim-1)-y] = e->GetSpherePoint(xfrac, yfrac);
 			}
 			break;
 		}
@@ -1187,10 +1191,15 @@ void GeoSphere::Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix
 	// individual patches will change settings to match their own parameters
 	mGeoPatchContext->UsePatchShader(ViewMatrix, ModelMatrix, MVP);
 
+#if TEST_CASE
+	mGeoPatches[0]->Render();	// red
+	mGeoPatches[2]->Render();	// blue
+#else
 	checkGLError();
 	for (int i=0; i<NUM_PATCHES; i++) {
 		mGeoPatches[i]->Render();
 	}
+#endif
 }
 
 static const int geo_sphere_edge_friends[6][4] = {
@@ -1206,9 +1215,9 @@ void GeoSphere::BuildFirstPatches()
 {
 	assert(nullptr==mGeoPatchContext);
 #if TEST_CASE
-	mGeoPatchContext = new GeoPatchContext(5);
+	mGeoPatchContext = new GeoPatchContext(9);
 #else
-	mGeoPatchContext = new GeoPatchContext(17);//33);
+	mGeoPatchContext = new GeoPatchContext(29);//33);
 #endif
 	assert(nullptr!=mGeoPatchContext);
 
