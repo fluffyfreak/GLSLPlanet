@@ -79,7 +79,7 @@ void GeoSphere::BuildFirstPatches()
 #if TEST_CASE
 	mGeoPatchContext = new GeoPatchContext(9);
 #else
-	mGeoPatchContext = new GeoPatchContext(29);//33);
+	mGeoPatchContext = new GeoPatchContext(29);
 #endif
 	assert(nullptr!=mGeoPatchContext);
 
