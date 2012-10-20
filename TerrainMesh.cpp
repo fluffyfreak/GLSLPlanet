@@ -15,7 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-#define TEST_CASE 0
+#define TEST_CASE 1
 
 #define GEOPATCH_SUBDIVIDE_AT_CAMDIST	2.0f	//1.5f
 #if TEST_CASE
@@ -801,6 +801,52 @@ public:
 		assert(vts == &posMap[texDim*texDim]);
 	}
 
+	static void GenerateEdgeHeights(const uint32_t edge, const GeoPatch* e, glm::vec3 *pEv, const uint32_t texDim, const float fracStep)
+	{
+		uint32_t x=0, y=0;
+		switch(edge)
+		{
+		case 0:
+			for (x=0; x<texDim; x++) {
+				const float xfrac = float(x) * fracStep;
+				const float yfrac = float(y) * fracStep;
+				assert(xfrac>=0.0f && yfrac>=0.0f);
+				assert(xfrac<=1.0f && yfrac<=1.0f);
+				pEv[(texDim-1)-x] = e->GetSpherePoint(xfrac, yfrac);//posMapB[x];
+			}
+			break;
+		case 1:
+			x = texDim-1;
+			for (y=0; y<texDim; y++) {
+				const float xfrac = float(x) * fracStep;
+				const float yfrac = float(y) * fracStep;
+				assert(xfrac>=0.0f && yfrac>=0.0f);
+				assert(xfrac<=1.0f && yfrac<=1.0f);
+				pEv[(texDim-1)-y] = e->GetSpherePoint(xfrac, yfrac);//posMapB[x + y*texDim];
+			}
+			break;
+		case 2:
+			y = texDim-1;
+			for (x=0; x<texDim; x++) {
+				const float xfrac = float((texDim-1)-x) * fracStep;
+				const float yfrac = float(y) * fracStep;
+				assert(xfrac>=0.0f && yfrac>=0.0f);
+				assert(xfrac<=1.0f && yfrac<=1.0f);
+				pEv[(texDim-1)-x] = e->GetSpherePoint(xfrac, yfrac);//posMapB[(texDim-1)-x + y*texDim];
+			}
+			break;
+		case 3:
+			for (y=0; y<texDim; y++) {
+				const float xfrac = float(x) * fracStep;
+				const float yfrac = float((texDim-1)-y) * fracStep;
+				assert(xfrac>=0.0f && yfrac>=0.0f);
+				assert(xfrac<=1.0f && yfrac<=1.0f);
+				pEv[(texDim-1)-y] = e->GetSpherePoint(xfrac, yfrac);//posMapB[1 + ((texDim-1)-y)*texDim];
+			}
+			break;
+		}
+	}
+
 	static void GetHeightmapData(const GLuint texID, float *dataOut)
 	{
 		glBindTexture(GL_TEXTURE_2D, texID);
@@ -811,7 +857,7 @@ public:
 		checkGLError();
 	}
 
-	void CheckEdgeFriendsEdges() const {
+	void CheckEdgeFriendsHeightmaps() const {
 		////////////////////////////////////////////////////////////////
 		// useful debugging stuff and one-time initialisation
 		static float *heightmapA = nullptr;
@@ -868,7 +914,7 @@ public:
 				break;
 			case 3:
 				for (y=0; y<texDim; y++) 
-					pEf[(texDim-1)-y] = heightmapB[1 + ((texDim-1)-y)*texDim];
+					pEf[(texDim-1)-y] = heightmapB[((texDim-1)-y)*texDim];
 				break;
 			default: 
 				assert(false && "this shouldn't happen");	
@@ -950,47 +996,6 @@ public:
 		for (int i=0; i<4; i++) {
 			const GeoPatch *e = edgeFriend[i];
 
-			if(faceIdx==0 && i==1) {
-				printf("");
-			}
-
-			// this is me attempting to figure out if the edges match up correctly
-			// this test isn't really valid yet!
-			bool badCornerMatch = false;
-			if(faceIdx==0) {
-				switch(i)
-				{
-				case 0:					badCornerMatch = (mV0 != e->mV1) || (mV1 != e->mV0);					break;
-				case 1:					badCornerMatch = (mV1 != e->mV1) || (mV2 != e->mV0);					break;
-				case 2:					badCornerMatch = (mV2 != e->mV1) || (mV3 != e->mV0);					break;
-				case 3:					badCornerMatch = (mV3 != e->mV1) || (mV0 != e->mV0);					break;
-				}
-			} else if(faceIdx==1) {
-				switch(i)
-				{
-				case 0:					badCornerMatch = (mV0 != e->mV3) || (mV1 != e->mV2);					break;
-				case 1:					badCornerMatch = (mV1 != e->mV3) || (mV2 != e->mV2);					break;
-				case 2:					badCornerMatch = (mV2 != e->mV3) || (mV3 != e->mV2);					break;
-				case 3:					badCornerMatch = (mV3 != e->mV3) || (mV0 != e->mV2);					break;
-				}
-			} else if(faceIdx==2) {
-				switch(i)
-				{
-				case 0:					badCornerMatch = (mV0 != e->mV0) || (mV1 != e->mV3);					break;
-				case 1:					badCornerMatch = (mV1 != e->mV0) || (mV2 != e->mV3);					break;
-				case 2:					badCornerMatch = (mV2 != e->mV0) || (mV3 != e->mV3);					break;
-				case 3:					badCornerMatch = (mV3 != e->mV0) || (mV0 != e->mV3);					break;
-				}
-			} else if(faceIdx==3) {
-				switch(i)
-				{
-				case 0:					badCornerMatch = (mV0 != e->mV2) || (mV1 != e->mV1);					break;
-				case 1:					badCornerMatch = (mV1 != e->mV2) || (mV2 != e->mV1);					break;
-				case 2:					badCornerMatch = (mV2 != e->mV2) || (mV3 != e->mV1);					break;
-				case 3:					badCornerMatch = (mV3 != e->mV2) || (mV0 != e->mV1);					break;
-				}
-			}
-
 			////////////////////////////////////////////////////////////////
 			// populate the position map for the edgeFriend[i] quad
 			PopulateNormalisedPosMap(e, posMapB, texDim);
@@ -1016,7 +1021,7 @@ public:
 				break;
 			case 3:
 				for (y=0; y<texDim; y++) 
-					pEv[(texDim-1)-y] = posMapB[1 + ((texDim-1)-y)*texDim];
+					pEv[(texDim-1)-y] = posMapB[((texDim-1)-y)*texDim];
 				break;
 			default: 
 				assert(false && "this shouldn't happen");	
@@ -1024,7 +1029,7 @@ public:
 			}
 			
 			// performed on our data
-			// compares neighbours data (in pEf) to our own edge data
+			// compares neighbours data (in pEv) to our own edge data
 			bool badPos = false;
 			switch(i)
 			{
@@ -1188,7 +1193,7 @@ public:
 					edgeFriend[i]->NotifyEdgeFriendSplit(this);
 				}
 #if defined(_DEBUG) && TEST_CASE
-				CheckEdgeFriendsEdges();
+				//CheckEdgeFriendsHeightmaps();
 				CheckEdgeFriendsEdgePositions();
 #endif
 			} else {
@@ -1265,7 +1270,7 @@ void GeoSphere::BuildFirstPatches()
 {
 	assert(nullptr==mGeoPatchContext);
 #if TEST_CASE
-	mGeoPatchContext = new GeoPatchContext(3);//33);
+	mGeoPatchContext = new GeoPatchContext(5);//33);
 #else
 	mGeoPatchContext = new GeoPatchContext(33);
 #endif
