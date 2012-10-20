@@ -9,13 +9,13 @@
 
 #include <vector>
 
-#define TEST_CASE 0
+#define TEST_CASE 1
 
 #include "shader_heightmap.h"
 
 #define GEOPATCH_SUBDIVIDE_AT_CAMDIST	2.0f	//1.5f
 #if TEST_CASE
-#define GEOPATCH_MAX_DEPTH  4
+#define GEOPATCH_MAX_DEPTH  7
 #else
 #define GEOPATCH_MAX_DEPTH  10
 #endif

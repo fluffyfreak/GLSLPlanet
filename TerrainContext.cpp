@@ -15,6 +15,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
+#if TEST_CASE
+#define USE_CPP_HEIGHTMAP_SHADER 1
+#else
+#define USE_CPP_HEIGHTMAP_SHADER 0
+#endif
+
+#if USE_CPP_HEIGHTMAP_SHADER
+#include "shader_heightmap.h"
+#endif
+
 int GeoPatchContext::getIndices(std::vector<unsigned short> &pl, const unsigned int edge_hi_flags,
 	unsigned short *midIndices, unsigned short *loEdgeIndices[4], unsigned short *hiEdgeIndices[4]) const
 {
@@ -302,6 +312,19 @@ GeoPatchContext::~GeoPatchContext() {
 // render the heightmap to a framebuffer
 void GeoPatchContext::renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3) const
 {
+#if USE_CPP_HEIGHTMAP_SHADER
+	const float fracStep = textureLerpStep();
+	NCppHeightmapShader::setUniforms(v0, v1, v2, v3, fracStep);
+
+	for (uint32_t y=0; y<mEdgeLen; y++) {
+		for (uint32_t x=0; x<mEdgeLen; x++) {
+			const float xfrac = float(x) * fracStep;
+			const float yfrac = float(y) * fracStep;
+			const float blah = NCppHeightmapShader::shader_heightmap_frag(vec2(float(x)+0.5f, float(y)+0.5f));
+			mpHeightmapData[x + (y * mEdgeLen)] = blah;
+		}
+	}
+#else
 	// bind the framebuffer
 	ScopedBindRelease<CGLfbo> fbo(mFBO);
 
@@ -328,6 +351,7 @@ void GeoPatchContext::renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, 
 	renderQuad();
 
 	// the framebuffer is automatically released
+#endif
 }
 
 void GeoPatchContext::renderQuad() const
@@ -347,7 +371,9 @@ void GeoPatchContext::createHeightmapData() {
 
 float* GeoPatchContext::getHeightmapData() const {
 	assert(mpHeightmapData);
+#if !USE_CPP_HEIGHTMAP_SHADER
 	mFBO.GetData(mpHeightmapData);
+#endif
 	return mpHeightmapData;
 }
 

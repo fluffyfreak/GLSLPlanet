@@ -7,7 +7,10 @@
 // Include GLM
 #include <glm/glm.hpp>
 
-float shader_heightmap_frag(const glm::vec2 &gl_FragCoord);
-void setUniforms(const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const float fracStep_);
+namespace NCppHeightmapShader
+{
+	float shader_heightmap_frag(const glm::vec2 &gl_FragCoord);
+	void setUniforms(const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const float fracStep_);
+};
 
 #endif // __SHADER_HEIGHTMAP_H__
