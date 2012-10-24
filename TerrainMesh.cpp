@@ -40,10 +40,13 @@ void GeoSphere::Update(const glm::vec3 &campos)
 {
 	if(nullptr==mGeoPatches[0]) {
 		BuildFirstPatches();
-	} else {
+	} else if(mSplitRequestDescriptions.size()==0) {
+		ProcessSplitResults();
 		for (int i=0; i<NUM_PATCHES; i++) {
 			mGeoPatches[i]->LODUpdate(campos);
 		}
+	} else {
+		ProcessSplitRequests();
 	}
 }
 
@@ -63,6 +66,80 @@ void GeoSphere::Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix
 	}
 #endif
 }
+
+bool GeoSphere::AddSplitRequest(const SSplitRequestDescription &desc)
+{
+	if(mSplitRequestDescriptions.size()<MAX_SPLIT_REQUESTS) {
+		mSplitRequestDescriptions.push_back(desc);
+		return true;
+	}
+	return false;
+}
+
+void GeoSphere::ProcessSplitRequests(const uint32_t processNumRequests)
+{
+	if(mSplitRequestDescriptions.size()==0) {
+		return;
+	}
+
+	for(uint32_t i=0; i<processNumRequests; i++)
+	{
+		const SSplitRequestDescription srd = mSplitRequestDescriptions[0];
+		mSplitRequestDescriptions.pop_front();
+
+		SSplitResult sr(srd.v0, srd.v1, srd.v2, srd.v3, srd.depth, srd.patchID);
+
+		{
+			// Now we need to create the texture which will contain the heightmap. 
+			glGenTextures(1, &sr.texID);
+			checkGLError();
+ 
+			// Bind the newly created texture : all future texture functions will modify this texture
+			glBindTexture(GL_TEXTURE_2D, sr.texID);
+			checkGLError();
+ 
+			// Create the texture itself without any data
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, 
+				mGeoPatchContext->fboWidth(), mGeoPatchContext->fboWidth(), 
+				0, GL_LUMINANCE, GL_FLOAT, nullptr);
+			checkGLError();
+		
+			// Bad filtering needed
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			checkGLError();
+
+			// render the heightmap to a framebuffer.
+			mGeoPatchContext->renderHeightmap(srd.v0, srd.v1, srd.v2, srd.v3, sr.texID);
+		}
+
+		// store result
+		mSplitResult.push_back( sr );
+	}
+}
+
+void GeoSphere::ProcessSplitResults()
+{
+	while(mSplitResult.size()>=4)
+	{
+		// finally pass SplitResults
+		const int faceIdx = mSplitResult[0].patchID.GetPatchFaceIdx();
+		mGeoPatches[faceIdx]->ReceiveHeightmaps( 
+			mSplitResult[0], 
+			mSplitResult[1],
+			mSplitResult[2],
+			mSplitResult[3] );
+		mSplitResult.pop_front();
+		mSplitResult.pop_front();
+		mSplitResult.pop_front();
+		mSplitResult.pop_front();
+	}
+	mSplitResult.clear();
+}
+
 
 static const int geo_sphere_edge_friends[6][4] = {
 	{ 3, 4, 1, 2 },
@@ -93,13 +170,41 @@ void GeoSphere::BuildFirstPatches()
 	static const glm::vec3 p7 = glm::normalize(glm::vec3(-1,-1,-1));
 	static const glm::vec3 p8 = glm::normalize(glm::vec3( 1,-1,-1));
 
-	const uint64_t maxShiftDepth = (GEOPATCH_MAX_DEPTH+1)*2;
+	const uint64_t maxShiftDepth = GeoPatchID::MAX_SHIFT_DEPTH;
+	SSplitRequestDescription desc0(p1, p2, p3, p4, 0, (0i64 << maxShiftDepth));
+	SSplitRequestDescription desc1(p4, p3, p7, p8, 0, (1i64 << maxShiftDepth));
+	SSplitRequestDescription desc2(p1, p4, p8, p5, 0, (2i64 << maxShiftDepth));
+	SSplitRequestDescription desc3(p2, p1, p5, p6, 0, (3i64 << maxShiftDepth));
+	SSplitRequestDescription desc4(p3, p2, p6, p7, 0, (4i64 << maxShiftDepth));
+	SSplitRequestDescription desc5(p8, p7, p6, p5, 0, (5i64 << maxShiftDepth));
+	AddSplitRequest(desc0);
+	AddSplitRequest(desc1);
+	AddSplitRequest(desc2);
+	AddSplitRequest(desc3);
+	AddSplitRequest(desc4);
+	AddSplitRequest(desc5);
+
+	ProcessSplitRequests( 6 );
+
 	mGeoPatches[0] = new GeoPatch(*mGeoPatchContext, this, p1, p2, p3, p4, 0, (0i64 << maxShiftDepth));
 	mGeoPatches[1] = new GeoPatch(*mGeoPatchContext, this, p4, p3, p7, p8, 0, (1i64 << maxShiftDepth));
 	mGeoPatches[2] = new GeoPatch(*mGeoPatchContext, this, p1, p4, p8, p5, 0, (2i64 << maxShiftDepth));
 	mGeoPatches[3] = new GeoPatch(*mGeoPatchContext, this, p2, p1, p5, p6, 0, (3i64 << maxShiftDepth));
 	mGeoPatches[4] = new GeoPatch(*mGeoPatchContext, this, p3, p2, p6, p7, 0, (4i64 << maxShiftDepth));
 	mGeoPatches[5] = new GeoPatch(*mGeoPatchContext, this, p8, p7, p6, p5, 0, (5i64 << maxShiftDepth));
+
+	//ProcessSplitResults();
+	assert(mSplitResult.size()==6);
+	std::deque<SSplitResult>::const_iterator iter = mSplitResult.begin();
+	while(iter!=mSplitResult.end())
+	{
+		// finally pass SplitResults
+		const int faceIdx = (*iter).patchID.GetPatchFaceIdx();
+		mGeoPatches[faceIdx]->ReceiveHeightmapTex( (*iter).texID );
+		++iter;
+	}
+	mSplitResult.clear();
+
 	for (int i=0; i<NUM_PATCHES; i++) {
 		for (int j=0; j<4; j++) {
 			mGeoPatches[i]->edgeFriend[j] = mGeoPatches[geo_sphere_edge_friends[i][j]];
@@ -166,7 +271,6 @@ void GeoSphere::SetupDebugRendering()
 	for (int i=0; i<6; i++) {
 		cubeTextures[i] = mGeoPatches[i]->getHeightmapID();
 	}
-//	mpCube = new CGLcube(false, true, cubeTextures, faceColours, simple_colour);
 
 	// load the shaders
 	////////////////////////////////////////////////////////////////

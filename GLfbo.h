@@ -24,7 +24,8 @@ public:
 	inline uint32_t Width()	const { return mWidth; }
 	inline uint32_t Height()	const { return mHeight; }
 
-	void GetData(float *data) const;
+	//void GetData(float *data) const;
+	void CopyTexture(const uint32_t target) const;
 };
 
 #endif // __glfbo_h__

@@ -9,17 +9,7 @@
 #include "glee.h"
 #include <gl\GLU.h>
 
-inline void checkGLError()
-{
-	GLenum err = glGetError();
-	if( err ) {
-		const char * errmsg = (const char *)gluErrorString(err);
-		if( errmsg == nullptr )
-			printf("[%s line %d] GL Error: Unknown\n", __FILE__, __LINE__);
-		else
-			printf("[%s line %d] GL Error: %s\n", __FILE__, __LINE__, errmsg);
-	}
-}
+void checkGLError();
 
 template<class T> inline const T& Clamp(const T& x, const T& min, const T& max) { return x > max ? max : (x < min ? min : x); }
 

@@ -63,7 +63,7 @@ int GeoPatchContext::getIndices(std::vector<unsigned short> &pl, const unsigned 
 
 // constructor
 GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) : 
-	mpHeightmapData(nullptr), mEdgeLen(edgeLen), mHalfEdgeLen(edgeLen>>1), 
+	mEdgeLen(edgeLen), mHalfEdgeLen(edgeLen>>1), 
 	mQuad(false, true), mFBO(edgeLen,edgeLen)//, mVBO(nullptr)
 {
 	mVertexs = new glm::vec3[NUM_MESH_VERTS()];
@@ -249,9 +249,6 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		}
 	}
 
-	// temporary buffer where we'll retrieve the generated textures data into
-	createHeightmapData();
-
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader
 	LoadShader(quad_heightmap_prog, "heightmap", "heightmap");
@@ -310,7 +307,9 @@ GeoPatchContext::~GeoPatchContext() {
 }
 
 // render the heightmap to a framebuffer
-void GeoPatchContext::renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3) const
+void GeoPatchContext::renderHeightmap(
+	const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3, 
+	const uint32_t targetTex) const
 {
 #if USE_CPP_HEIGHTMAP_SHADER
 	const float fracStep = textureLerpStep();
@@ -350,6 +349,8 @@ void GeoPatchContext::renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, 
 	// rendering our quad now should fill the render texture with the heightmap shaders output
 	renderQuad();
 
+	mFBO.CopyTexture(targetTex);
+
 	// the framebuffer is automatically released
 #endif
 }
@@ -358,23 +359,6 @@ void GeoPatchContext::renderQuad() const
 {
 	mQuad.Render();
 	checkGLError();
-}
-
-void GeoPatchContext::createHeightmapData() {
-	if(mpHeightmapData) {
-		delete [] mpHeightmapData;
-		mpHeightmapData = nullptr;
-	}
-	mpHeightmapData = new float[(int)(edgeLen() * edgeLen())];
-	memset(mpHeightmapData,0,sizeof(float)*(int)(edgeLen() * edgeLen()));
-}
-
-float* GeoPatchContext::getHeightmapData() const {
-	assert(mpHeightmapData);
-#if !USE_CPP_HEIGHTMAP_SHADER
-	mFBO.GetData(mpHeightmapData);
-#endif
-	return mpHeightmapData;
 }
 
 void GeoPatchContext::UsePatchShader(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix, const glm::mat4 &MVP) const {

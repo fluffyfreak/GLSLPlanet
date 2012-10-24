@@ -4,6 +4,8 @@
 #ifndef __TERRAINPATCH_H__
 #define __TERRAINPATCH_H__
 
+#include "TerrainPatchID.h"
+
 // fwd decl's
 class CGLvbo;
 
@@ -14,7 +16,7 @@ private:
 	// private members
 
 	const GeoPatchContext &mContext;
-	const GeoSphere *mpGeoSphere;
+	GeoSphere *mpGeoSphere;
 	CGLvbo *mVBO;
 	GLuint mHeightmap;
 	const glm::vec3 mV0, mV1, mV2, mV3;	// corner vertices for the patch
@@ -24,13 +26,8 @@ private:
 	float mClipRadius;
 	float mRoughLength;
 
-	typedef uint64_t TGeoPatchID;
-	const uint64_t mPatchID64;
-
-	TGeoPatchID calculateNextPatchID(const int depth, const int idx) const;
-	int getPatchIdx(const int depth) const;
-	int getPatchFaceIdx() const;
-	
+	const GeoPatchID mPatchID;
+	bool mHasSplitRequest;
 
 public:
 	////////////////////////////////////////////////////////////////
@@ -48,9 +45,9 @@ public:
 	// public methods
 
 	// constructor
-	GeoPatch(const GeoPatchContext &context_, const GeoSphere *pGeoSphere_, 
+	GeoPatch(const GeoPatchContext &context_, GeoSphere *pGeoSphere_, 
 		const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, 
-		const uint32_t depth_, const TGeoPatchID ID_);
+		const uint32_t depth_, const GeoPatchID &ID_);
 
 	// destructor
 	~GeoPatch();
@@ -62,6 +59,9 @@ public:
 
 	// Generates full-detail vertices, and also non-edge normals and colors
 	void GenerateMesh();
+
+	void ReceiveHeightmaps(const SSplitResult &s1, const SSplitResult &s2, const SSplitResult &s3, const SSplitResult &s4);
+	void ReceiveHeightmapTex(const GLuint tex);
 
 	inline void OnEdgeFriendChanged(const int edge, GeoPatch *e) {
 		edgeFriend[edge] = e;

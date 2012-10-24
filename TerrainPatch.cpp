@@ -17,40 +17,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
-GeoPatch::TGeoPatchID GeoPatch::calculateNextPatchID(const int depth, const int idx) const
-{
-	assert(idx>=0 && idx<4);
-	assert(depth<=GEOPATCH_MAX_DEPTH);
-	const uint64_t idx64 = idx;
-	const uint64_t shiftDepth64 = depth*2ULL;
-	assert((mPatchID64 & (3i64<<shiftDepth64))==0);
-	return TGeoPatchID( mPatchID64 | (idx64<<shiftDepth64) );
-}
-
-int GeoPatch::getPatchIdx(const int depth) const
-{
-	assert(depth<=GEOPATCH_MAX_DEPTH);
-	const uint64_t shiftDepth64 = depth*2ULL;
-	const uint64_t idx64 = (mPatchID64 & (3i64<<shiftDepth64)) >> shiftDepth64;
-	assert(idx64<=UINT_MAX);
-	return int(idx64);
-}
-
-int GeoPatch::getPatchFaceIdx() const
-{
-	const uint64_t maxShiftDepth = (GEOPATCH_MAX_DEPTH+1)*2;
-	const int res = (mPatchID64 & (7i64 << maxShiftDepth)) >> maxShiftDepth;
-	assert(res>=0 && res<6);
-	return res;
-}
-
 // constructor
-GeoPatch::GeoPatch(const GeoPatchContext &context_, const GeoSphere *pGeoSphere_, 
+GeoPatch::GeoPatch(const GeoPatchContext &context_, GeoSphere *pGeoSphere_, 
 	const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, 
-	const uint32_t depth_, const TGeoPatchID ID_)
+	const uint32_t depth_, const GeoPatchID &ID_)
 	: mContext(context_), mpGeoSphere(pGeoSphere_), mHeightmap(0), mVBO(nullptr), mV0(v0_), mV1(v1_), mV2(v2_), mV3(v3_), 
 	mClipCentroid((v0_+v1_+v2_+v3_) * 0.25f), mDepth(depth_), mClipRadius(0.0f), mRoughLength(0.0f), 
-	mPatchID64(ID_), parent(nullptr)
+	mPatchID(ID_), mHasSplitRequest(false), parent(nullptr)
 {
 	for (int i=0; i<NUM_KIDS; i++) {
 		edgeFriend[i]	= nullptr;
@@ -97,35 +70,6 @@ GeoPatch::~GeoPatch()
 void GeoPatch::GenerateMesh() {
 	mCentroid = glm::normalize(mClipCentroid);
 
-	// render the heightmap to a framebuffer
-	mContext.renderHeightmap(mV0, mV1, mV2, mV3);
-
-	//download generated heightmap
-	const float* heightmap_ = mContext.getHeightmapData();
-
-	// Now we need to create the texture which will contain the heightmap. 
-	glGenTextures(1, &mHeightmap);
-	checkGLError();
- 
-	// Bind the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, mHeightmap);
-	checkGLError();
- 
-	// Give the heightmap values to OpenGL ( the last parameter )
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, mContext.fboWidth(), mContext.fboWidth(), 0, GL_LUMINANCE, GL_FLOAT, heightmap_);
-	checkGLError();
-		
-	// Bad filtering needed
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	checkGLError();
-
-	// release the texture binding
-	glBindTexture(GL_TEXTURE_2D, 0);
-
 	////////////////////////////////////////////////////////////////
 	// Create the base mesh that the heightmap will modify
 	glm::vec3 *vts = mContext.vertexs();
@@ -150,6 +94,65 @@ void GeoPatch::GenerateMesh() {
 	// now create the VBO
 	assert(nullptr==mVBO);
 	mVBO = new CGLvbo( mContext.NUM_MESH_VERTS(), &mContext.vertexs()[0], nullptr, mContext.uvs() );
+}
+
+void GeoPatch::ReceiveHeightmaps(
+	const SSplitResult &s1, 
+	const SSplitResult &s2,
+	const SSplitResult &s3, 
+	const SSplitResult &s4)
+{
+	if (mDepth<s1.depth) {
+		const uint32_t kidIdx = s1.patchID.GetPatchIdx(mDepth+1);
+		kids[kidIdx]->ReceiveHeightmaps(s1, s2, s3, s4);
+	} else {
+		const int nD = mDepth+1;
+		kids[0] = new GeoPatch(mContext, mpGeoSphere, s1.v0, s1.v1, s1.v2, s1.v3, nD, mPatchID.NextPatchID(nD,0));
+		kids[1] = new GeoPatch(mContext, mpGeoSphere, s2.v0, s2.v1, s2.v2, s2.v3, nD, mPatchID.NextPatchID(nD,1));
+		kids[2] = new GeoPatch(mContext, mpGeoSphere, s3.v0, s3.v1, s3.v2, s3.v3, nD, mPatchID.NextPatchID(nD,2));
+		kids[3] = new GeoPatch(mContext, mpGeoSphere, s4.v0, s4.v1, s4.v2, s4.v3, nD, mPatchID.NextPatchID(nD,3));
+
+		kids[0]->ReceiveHeightmapTex(s1.texID);
+		kids[1]->ReceiveHeightmapTex(s2.texID);
+		kids[2]->ReceiveHeightmapTex(s3.texID);
+		kids[3]->ReceiveHeightmapTex(s4.texID);
+
+		// hm.. edges. Not right to pass this
+		// edgeFriend...
+		kids[0]->edgeFriend[0] = GetEdgeFriendForKid(0, 0);
+		kids[0]->edgeFriend[1] = kids[1];
+		kids[0]->edgeFriend[2] = kids[3];
+		kids[0]->edgeFriend[3] = GetEdgeFriendForKid(0, 3);
+		kids[1]->edgeFriend[0] = GetEdgeFriendForKid(1, 0);
+		kids[1]->edgeFriend[1] = GetEdgeFriendForKid(1, 1);
+		kids[1]->edgeFriend[2] = kids[2];
+		kids[1]->edgeFriend[3] = kids[0];
+		kids[2]->edgeFriend[0] = kids[1];
+		kids[2]->edgeFriend[1] = GetEdgeFriendForKid(2, 1);
+		kids[2]->edgeFriend[2] = GetEdgeFriendForKid(2, 2);
+		kids[2]->edgeFriend[3] = kids[3];
+		kids[3]->edgeFriend[0] = kids[0];
+		kids[3]->edgeFriend[1] = kids[2];
+		kids[3]->edgeFriend[2] = GetEdgeFriendForKid(3, 2);
+		kids[3]->edgeFriend[3] = GetEdgeFriendForKid(3, 3);
+		kids[0]->parent = kids[1]->parent = kids[2]->parent = kids[3]->parent = this;
+		for (int i=0; i<4; i++) {
+			kids[i]->GenerateMesh();
+		}
+		for (int i=0; i<4; i++) {
+			edgeFriend[i]->NotifyEdgeFriendSplit(this);
+		}
+#if defined(_DEBUG) && TEST_CASE
+		//CheckEdgeFriendsHeightmaps();
+		//CheckEdgeFriendsEdgePositions();
+#endif
+		mHasSplitRequest = false;
+	}
+}
+
+void GeoPatch::ReceiveHeightmapTex(const GLuint tex)
+{
+	mHeightmap = tex;
 }
 
 #ifdef _DEBUG
@@ -217,7 +220,7 @@ void GeoPatch::CheckEdgeFriendsHeightmaps() const {
 			break;
 		}
 
-		const int faceIdx = getPatchFaceIdx();
+		const int faceIdx = mPatchID.GetPatchFaceIdx();
 		// performed on our data
 		// compares neighbours data (in pEf) to our own edge data
 		bool badVerts = false;
@@ -288,7 +291,7 @@ void GeoPatch::CheckEdgeFriendsEdgePositions() const {
 		we_are[i] = edgeFriend[i]->GetEdgeIdxOf(this);
 	}
 
-	const int faceIdx = getPatchFaceIdx();
+	const int faceIdx = mPatchID.GetPatchFaceIdx();
 	for (int i=0; i<4; i++) {
 		const GeoPatch *e = edgeFriend[i];
 
@@ -395,7 +398,7 @@ void GeoPatch::Render()
 			glm::vec4(0.0f, 1.0f, 1.0f, 1.0f),	// cyan
 			glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)	// problem child - yellow (meets purple & blue)
 		};
-		glUniform4fv(mContext.patchColourID(), 1, &patchColour[getPatchFaceIdx()][0]);
+		glUniform4fv(mContext.patchColourID(), 1, &patchColour[GetPatchFaceIdx()][0]);
 #else
 		glm::vec4 patchColour(float(mDepth+1) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 0.0f, float(GEOPATCH_MAX_DEPTH-mDepth) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 1.0f);
 		//glm::vec4 patchColour(1.0f, 1.0f, 1.0f, 1.0f);
@@ -430,6 +433,9 @@ void GeoPatch::Render()
 }
 
 void GeoPatch::LODUpdate(const glm::vec3 &campos) {
+	// there should be no LODUpdate'ing when we have active split requests
+	assert(!mHasSplitRequest);
+
 	bool canSplit = true;
 	// always split at first level
 	if (parent) {
@@ -452,46 +458,21 @@ void GeoPatch::LODUpdate(const glm::vec3 &campos) {
 
 	if (canSplit) {
 		if (!kids[0]) {
+			mHasSplitRequest = true;
 			const glm::vec3 v01	= glm::normalize(mV0+mV1);
 			const glm::vec3 v12	= glm::normalize(mV1+mV2);
 			const glm::vec3 v23	= glm::normalize(mV2+mV3);
 			const glm::vec3 v30	= glm::normalize(mV3+mV0);
 			const glm::vec3 cn	= glm::normalize(mCentroid);
-			//const glm::vec3 cn = glm::normalize((v01+v12)+(v23+v30));
-			const int newDepth = mDepth+1;
-			kids[0] = new GeoPatch(mContext, mpGeoSphere, mV0, v01, cn, v30, newDepth, calculateNextPatchID(newDepth,0));
-			kids[1] = new GeoPatch(mContext, mpGeoSphere, v01, mV1, v12, cn, newDepth, calculateNextPatchID(newDepth,1));
-			kids[2] = new GeoPatch(mContext, mpGeoSphere, cn, v12, mV2, v23, newDepth, calculateNextPatchID(newDepth,2));
-			kids[3] = new GeoPatch(mContext, mpGeoSphere, v30, cn, v23, mV3, newDepth, calculateNextPatchID(newDepth,3));
 			// hm.. edges. Not right to pass this
-			// edgeFriend...
-			kids[0]->edgeFriend[0] = GetEdgeFriendForKid(0, 0);
-			kids[0]->edgeFriend[1] = kids[1];
-			kids[0]->edgeFriend[2] = kids[3];
-			kids[0]->edgeFriend[3] = GetEdgeFriendForKid(0, 3);
-			kids[1]->edgeFriend[0] = GetEdgeFriendForKid(1, 0);
-			kids[1]->edgeFriend[1] = GetEdgeFriendForKid(1, 1);
-			kids[1]->edgeFriend[2] = kids[2];
-			kids[1]->edgeFriend[3] = kids[0];
-			kids[2]->edgeFriend[0] = kids[1];
-			kids[2]->edgeFriend[1] = GetEdgeFriendForKid(2, 1);
-			kids[2]->edgeFriend[2] = GetEdgeFriendForKid(2, 2);
-			kids[2]->edgeFriend[3] = kids[3];
-			kids[3]->edgeFriend[0] = kids[0];
-			kids[3]->edgeFriend[1] = kids[2];
-			kids[3]->edgeFriend[2] = GetEdgeFriendForKid(3, 2);
-			kids[3]->edgeFriend[3] = GetEdgeFriendForKid(3, 3);
-			kids[0]->parent = kids[1]->parent = kids[2]->parent = kids[3]->parent = this;
-			for (int i=0; i<4; i++) {
-				kids[i]->GenerateMesh();
-			}
-			for (int i=0; i<4; i++) {
-				edgeFriend[i]->NotifyEdgeFriendSplit(this);
-			}
-#if defined(_DEBUG) && TEST_CASE
-			//CheckEdgeFriendsHeightmaps();
-			//CheckEdgeFriendsEdgePositions();
-#endif
+			SSplitRequestDescription desc0(mV0, v01, cn, v30, mDepth, mPatchID);
+			SSplitRequestDescription desc1(v01, mV1, v12, cn, mDepth, mPatchID);
+			SSplitRequestDescription desc2(cn, v12, mV2, v23, mDepth, mPatchID);
+			SSplitRequestDescription desc3(v30, cn, v23, mV3, mDepth, mPatchID);
+			mpGeoSphere->AddSplitRequest(desc0);
+			mpGeoSphere->AddSplitRequest(desc1);
+			mpGeoSphere->AddSplitRequest(desc2);
+			mpGeoSphere->AddSplitRequest(desc3);
 		} else {
 			for (int i=0; i<4; i++) {
 				kids[i]->LODUpdate(campos);

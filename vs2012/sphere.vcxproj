@@ -25,6 +25,7 @@
     <ClCompile Include="..\TerrainContext.cpp" />
     <ClCompile Include="..\TerrainMesh.cpp" />
     <ClCompile Include="..\TerrainPatch.cpp" />
+    <ClCompile Include="..\TerrainPatchID.cpp" />
     <ClCompile Include="..\textfile.cpp" />
     <ClCompile Include="..\utils.cpp" />
   </ItemGroup>
@@ -38,6 +39,7 @@
     <ClInclude Include="..\TerrainContext.h" />
     <ClInclude Include="..\TerrainMesh.h" />
     <ClInclude Include="..\TerrainPatch.h" />
+    <ClInclude Include="..\TerrainPatchID.h" />
     <ClInclude Include="..\textfile.h" />
     <ClInclude Include="..\utils.h" />
     <ClInclude Include="..\vcacheopt.h" />

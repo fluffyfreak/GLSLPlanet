@@ -6,7 +6,10 @@
 
 // Include GLEE
 #include "glee.h"
-#include <vector>
+
+#include "TerrainPatchID.h"
+
+#include <deque>
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -21,10 +24,42 @@ class GeoPatchContext;
 	class CGLcube;
 #endif
 
-struct GLFramebufferObjectParams {
-    int width, height, nColorAttachments, nSamples, nCSamples;
-    bool hasDepth;
-    GLenum format, depthFormat, type;
+struct SSplitRequestDescription {
+	SSplitRequestDescription(const glm::vec3 &v0_,
+							const glm::vec3 &v1_,
+							const glm::vec3 &v2_,
+							const glm::vec3 &v3_,
+							const uint32_t depth_,
+							const GeoPatchID patchID_)
+							: v0(v0_), v1(v1_), v2(v2_), v3(v3_), depth(depth_), patchID(patchID_)
+	{
+	}
+
+	const glm::vec3 v0;
+	const glm::vec3 v1;
+	const glm::vec3 v2;
+	const glm::vec3 v3;
+	const uint32_t depth;
+	const GeoPatchID patchID;
+};
+
+struct SSplitResult {
+	SSplitResult(const glm::vec3 &v0_,
+				const glm::vec3 &v1_,
+				const glm::vec3 &v2_,
+				const glm::vec3 &v3_,
+				const uint32_t depth_,
+				const GeoPatchID patchID_)
+				: v0(v0_), v1(v1_), v2(v2_), v3(v3_), depth(depth_), patchID(patchID_)
+	{
+	}
+	GLuint texID;
+	const glm::vec3 v0;
+	const glm::vec3 v1;
+	const glm::vec3 v2;
+	const glm::vec3 v3;
+	const uint32_t depth;
+	const GeoPatchID patchID;
 };
 
 class GeoSphere
@@ -36,12 +71,20 @@ private:
 	GeoPatch*			mGeoPatches[NUM_PATCHES];
 	GeoPatchContext*	mGeoPatchContext;
 
+	static const uint32_t MAX_SPLIT_REQUESTS = 128;
+	std::deque<SSplitRequestDescription> mSplitRequestDescriptions;
+	std::deque<SSplitResult> mSplitResult;
+
 public:
 	GeoSphere();
 	~GeoSphere();
 
 	void Update(const glm::vec3 &campos);
 	void Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix, const glm::mat4 &MVP);
+
+	bool AddSplitRequest(const SSplitRequestDescription &desc);
+	void ProcessSplitRequests(const uint32_t processNumRequests = 4);
+	void ProcessSplitResults();
 
 #ifdef _DEBUG
 	CGLquad *mpUVquad;

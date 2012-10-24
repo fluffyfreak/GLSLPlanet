@@ -79,10 +79,20 @@ void CGLfbo::Release() const {
 	checkGLError();
 }
 
-void CGLfbo::GetData(float *data) const {
-	glBindTexture(GL_TEXTURE_2D, mTexture);
+//void CGLfbo::GetData(float *data) const {
+//	glBindTexture(GL_TEXTURE_2D, mTexture);
+//	checkGLError();
+//	glGetTexImage(GL_TEXTURE_2D,0,GL_LUMINANCE,GL_FLOAT,&data[0]);
+//	checkGLError();
+//	glBindTexture(GL_TEXTURE_2D, 0);
+//	checkGLError();
+//}
+
+void CGLfbo::CopyTexture(const uint32_t target) const
+{
+	glBindTexture(GL_TEXTURE_2D, target);
 	checkGLError();
-	glGetTexImage(GL_TEXTURE_2D,0,GL_LUMINANCE,GL_FLOAT,&data[0]);
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, 0, 0, mWidth, mHeight, 0);
 	checkGLError();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	checkGLError();

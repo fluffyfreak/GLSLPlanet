@@ -25,7 +25,6 @@ class GeoPatchContext
 private:
 	////////////////////////////////////////////////////////////////
 	// class static private members
-	float *mpHeightmapData;
 
 	////////////////////////////////////////////////////////////////
 	// private members
@@ -96,7 +95,7 @@ private:
 	GLuint quad_heightmap_v3;
 	GLuint quad_heightmap_fracStep;
 public:
-	void renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3) const;
+	void renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3, const uint32_t targetTex) const;
 	void renderQuad() const;
 
 	GLuint quadHeightmapProg()					const { return quad_heightmap_prog; }
@@ -105,11 +104,6 @@ public:
 	GLuint quadHeightmapV2ID()					const { return quad_heightmap_v2; }
 	GLuint quadHeightmapV3ID()					const { return quad_heightmap_v3; }
 	GLuint quadHeightmapFracStepID()			const { return quad_heightmap_fracStep; }
-
-private:
-	void createHeightmapData();
-public:
-	float* getHeightmapData() const;
 
 private:
 	GLuint patch_prog;
