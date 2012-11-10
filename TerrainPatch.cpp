@@ -140,7 +140,9 @@ void GeoPatch::ReceiveHeightmaps(
 			kids[i]->GenerateMesh();
 		}
 		for (int i=0; i<4; i++) {
-			edgeFriend[i]->NotifyEdgeFriendSplit(this);
+			if(edgeFriend[i]) {
+				edgeFriend[i]->NotifyEdgeFriendSplit(this);
+			}
 		}
 #if defined(_DEBUG) && TEST_CASE
 		//CheckEdgeFriendsHeightmaps();
@@ -398,7 +400,7 @@ void GeoPatch::Render()
 			glm::vec4(0.0f, 1.0f, 1.0f, 1.0f),	// cyan
 			glm::vec4(1.0f, 1.0f, 0.0f, 1.0f)	// problem child - yellow (meets purple & blue)
 		};
-		glUniform4fv(mContext.patchColourID(), 1, &patchColour[GetPatchFaceIdx()][0]);
+		glUniform4fv(mContext.patchColourID(), 1, &patchColour[mPatchID.GetPatchFaceIdx()][0]);
 #else
 		glm::vec4 patchColour(float(mDepth+1) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 0.0f, float(GEOPATCH_MAX_DEPTH-mDepth) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 1.0f);
 		//glm::vec4 patchColour(1.0f, 1.0f, 1.0f, 1.0f);
@@ -437,6 +439,8 @@ void GeoPatch::LODUpdate(const glm::vec3 &campos) {
 	assert(!mHasSplitRequest);
 
 	bool canSplit = true;
+	bool canMerge = (kids[0]!=NULL);
+
 	// always split at first level
 	if (parent) {
 		for (int i=0; i<4; i++) {
@@ -478,12 +482,10 @@ void GeoPatch::LODUpdate(const glm::vec3 &campos) {
 				kids[i]->LODUpdate(campos);
 			}
 		}
-	} else {
-		if (kids[0]) {
-			for (int i=0; i<4; i++) { 
-				delete kids[i]; 
-				kids[i] = nullptr; 
-			}
+	} else if (canMerge) {
+		for (int i=0; i<4; i++) { 
+			delete kids[i]; 
+			kids[i] = nullptr; 
 		}
 	}
 }

@@ -143,6 +143,7 @@ int main()
 #ifdef _DEBUG
 	float cube_theta=0.0f, cube_phi=0.0f;
 #endif
+	float sample_pt_theta=0.0f, sample_pt_phi=0.0f;
 
 	int mouseWPrev = glfwGetMouseWheel();
 	float zoomDist = -15.0f;
@@ -189,6 +190,12 @@ int main()
 				cube_phi += float(yDiff) * 0.2f;
 				cube_phi = Clamp<float>(cube_phi, -phi_limit, phi_limit);
 #endif
+			} else if(GLFW_PRESS==glfwGetMouseButton(GLFW_MOUSE_BUTTON_MIDDLE)) {
+				// rotate/move the campos (cube marker)
+				sample_pt_theta -= float(xDiff) * 0.2f;
+				//theta = Clamp<float>(theta, -45.0f, 45.0f);
+				sample_pt_phi += float(yDiff) * 0.2f;
+				sample_pt_phi = Clamp<float>(sample_pt_phi, -phi_limit, phi_limit);
 			}
 		}
 		
@@ -217,8 +224,11 @@ int main()
 
 		////////////////////////////////////////////////////////////////
 		// update, and possibly render the terrain for the sphere
-		const glm::vec3 campos(1.0f, 0.0, 0.0);
-		pSphere->Update(campos);
+		glm::mat4 samplePtMat;
+		samplePtMat = rotate(samplePtMat, sample_pt_phi, glm::vec3(0.f, 0.f, 1.f));
+		samplePtMat = rotate(samplePtMat, sample_pt_theta, glm::vec3(0.f, 1.f, 0.f));
+		const glm::vec4 campos(1.0f, 0.0f, 0.0f, 1.0f);
+		pSphere->Update(vec3(campos*samplePtMat));
 
 		////////////////////////////////////////////////////////////////
 		// Render the main scene

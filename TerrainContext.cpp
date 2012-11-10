@@ -16,7 +16,7 @@
 using namespace glm;
 
 #if TEST_CASE
-#define USE_CPP_HEIGHTMAP_SHADER 1
+#define USE_CPP_HEIGHTMAP_SHADER 0
 #else
 #define USE_CPP_HEIGHTMAP_SHADER 0
 #endif
