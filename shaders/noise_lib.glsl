@@ -188,3 +188,40 @@ float billow_octavenoise(in int octaves, in float roughness, in float lacunarity
     n = (2.0 * abs(n) - 1.0)+1.0;
     return(n);
 }
+
+float dunes_octavenoise(in int octaves, in float roughness, in float frequency, in float lacunarity, in vec3 p) {
+	float n = 0.0;
+	float octaveAmplitude = roughness;
+	float jizm = frequency;
+	for (int i=0; i<octaves; i++) {
+		n += octaveAmplitude * snoise(vec4(jizm*p,1.0));
+		octaveAmplitude *= roughness;
+		jizm *= lacunarity;
+	}
+	return 1.0 - abs(n);
+}
+
+float river_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p) {
+	float n = 0.0;
+	float octaveAmplitude = roughness;
+	float jizm = 1.0;
+	for (int i=0; i<octaves; i++) {
+		n += octaveAmplitude * abs(snoise(vec4(jizm*p,1.0)));
+		octaveAmplitude *= roughness;
+		jizm *= lacunarity;
+	}
+	return n;
+}
+
+float voronoiscam_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p) {
+	float n = 0.0;
+	float octaveAmplitude = roughness;
+	float jizm = 1.0;
+	for (int i=0; i<octaves; i++) {
+		n += octaveAmplitude * snoise(vec4(jizm*p,1.0));
+		octaveAmplitude *= roughness;
+		jizm *= lacunarity;
+	}
+	return sqrt(10.0 * abs(n));
+}
+

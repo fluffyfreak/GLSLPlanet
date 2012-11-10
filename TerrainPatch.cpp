@@ -436,7 +436,8 @@ void GeoPatch::Render()
 
 void GeoPatch::LODUpdate(const glm::vec3 &campos) {
 	// there should be no LODUpdate'ing when we have active split requests
-	assert(!mHasSplitRequest);
+	if(mHasSplitRequest)
+		return;
 
 	bool canSplit = true;
 	bool canMerge = (kids[0]!=NULL);
