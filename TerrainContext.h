@@ -88,13 +88,6 @@ public:
 	inline uint32_t fboWidth() const		{ return mFBO.Width(); }
 
 private:
-	GLuint quad_heightmap_prog;
-	GLuint quad_heightmap_v0;
-	GLuint quad_heightmap_v1;
-	GLuint quad_heightmap_v2;
-	GLuint quad_heightmap_v3;
-	GLuint quad_heightmap_fracStep;
-
 	struct SHeightmapGen{
 		GLuint prog;
 		GLuint v0;
@@ -104,16 +97,17 @@ private:
 		GLuint fracStep;
 	};
 	std::vector<SHeightmapGen> mHeightmapProgs;
+	size_t mCurrentHeightmapProg;
 public:
 	void renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3, const uint32_t targetTex) const;
 	void renderQuad() const;
 
-	GLuint quadHeightmapProg()					const { return quad_heightmap_prog; }
-	GLuint quadHeightmapV0ID()					const { return quad_heightmap_v0; }
-	GLuint quadHeightmapV1ID()					const { return quad_heightmap_v1; }
-	GLuint quadHeightmapV2ID()					const { return quad_heightmap_v2; }
-	GLuint quadHeightmapV3ID()					const { return quad_heightmap_v3; }
-	GLuint quadHeightmapFracStepID()			const { return quad_heightmap_fracStep; }
+	GLuint quadHeightmapProg()					const { return mHeightmapProgs[mCurrentHeightmapProg].prog; }
+	GLuint quadHeightmapV0ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v0; }
+	GLuint quadHeightmapV1ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v1; }
+	GLuint quadHeightmapV2ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v2; }
+	GLuint quadHeightmapV3ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v3; }
+	GLuint quadHeightmapFracStepID()			const { return mHeightmapProgs[mCurrentHeightmapProg].fracStep; }
 
 private:
 	GLuint patch_prog;

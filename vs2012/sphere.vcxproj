@@ -84,6 +84,7 @@
     <None Include="..\shaders\terrains\TerrainHeightMountainsVolcano.glsl" />
     <None Include="..\shaders\terrains\TerrainHeightRuggedDesert.glsl" />
     <None Include="..\shaders\terrains\TerrainHeightRuggedLava.glsl" />
+    <None Include="..\shaders\terrains\TerrainHeightShaderFun.glsl" />
     <None Include="..\shaders\terrains\TerrainHeightWaterSolid.glsl" />
     <None Include="..\shaders\terrains\TerrainHeightWaterSolidCanyons.glsl" />
     <None Include="..\shaders\test.frag" />

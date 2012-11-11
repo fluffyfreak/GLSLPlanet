@@ -15,5 +15,5 @@ float GetHeight(in vec3 p)
 {
 	float n = octavenoise(8, 0.4, 2.4, p, 1.0, 1.0);
 	
-	return (n > 0.0? maxHeight*n : 0.0);
+	return n;//(n > 0.0? maxHeight*n : 0.0);
 }

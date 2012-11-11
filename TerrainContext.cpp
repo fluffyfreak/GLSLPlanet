@@ -250,32 +250,63 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	}
 
 	////////////////////////////////////////////////////////////////
-	// load the quad terrain shader
+	// load the quad terrain shader(s)
+	/*static const std::string shaderFilenames[] = {
+		"terrains/TerrainHeightAsteroid.glsl",
+		"terrains/TerrainHeightAsteroid2.glsl",
+		"terrains/TerrainHeightAsteroid3.glsl",
+		"terrains/TerrainHeightAsteroid4.glsl",
+		"terrains/TerrainHeightBarrenRock.glsl",
+		"terrains/TerrainHeightBarrenRock2.glsl",
+		"terrains/TerrainHeightBarrenRock3.glsl",
+		"terrains/TerrainHeightFlat.glsl",
+		"terrains/TerrainHeightHillsCraters.glsl",
+		"terrains/TerrainHeightHillsCraters2.glsl",
+		"terrains/TerrainHeightHillsDunes.glsl",
+		"terrains/TerrainHeightHillsNormal.glsl",
+		"terrains/TerrainHeightHillsRidged.glsl",
+		"terrains/TerrainHeightHillsRivers.glsl",
+		"terrains/TerrainHeightMapped.glsl",
+		"terrains/TerrainHeightMapped2.glsl",
+		"terrains/TerrainHeightMountainsCraters.glsl",
+		"terrains/TerrainHeightMountainsCraters2.glsl",
+		"terrains/TerrainHeightMountainsNormal.glsl",
+		"terrains/TerrainHeightMountainsRidged.glsl",
+		"terrains/TerrainHeightMountainsRivers.glsl",
+		"terrains/TerrainHeightMountainsRiversVolcano.glsl",
+		"terrains/TerrainHeightMountainsVolcano.glsl",
+		"terrains/TerrainHeightRuggedDesert.glsl",
+		"terrains/TerrainHeightRuggedLava.glsl",
+		"terrains/TerrainHeightShaderFun.glsl",
+		"terrains/TerrainHeightWaterSolid.glsl",
+		"terrains/TerrainHeightWaterSolidCanyons.glsl",
+		""
+	};*/
+	static const std::string shaderFilenames[] = {
+		"terrains/TerrainHeightAsteroid.glsl",
+		"terrains/TerrainHeightShaderFun.glsl",
+		""
+	};
 	vecBindings noiseyBinding;
-	noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
-	LoadShader(quad_heightmap_prog, "heightmap.vert", "heightmap.frag", noiseyBinding);
-	quad_heightmap_v0		= glGetUniformLocation(quad_heightmap_prog, "v0");
-	quad_heightmap_v1		= glGetUniformLocation(quad_heightmap_prog, "v1");
-	quad_heightmap_v2		= glGetUniformLocation(quad_heightmap_prog, "v2");
-	quad_heightmap_v3		= glGetUniformLocation(quad_heightmap_prog, "v3");
-	quad_heightmap_fracStep	= glGetUniformLocation(quad_heightmap_prog, "fracStep");
-	checkGLError();
-
-	////////////////////////////////////////////////////////////////
-	// load the quad terrain shader
-	noiseyBinding.clear();
-	noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
-	noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
-	noiseyBinding.push_back( ShaderBindPair("terrains/TerrainHeightAsteroid.glsl",eFragShader) );
-	SHeightmapGen hProg;
-	LoadShader(hProg.prog, "heightmap_gen.vert", "heightmap_gen.frag", noiseyBinding);
-	hProg.v0		= glGetUniformLocation(hProg.prog, "v0");
-	hProg.v1		= glGetUniformLocation(hProg.prog, "v1");
-	hProg.v2		= glGetUniformLocation(hProg.prog, "v2");
-	hProg.v3		= glGetUniformLocation(hProg.prog, "v3");
-	hProg.fracStep	= glGetUniformLocation(hProg.prog, "fracStep");
-	checkGLError();
-	mHeightmapProgs.push_back(hProg);
+	int shdFnameIdx=0;
+	while(shaderFilenames[shdFnameIdx][0] != '\0')
+	{
+		noiseyBinding.clear();
+		noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
+		noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
+		noiseyBinding.push_back( ShaderBindPair(shaderFilenames[shdFnameIdx],eFragShader) );
+		SHeightmapGen hProg;
+		LoadShader(hProg.prog, "heightmap_gen.vert", "heightmap_gen.frag", noiseyBinding);
+		hProg.v0		= glGetUniformLocation(hProg.prog, "v0");
+		hProg.v1		= glGetUniformLocation(hProg.prog, "v1");
+		hProg.v2		= glGetUniformLocation(hProg.prog, "v2");
+		hProg.v3		= glGetUniformLocation(hProg.prog, "v3");
+		hProg.fracStep	= glGetUniformLocation(hProg.prog, "fracStep");
+		checkGLError();
+		mHeightmapProgs.push_back(hProg);
+		shdFnameIdx++;
+	}
+	mCurrentHeightmapProg = 0;//mHeightmapProgs.size()-1;
 
 	////////////////////////////////////////////////////////////////
 	// load the patch terrain shader
