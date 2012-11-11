@@ -29,9 +29,10 @@ struct SSplitRequestDescription {
 							const glm::vec3 &v1_,
 							const glm::vec3 &v2_,
 							const glm::vec3 &v3_,
+							const glm::vec3 &cn,
 							const uint32_t depth_,
 							const GeoPatchID patchID_)
-							: v0(v0_), v1(v1_), v2(v2_), v3(v3_), depth(depth_), patchID(patchID_)
+							: v0(v0_), v1(v1_), v2(v2_), v3(v3_), centroid(cn), depth(depth_), patchID(patchID_)
 	{
 	}
 
@@ -39,27 +40,38 @@ struct SSplitRequestDescription {
 	const glm::vec3 v1;
 	const glm::vec3 v2;
 	const glm::vec3 v3;
+	const glm::vec3 centroid;
 	const uint32_t depth;
 	const GeoPatchID patchID;
 };
 
 struct SSplitResult {
-	SSplitResult(const glm::vec3 &v0_,
-				const glm::vec3 &v1_,
-				const glm::vec3 &v2_,
-				const glm::vec3 &v3_,
-				const uint32_t depth_,
-				const GeoPatchID patchID_)
-				: v0(v0_), v1(v1_), v2(v2_), v3(v3_), depth(depth_), patchID(patchID_)
+	struct SSplitResultData {
+		SSplitResultData(const GLuint texID_, const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const GeoPatchID patchID_) :
+			texID(texID_), v0(v0_), v1(v1_), v2(v2_), v3(v3_), patchID(patchID_)
+		{
+		}
+		const GLuint texID;
+		const glm::vec3 v0;
+		const glm::vec3 v1;
+		const glm::vec3 v2;
+		const glm::vec3 v3;
+		const GeoPatchID patchID;
+	};
+
+	SSplitResult(const int32_t face_, const uint32_t depth_) : face(face_), depth(depth_)
 	{
 	}
-	GLuint texID;
-	const glm::vec3 v0;
-	const glm::vec3 v1;
-	const glm::vec3 v2;
-	const glm::vec3 v3;
+
+	void addResult(const GLuint tex, const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const GeoPatchID patchID_)
+	{
+		data.push_back(SSplitResultData(tex, v0_, v1_, v2_, v3_, patchID_));
+		assert(data.size()<=4);
+	}
+
+	const int32_t face;
 	const uint32_t depth;
-	const GeoPatchID patchID;
+	std::deque<SSplitResultData> data;
 };
 
 class GeoSphere
@@ -72,8 +84,8 @@ private:
 	GeoPatchContext*	mGeoPatchContext;
 
 	static const uint32_t MAX_SPLIT_REQUESTS = 128;
-	std::deque<SSplitRequestDescription> mSplitRequestDescriptions;
-	std::deque<SSplitResult> mSplitResult;
+	std::deque<SSplitRequestDescription*> mSplitRequestDescriptions;
+	std::deque<SSplitResult*> mSplitResult;
 
 public:
 	GeoSphere();
@@ -82,23 +94,9 @@ public:
 	void Update(const glm::vec3 &campos);
 	void Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix, const glm::mat4 &MVP);
 
-	bool AddSplitRequest(const SSplitRequestDescription &desc);
-	void ProcessSplitRequests(const uint32_t processNumRequests = 4);
+	bool AddSplitRequest(SSplitRequestDescription *desc);
+	void ProcessSplitRequests();
 	void ProcessSplitResults();
-
-#ifdef _DEBUG
-	CGLquad *mpUVquad;
-	CGLcube *mpCube;
-	GLuint simple_shader;
-	GLuint simple_MatrixID;
-	GLuint simple_ViewMatrixID;
-	GLuint simple_ModelMatrixID;
-	GLuint simple_texHeightmap;
-	GLuint simple_colour;
-	void SetupDebugRendering();
-	void RenderCube(glm::mat4 &ViewMatrix);
-	void RenderLOD0Heightmaps();
-#endif
 };
 
 #endif //__TERRAINMESH_H__

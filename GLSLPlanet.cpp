@@ -252,17 +252,6 @@ int main()
 		glUseProgram(0);
 		checkGLError();
 
-#ifdef _DEBUG
-		glm::mat4 cubeView = matty;
-		cubeView = translate(cubeView, glm::normalize(glm::vec3(1.f, 0.f, 0.f))*30.0f);
-		cubeView = rotate(cubeView, cube_phi, glm::vec3(1.f, 0.f, 0.f));
-		cubeView = rotate(cubeView, cube_theta, glm::vec3(0.f, 1.f, 0.f));
-		
-		pSphere->RenderCube(cubeView);
-
-		pSphere->RenderLOD0Heightmaps();
-#endif
-
 		// Swap buffers
 		glfwSwapBuffers();
 		checkGLError();

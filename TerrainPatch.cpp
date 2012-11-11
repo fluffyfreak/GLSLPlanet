@@ -21,9 +21,9 @@ using namespace glm;
 GeoPatch::GeoPatch(const GeoPatchContext &context_, GeoSphere *pGeoSphere_, 
 	const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, 
 	const uint32_t depth_, const GeoPatchID &ID_)
-	: mContext(context_), mpGeoSphere(pGeoSphere_), mHeightmap(0), mVBO(nullptr), mV0(v0_), mV1(v1_), mV2(v2_), mV3(v3_), 
-	mClipCentroid((v0_+v1_+v2_+v3_) * 0.25f), mDepth(depth_), mClipRadius(0.0f), mRoughLength(0.0f), 
-	mPatchID(ID_), mHasSplitRequest(false), parent(nullptr)
+	: mContext(context_), mpGeoSphere(pGeoSphere_), mV0(v0_), mV1(v1_), mV2(v2_), mV3(v3_), 
+	mClipCentroid((v0_+v1_+v2_+v3_) * 0.25f), mCentroid(glm::normalize(mClipCentroid)), mDepth(depth_), mClipRadius(0.0f), mRoughLength(0.0f), 
+	mPatchID(ID_), mHeightmap(0), mVBO(nullptr), mHasSplitRequest(false), parent(nullptr)
 {
 	for (int i=0; i<NUM_KIDS; i++) {
 		edgeFriend[i]	= nullptr;
@@ -68,8 +68,6 @@ GeoPatch::~GeoPatch()
 
 // Generates full-detail vertices, and also non-edge normals and colors
 void GeoPatch::GenerateMesh() {
-	mCentroid = glm::normalize(mClipCentroid);
-
 	////////////////////////////////////////////////////////////////
 	// Create the base mesh that the heightmap will modify
 	glm::vec3 *vts = mContext.vertexs();
@@ -96,26 +94,25 @@ void GeoPatch::GenerateMesh() {
 	mVBO = new CGLvbo( mContext.NUM_MESH_VERTS(), &mContext.vertexs()[0], nullptr, mContext.uvs() );
 }
 
-void GeoPatch::ReceiveHeightmaps(
-	const SSplitResult &s1, 
-	const SSplitResult &s2,
-	const SSplitResult &s3, 
-	const SSplitResult &s4)
+void GeoPatch::ReceiveHeightmaps(const SSplitResult *psr)
 {
-	if (mDepth<s1.depth) {
-		const uint32_t kidIdx = s1.patchID.GetPatchIdx(mDepth+1);
-		kids[kidIdx]->ReceiveHeightmaps(s1, s2, s3, s4);
+	if (mDepth<psr->depth) {
+		// this should work because each depth should have a common history
+		const uint32_t kidIdx = psr->data[0].patchID.GetPatchIdx(mDepth+1);
+		kids[kidIdx]->ReceiveHeightmaps(psr);
 	} else {
 		const int nD = mDepth+1;
-		kids[0] = new GeoPatch(mContext, mpGeoSphere, s1.v0, s1.v1, s1.v2, s1.v3, nD, mPatchID.NextPatchID(nD,0));
-		kids[1] = new GeoPatch(mContext, mpGeoSphere, s2.v0, s2.v1, s2.v2, s2.v3, nD, mPatchID.NextPatchID(nD,1));
-		kids[2] = new GeoPatch(mContext, mpGeoSphere, s3.v0, s3.v1, s3.v2, s3.v3, nD, mPatchID.NextPatchID(nD,2));
-		kids[3] = new GeoPatch(mContext, mpGeoSphere, s4.v0, s4.v1, s4.v2, s4.v3, nD, mPatchID.NextPatchID(nD,3));
+		for (int i=0; i<4; i++)
+		{
+			kids[i] = new GeoPatch(mContext, mpGeoSphere, 
+				psr->data[i].v0, psr->data[i].v1, psr->data[i].v2, psr->data[i].v3, 
+				nD, mPatchID.NextPatchID(nD,i));
+		}
 
-		kids[0]->ReceiveHeightmapTex(s1.texID);
-		kids[1]->ReceiveHeightmapTex(s2.texID);
-		kids[2]->ReceiveHeightmapTex(s3.texID);
-		kids[3]->ReceiveHeightmapTex(s4.texID);
+		for (int i=0; i<4; i++)
+		{
+			kids[i]->ReceiveHeightmapTex(psr->data[i].texID);
+		}
 
 		// hm.. edges. Not right to pass this
 		// edgeFriend...
@@ -144,10 +141,6 @@ void GeoPatch::ReceiveHeightmaps(
 				edgeFriend[i]->NotifyEdgeFriendSplit(this);
 			}
 		}
-#if defined(_DEBUG) && TEST_CASE
-		//CheckEdgeFriendsHeightmaps();
-		//CheckEdgeFriendsEdgePositions();
-#endif
 		mHasSplitRequest = false;
 	}
 }
@@ -157,230 +150,6 @@ void GeoPatch::ReceiveHeightmapTex(const GLuint tex)
 	mHeightmap = tex;
 }
 
-#ifdef _DEBUG
-void GeoPatch::CheckEdgeFriendsHeightmaps() const {
-	////////////////////////////////////////////////////////////////
-	// useful debugging stuff and one-time initialisation
-	static float *heightmapA = nullptr;
-	static float *heightmapB = nullptr;
-	static float *pEf = nullptr;
-	static const uint32_t texDim = mContext.edgeLen();
-	if(nullptr==heightmapA) {
-		heightmapA = new float[texDim*texDim];
-		heightmapB = new float[texDim*texDim];
-		pEf = new float[texDim];
-		for(uint32_t i=0;i<texDim;i++) {
-			for(uint32_t j=0;j<texDim;j++) {
-				heightmapA[i + (j*texDim)] = -1.0f;
-				heightmapB[i + (j*texDim)] = -2.0f;
-			}
-			pEf[i] = -5.0f;
-		}
-	}
-			
-	////////////////////////////////////////////////////////////////
-	//
-	int we_are[4];
-	for (int i=0; i<4; i++) {
-		we_are[i] = edgeFriend[i]->GetEdgeIdxOf(this);
-	}
-
-	// get heightmapA's data
-	GetHeightmapData(getHeightmapID(),heightmapA);
-
-	for (int i=0; i<4; i++) {
-		const GeoPatch *e = edgeFriend[i];
-
-		// get heightmapB's data
-		GetHeightmapData(e->getHeightmapID(),heightmapB);
-
-		// performed on neighbours data
-		// copies neighbours data into pEf
-		uint32_t x, y;
-		switch(we_are[i])
-		{
-		case 0:
-			for (x=0; x<texDim; x++)
-				pEf[(texDim-1)-x] = heightmapB[x];
-			break;
-		case 1:
-			x = texDim-1;
-			for (y=0; y<texDim; y++) 
-				pEf[(texDim-1)-y] = heightmapB[x + y*texDim];
-			break;
-		case 2:
-			y = texDim-1;
-			for (x=0; x<texDim; x++) 
-				pEf[(texDim-1)-x] = heightmapB[(texDim-1)-x + y*texDim];
-			break;
-		case 3:
-			for (y=0; y<texDim; y++) 
-				pEf[(texDim-1)-y] = heightmapB[((texDim-1)-y)*texDim];
-			break;
-		default: 
-			assert(false && "this shouldn't happen");	
-			break;
-		}
-
-		const int faceIdx = mPatchID.GetPatchFaceIdx();
-		// performed on our data
-		// compares neighbours data (in pEf) to our own edge data
-		bool badVerts = false;
-		switch(i)
-		{
-		case 0:
-			for (x=0; x<texDim; x++) {
-				const float a = pEf[x];
-				const float b = heightmapA[x];
-				badVerts = ( a!=b );
-			}
-			break;
-		case 1:
-			x = texDim-1;
-			for (y=0; y<texDim; y++) {
-				const float a = heightmapA[x + y*texDim];
-				const float b = pEf[y];
-				badVerts = ( a!=b );
-			}
-			break;
-		case 2:
-			y = texDim-1;
-			for (x=0; x<texDim; x++) {
-				const float a = heightmapA[x + y*texDim];
-				const float b = pEf[(texDim-1)-x];
-				badVerts = ( a!=b );
-			}
-			break;
-		case 3:
-			for (y=0; y<texDim; y++) {
-				const float a = pEf[(texDim-1)-y];
-				const float b = heightmapA[0 + y*texDim];
-				badVerts = ( a!=b );
-			}
-			break;
-		default: 
-			assert(false && "this shouldn't happen");	
-			break;
-		}
-
-		if( badVerts ) {
-			printf("badVerts: faceIdx %i, depth %u, edge %i wrong\n",faceIdx, mDepth,i);
-		}
-	}
-}
-
-void GeoPatch::CheckEdgeFriendsEdgePositions() const {
-	////////////////////////////////////////////////////////////////
-	// useful debugging stuff and one-time initialisation
-	static glm::vec3 *posMapA = nullptr;
-	static glm::vec3 *posMapB = nullptr;
-	static glm::vec3 *pEv = nullptr;
-	static const uint32_t texDim = mContext.edgeLen();
-	if(nullptr==posMapA) {
-		posMapA = new glm::vec3[texDim*texDim];
-		posMapB = new glm::vec3[texDim*texDim];
-		pEv = new glm::vec3[texDim];
-	}
-
-	////////////////////////////////////////////////////////////////
-	// populate the position map for THIS quad
-	PopulateNormalisedPosMap(this, posMapA, texDim);
-			
-	////////////////////////////////////////////////////////////////
-	//
-	int we_are[4];
-	for (int i=0; i<4; i++) {
-		we_are[i] = edgeFriend[i]->GetEdgeIdxOf(this);
-	}
-
-	const int faceIdx = mPatchID.GetPatchFaceIdx();
-	for (int i=0; i<4; i++) {
-		const GeoPatch *e = edgeFriend[i];
-
-		////////////////////////////////////////////////////////////////
-		// populate the position map for the edgeFriend[i] quad
-		PopulateNormalisedPosMap(e, posMapB, texDim);
-
-		// performed on neighbours data
-		// copies neighbours data into pEf
-		uint32_t x, y;
-		switch(we_are[i])
-		{
-		case 0:
-			for (x=0; x<texDim; x++)
-				pEv[(texDim-1)-x] = posMapB[x];
-			break;
-		case 1:
-			x = texDim-1;
-			for (y=0; y<texDim; y++)
-				pEv[(texDim-1)-y] = posMapB[x + y*texDim];
-			break;
-		case 2:
-			y = texDim-1;
-			for (x=0; x<texDim; x++) 
-				pEv[(texDim-1)-x] = posMapB[(texDim-1)-x + y*texDim];
-			break;
-		case 3:
-			for (y=0; y<texDim; y++) 
-				pEv[(texDim-1)-y] = posMapB[((texDim-1)-y)*texDim];
-			break;
-		default: 
-			assert(false && "this shouldn't happen");	
-			break;
-		}
-			
-		// performed on our data
-		// compares neighbours data (in pEv) to our own edge data
-		bool badPos = false;
-		switch(i)
-		{
-		case 0:
-			for (x=0; x<texDim; x++) {
-				const glm::vec3 a = pEv[x];
-				const glm::vec3 b = posMapA[x];
-				badPos = ( a!=b );
-				if(badPos) 
-					printf("%f, ", b-a);
-			}
-			break;
-		case 1:
-			x = texDim-1;
-			for (y=0; y<texDim; y++) {
-				const glm::vec3 a = posMapA[x + y*texDim];
-				const glm::vec3 b = pEv[y];
-				badPos = ( a!=b );
-				if(badPos) 
-					printf("%f, ", b-a);
-			}
-			break;
-		case 2:
-			y = texDim-1;
-			for (x=0; x<texDim; x++) {
-				const glm::vec3 a = posMapA[x + y*texDim];
-				const glm::vec3 b = pEv[(texDim-1)-x];
-				badPos = ( a!=b );
-				if(badPos) 
-					printf("%f, ", b-a);
-			}
-			break;
-		case 3:
-			for (y=0; y<texDim; y++) {
-				const glm::vec3 a = pEv[(texDim-1)-y];
-				const glm::vec3 b = posMapA[0 + y*texDim];
-				badPos = ( a!=b );
-				if(badPos) 
-					printf("%f, ", b-a);
-			}
-			break;
-		}
-
-		if( badPos ) {
-			printf("\nbadPos: faceIdx %i, depth %u, edge %i wrong\n",faceIdx, mDepth,i);
-		}
-	}
-}
-#endif
-
 void GeoPatch::Render()
 {
 	if (kids[0]) {
@@ -388,7 +157,7 @@ void GeoPatch::Render()
 			kids[i]->Render();
 		}
 	} 
-	else 
+	else if(parent)
 	{
 #if TEST_CASE
 		//glm::vec4 patchColour(float(mDepth+1) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 0.0f, float(GEOPATCH_MAX_DEPTH-mDepth) * (1.0f/float(GEOPATCH_MAX_DEPTH)), 1.0f);
@@ -464,20 +233,8 @@ void GeoPatch::LODUpdate(const glm::vec3 &campos) {
 	if (canSplit) {
 		if (!kids[0]) {
 			mHasSplitRequest = true;
-			const glm::vec3 v01	= glm::normalize(mV0+mV1);
-			const glm::vec3 v12	= glm::normalize(mV1+mV2);
-			const glm::vec3 v23	= glm::normalize(mV2+mV3);
-			const glm::vec3 v30	= glm::normalize(mV3+mV0);
-			const glm::vec3 cn	= glm::normalize(mCentroid);
-			// hm.. edges. Not right to pass this
-			SSplitRequestDescription desc0(mV0, v01, cn, v30, mDepth, mPatchID);
-			SSplitRequestDescription desc1(v01, mV1, v12, cn, mDepth, mPatchID);
-			SSplitRequestDescription desc2(cn, v12, mV2, v23, mDepth, mPatchID);
-			SSplitRequestDescription desc3(v30, cn, v23, mV3, mDepth, mPatchID);
-			mpGeoSphere->AddSplitRequest(desc0);
-			mpGeoSphere->AddSplitRequest(desc1);
-			mpGeoSphere->AddSplitRequest(desc2);
-			mpGeoSphere->AddSplitRequest(desc3);
+			SSplitRequestDescription *desc = new SSplitRequestDescription(mV0, mV1, mV2, mV3, mCentroid, mDepth, mPatchID);
+			mpGeoSphere->AddSplitRequest(desc);
 		} else {
 			for (int i=0; i<4; i++) {
 				kids[i]->LODUpdate(campos);

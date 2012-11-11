@@ -14,31 +14,29 @@ class GeoPatch
 private:
 	////////////////////////////////////////////////////////////////
 	// private members
-
-	const GeoPatchContext &mContext;
-	GeoSphere *mpGeoSphere;
-	CGLvbo *mVBO;
-	GLuint mHeightmap;
-	const glm::vec3 mV0, mV1, mV2, mV3;	// corner vertices for the patch
-	const glm::vec3 mClipCentroid;
-	glm::vec3 mCentroid;
-	const uint32_t mDepth;
-	float mClipRadius;
-	float mRoughLength;
-
-	const GeoPatchID mPatchID;
-	bool mHasSplitRequest;
-
-public:
-	////////////////////////////////////////////////////////////////
-	// public members
-
 	static const uint32_t NUM_EDGES = 4;
 	GeoPatch *edgeFriend[NUM_EDGES];
 
 	static const uint32_t NUM_KIDS = NUM_EDGES;
 	GeoPatch *kids[NUM_KIDS];
 
+	const GeoPatchContext &mContext;
+	GeoSphere *mpGeoSphere;
+	const glm::vec3 mV0, mV1, mV2, mV3;	// corner vertices for the patch
+	const glm::vec3 mClipCentroid;
+	glm::vec3 mCentroid;
+	const uint32_t mDepth;
+	float mClipRadius;
+	float mRoughLength;
+	const GeoPatchID mPatchID;
+
+	CGLvbo *mVBO;
+	GLuint mHeightmap;
+	bool mHasSplitRequest;
+
+public:
+	////////////////////////////////////////////////////////////////
+	// public members
 	GeoPatch *parent;
 
 	////////////////////////////////////////////////////////////////
@@ -60,7 +58,7 @@ public:
 	// Generates full-detail vertices, and also non-edge normals and colors
 	void GenerateMesh();
 
-	void ReceiveHeightmaps(const SSplitResult &s1, const SSplitResult &s2, const SSplitResult &s3, const SSplitResult &s4);
+	void ReceiveHeightmaps(const SSplitResult *psr);
 	void ReceiveHeightmapTex(const GLuint tex);
 
 	inline void OnEdgeFriendChanged(const int edge, GeoPatch *e) {
