@@ -14,7 +14,7 @@ float GetHeight(in vec3 p)
 {
 
 	float continents = octavenoise(octaves[3-fracnum], 0.65, lacunarity[3-fracnum], p) * (1.0-seaLevel) - (seaLevel*0.1);
-	if (continents < 0) return 0;
+	if (continents < 0) return 0.0;
 	float n = continents;
 	float distrib = octavenoise(octaves[4-fracnum], 0.5, lacunarity[4-fracnum], p);
 	distrib *= distrib;

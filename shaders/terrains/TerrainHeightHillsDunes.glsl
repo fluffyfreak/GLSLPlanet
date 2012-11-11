@@ -13,7 +13,7 @@ uniform float frequency[10];
 float GetHeight(in vec3 p)
 {
 	float continents = ridged_octavenoise(octaves[3], 0.65, lacunarity[3], p) * (1.0-seaLevel) - (seaLevel*0.1);
-	if (continents < 0) return 0;
+	if (continents < 0) return 0.0;
 	float n = continents;
 	float distrib = dunes_octavenoise(octaves[4], 0.4, lacunarity[4], p);
 	distrib *= distrib * distrib;

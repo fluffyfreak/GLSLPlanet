@@ -13,7 +13,7 @@ uniform float frequency[10];
 float GetHeight(in vec3 p)
 {
 	float continents = river_octavenoise(octaves[3], 0.65, lacunarity[3], p) * (1.0-seaLevel) - (seaLevel*0.1);
-	if (continents < 0) return 0;
+	if (continents < 0) return 0.0;
 	float n = continents;
 	float distrib = voronoiscam_octavenoise(octaves[4], 0.5*amplitude[5], lacunarity[4], p);
 	float m = 0.1 * amplitude[4] * river_octavenoise(octaves[5], 0.5*distrib, lacunarity[5], p);

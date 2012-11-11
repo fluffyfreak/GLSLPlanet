@@ -13,7 +13,7 @@ uniform float frequency[10];
 float GetHeight(in vec3 p)
 {
 	float continents = octavenoise(octaves[0], 0.7*ridged_octavenoise(octaves[8], 0.58, lacunarity[8], p), lacunarity[0], p) - seaLevel*0.65;
-	if (continents < 0) return 0;
+	if (continents < 0) return 0.0;
 	float n = (river_function(octaves[9], amplitude[9], frequency[9], lacunarity[9], p)*
 		river_function(octaves[7], amplitude[7], frequency[7], lacunarity[7], p)*
 		river_function(octaves[6], amplitude[6], frequency[6], lacunarity[6], p)*

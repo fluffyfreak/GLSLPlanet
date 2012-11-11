@@ -13,7 +13,7 @@ uniform float frequency[10];
 float GetHeight(in vec3 p)
 {
 	float continents = octavenoise(octaves[0], Clamp(0.725-(seaLevel/2), 0.1, 0.725), lacunarity[0], p) - seaLevel;
-	if (continents < 0.0) return 0;
+	if (continents < 0.0) return 0.0;
 	float mountain_distrib = octavenoise(octaves[1], 0.55, lacunarity[1], p);
 	float mountains = octavenoise(octaves[2], 0.5, lacunarity[2], p) * ridged_octavenoise(octaves[2], 0.575, lacunarity[2], p);
 	float mountains2 = octavenoise(octaves[3], 0.5, lacunarity[3], p);
@@ -50,13 +50,12 @@ float GetHeight(in vec3 p)
 
 	n += continents*mountains*hill_distrib ;
 	if (n < 0.01) n += continents*mountains2 * n * 40.0f ;
-	else n += continents*mountains2*.4f ;
+	else n += continents*mountains2*0.4f ;
 	n *= 0.2;
 	n += mountains*mountains2*mountains2*hills*hills*hill_distrib*mountain_distrib*20.0;
 
 	rocks = continents * mountain_distrib * amplitude[9] * rocks*rocks*rocks * 2.0;
 	n += rocks;
 
-	n = (n<0.0 ? 0.0 : maxHeight*n);
-	return n;
+	return (n > 0.0? maxHeight*n : 0.0);
 }

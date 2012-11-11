@@ -18,7 +18,7 @@ float GetHeight(in vec3 p)
 	// continents depending on the ridged noise value, we subtract sealevel so that sea level will have an effect on the continents size
 	float continents = octavenoise(octaves[0], 0.7*ridged_octavenoise(octaves[8], 0.58, lacunarity[8], p), lacunarity[0], p) - seaLevel*0.65;
 	// if there are no continents on an area, we want it to be sea level
-	if (continents < 0) return 0;
+	if (continents < 0) return 0.0;
 	float n = continents - (amplitude[0]*seaLevel*0.5);
 	// we save the height n now as a constant h
 	const float h = n;

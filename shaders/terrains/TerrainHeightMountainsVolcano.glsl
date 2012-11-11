@@ -13,7 +13,7 @@ uniform float frequency[10];
 float GetHeight(in vec3 p)
 {
 	float continents = octavenoise(octaves[0], 0.5, lacunarity[0], p) - seaLevel;
-	if (continents < 0) return 0;
+	if (continents < 0) return 0.0;
 	// unused variable \\ float mountain_distrib = octavenoise(octaves[1], 0.5, p);
 	float mountains = octavenoise(octaves[2], lacunarity[2], 0.5, p);
 	float mountains2 = octavenoise(octaves[3], lacunarity[3], 0.5, p);
@@ -48,7 +48,7 @@ float GetHeight(in vec3 p)
 	n += -0.05f;
 	n = (n > 0.0 ? n : 0.0);
 
-	n = n*.01f;
+	n = n*0.01f;
 
 	if (n > 0.0) {
 		// smooth in hills at shore edges
