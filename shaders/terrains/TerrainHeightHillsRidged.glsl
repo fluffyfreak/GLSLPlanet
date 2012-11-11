@@ -12,14 +12,14 @@ uniform float frequency[10];
 
 float GetHeight(in vec3 p)
 {
-	float continents = ridged_octavenoise(octaves[3], 0.65, lacunarity[3], p) * (1.0-seaLevel) - (seaLevel*0.1);
-	if (continents < 0) return 0.0;
+	float continents = ridged_octavenoise(octaves[3], 0.65, lacunarity[3], p, 1.0, 1.0) * (1.0-seaLevel) - (seaLevel*0.1);
+	if (continents < 0.0) return 0.0;
 	float n = continents;
-	float distrib = river_octavenoise(octaves[4], 0.5, lacunarity[4], p);
-	float m = 0.5* ridged_octavenoise(octaves[4], 0.55*distrib, lacunarity[4], p);
-	m += continents*0.25*ridged_octavenoise(octaves[5], 0.58*distrib, lacunarity[5], p);
+	float distrib = river_octavenoise(octaves[4], 0.5, lacunarity[4], p, 1.0, 1.0);
+	float m = 0.5* ridged_octavenoise(octaves[4], 0.55*distrib, lacunarity[4], p, 1.0, 1.0);
+	m += continents*0.25*ridged_octavenoise(octaves[5], 0.58*distrib, lacunarity[5], p, 1.0, 1.0);
 	// **
-	m += 0.001*ridged_octavenoise(octaves[6], 0.55*distrib*m, lacunarity[6], p);
+	m += 0.001*ridged_octavenoise(octaves[6], 0.55*distrib*m, lacunarity[6], p, 1.0, 1.0);
 	// cliffs at shore
 	if (continents < 0.01) n += m * continents * 100.0f;
 	else n += m;

@@ -12,17 +12,17 @@ uniform float frequency[10];
 
 float GetHeight(in vec3 p)
 {
-	float continents = octavenoise(octaves[0], 0.5, lacunarity[0], p) - seaLevel;
-	if (continents < 0) return 0.0;
+	float continents = octavenoise(octaves[0], 0.5, lacunarity[0], p, 1.0, 1.0) - seaLevel;
+	if (continents < 0.0) return 0.0;
 	float n = 0.3 * continents;
 	float m = 0;//amplitude[1] * octavenoise(octaves[1], 0.5, p);
-	float distrib = 0.5*ridged_octavenoise(octaves[1], 0.5*octavenoise(octaves[2], 0.5, lacunarity[2], p), lacunarity[1], p);
-	distrib += 0.7*billow_octavenoise(octaves[2], 0.5*ridged_octavenoise(octaves[1], 0.5, lacunarity[1], p), lacunarity[2], p) +
-		0.1*octavenoise(octaves[3], 0.5*ridged_octavenoise(octaves[2], 0.5, lacunarity[2], p), lacunarity[3], p);
+	float distrib = 0.5*ridged_octavenoise(octaves[1], 0.5*octavenoise(octaves[2], 0.5, lacunarity[2], p, 1.0, 1.0), lacunarity[1], p, 1.0, 1.0);
+	distrib += 0.7*billow_octavenoise(octaves[2], 0.5*ridged_octavenoise(octaves[1], 0.5, lacunarity[1], p, 1.0, 1.0), lacunarity[2], p, 1.0, 1.0) +
+		0.1*octavenoise(octaves[3], 0.5*ridged_octavenoise(octaves[2], 0.5, lacunarity[2], p, 1.0, 1.0), lacunarity[3], p, 1.0, 1.0);
 
-	if (distrib > 0.5) m += 2.0 * (distrib-0.5) * amplitude[3] * octavenoise(octaves[4], 0.5*distrib, lacunarity[4], p);
+	if (distrib > 0.5) m += 2.0 * (distrib-0.5) * amplitude[3] * octavenoise(octaves[4], 0.5*distrib, lacunarity[4], p, 1.0, 1.0);
 	// cliffs at shore
-	if (continents < 0.001) n += m * continents * 1000.0f;
+	if (continents < 0.001) n += m * continents * 1000.0;
 	else n += m;
 	n += crater_function(octaves[5], amplitude[5], frequency[5], lacunarity[5], p);
 	n += crater_function(octaves[6], amplitude[6], frequency[6], lacunarity[6], p);

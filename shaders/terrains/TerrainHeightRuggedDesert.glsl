@@ -12,14 +12,14 @@ uniform float frequency[10];
 
 float GetHeight(in vec3 p)
 {
-	float continents = octavenoise(octaves[0], 0.5, lacunarity[0], p) - seaLevel;// + (cliff_function(octaves[7], amplitude[7], frequency[7], lacunarity[7], p)*0.5);
-	if (continents < 0) return 0.0;
-	float mountain_distrib = octavenoise(octaves[2], 0.5, lacunarity[2], p);
-	float mountains = ridged_octavenoise(octaves[1], 0.5, lacunarity[1], p);
+	float continents = octavenoise(octaves[0], 0.5, lacunarity[0], p, 1.0, 1.0) - seaLevel;// + (cliff_function(octaves[7], amplitude[7], frequency[7], lacunarity[7], p)*0.5);
+	if (continents < 0.0) return 0.0;
+	float mountain_distrib = octavenoise(octaves[2], 0.5, lacunarity[2], p, 1.0, 1.0);
+	float mountains = ridged_octavenoise(octaves[1], 0.5, lacunarity[1], p, 1.0, 1.0);
 	//float rocks = octavenoise(octaves[9], 0.5, p);
-	float hill_distrib = octavenoise(octaves[4], 0.5, lacunarity[4], p);
-	float hills = hill_distrib * amplitude[3] * billow_octavenoise(octaves[3], 0.5, lacunarity[3], p);
-	float dunes = hill_distrib * amplitude[5] * dunes_octavenoise(octaves[5], 0.5, lacunarity[5], p);
+	float hill_distrib = octavenoise(octaves[4], 0.5, lacunarity[4], p, 1.0, 1.0);
+	float hills = hill_distrib * amplitude[3] * billow_octavenoise(octaves[3], 0.5, lacunarity[3], p, 1.0, 1.0);
+	float dunes = hill_distrib * amplitude[5] * dunes_octavenoise(octaves[5], 0.5, lacunarity[5], p, 1.0, 1.0);
 	float n = continents * amplitude[0] * 2 ;//+ (cliff_function(octaves[6], amplitude[6], frequency[6], lacunarity[6], p)*0.5);
 	float m = canyon_normal_function(octaves[6], amplitude[6], frequency[6], lacunarity[6], p);
 	m += canyon2_normal_function(octaves[6], amplitude[6], frequency[6], lacunarity[6], p);
@@ -39,11 +39,11 @@ float GetHeight(in vec3 p)
 	// makes larger dunes at lower altitudes, flat ones at high altitude.
 	mountains = mountain_distrib * amplitude[3] * mountains*mountains*mountains;
 	// smoothes edges of mountains and places them only above a set altitude
-	if (n < 0.1) n += n * 10.0f * hills;
+	if (n < 0.1) n += n * 10.0 * hills;
 	else n += hills;
 	if (n > 0.2) n += dunes * (0.2/n);
 	else n += dunes;
-	if (n < 0.1) n += n * 10.0f * mountains;
+	if (n < 0.1) n += n * 10.0 * mountains;
 	else n += mountains;
 
 	//rocks = mountain_distrib * amplitude[9] * rocks*rocks*rocks;

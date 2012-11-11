@@ -297,7 +297,20 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		"terrains/TerrainHeightHillsNormal.glsl",
 		"terrains/TerrainHeightHillsRidged.glsl",
 		"terrains/TerrainHeightHillsRivers.glsl",
-		//"terrains/TerrainHeightShaderFun.glsl",
+		//"terrains/TerrainHeightMapped.glsl",		// wtf to do with this?
+		//"terrains/TerrainHeightMapped2.glsl",		// wtf to do with this?
+		"terrains/TerrainHeightMountainsCraters.glsl",
+		"terrains/TerrainHeightMountainsCraters2.glsl",
+		"terrains/TerrainHeightMountainsNormal.glsl",
+		"terrains/TerrainHeightMountainsRidged.glsl",
+		"terrains/TerrainHeightMountainsRivers.glsl",
+		//"terrains/TerrainHeightMountainsRiversVolcano.glsl",	// requires m_seed and bit shifting
+		//"terrains/TerrainHeightMountainsVolcano.glsl",		// requires m_seed and bit shifting
+		"terrains/TerrainHeightRuggedDesert.glsl",
+		"terrains/TerrainHeightRuggedLava.glsl",
+		"terrains/TerrainHeightShaderFun.glsl",
+		"terrains/TerrainHeightWaterSolid.glsl",
+		"terrains/TerrainHeightWaterSolidCanyons.glsl",
 		""
 	};
 	vecBindings noiseyBinding;
