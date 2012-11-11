@@ -251,7 +251,9 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader
-	LoadShader(quad_heightmap_prog, "heightmap.vert", "heightmap.frag");
+	vecBindings noiseyBinding;
+	noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
+	LoadShader(quad_heightmap_prog, "heightmap.vert", "heightmap.frag", noiseyBinding);
 	quad_heightmap_v0		= glGetUniformLocation(quad_heightmap_prog, "v0");
 	quad_heightmap_v1		= glGetUniformLocation(quad_heightmap_prog, "v1");
 	quad_heightmap_v2		= glGetUniformLocation(quad_heightmap_prog, "v2");

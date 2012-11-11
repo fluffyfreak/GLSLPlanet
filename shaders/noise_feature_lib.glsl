@@ -435,10 +435,10 @@ float river_function(in int octaves, in float amplitude, in float frequency, in 
 {
 	float h;
 	float n = octavenoise(octaves, 0.585, 2.0, frequency*p*0.5);
-	float outer[] = {0.67, 0.01};
-	float inner[] = {0.715, 0.49};
-	float inner2[] = {0.715, 0.51};
-	float outer2[] = {0.76, 0.99};
+	float outer[2] = float[2](0.67, 0.01);
+	float inner[2] = float[2](0.715, 0.49);
+	float inner2[2] = float[2](0.715, 0.51);
+	float outer2[2] = float[2](0.76, 0.99);
 	if (n > outer2[style]) {
 		h = 1.0;
 	} else if (n > inner2[style]) {

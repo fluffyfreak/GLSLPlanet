@@ -9,7 +9,7 @@
 #include "utils.h"
 #include "TextFile.h"
 
-void LoadShader( GLuint &prog, std::string vertstr, std::string fragstr )
+void LoadShader( unsigned int &prog, const std::string &vertstr, const std::string &fragstr, const vecBindings &includePaths /* = s_nullBindings */ )
 {
 	GLuint v,f;
 	std::string vs, fs;
@@ -20,10 +20,28 @@ void LoadShader( GLuint &prog, std::string vertstr, std::string fragstr )
 
 	const std::string shaderpath("./shaders/");
 
-	/*const std::string libpath( shaderpath + "noise_lib.glsl");
-	const std::string lib = textFileRead( libpath.c_str() );
-	vs = lib;
-	fs = lib;*/
+	vecBindings::const_iterator iter = includePaths.begin();
+	while (iter!=includePaths.end())
+	{
+		const std::string libpath( shaderpath + (*iter).first );
+		const std::string lib = textFileRead( libpath.c_str() );
+		switch ((*iter).second)
+		{
+		case eBothShaders:
+			vs = lib;
+			fs = lib;
+			break;
+		case eVertShader:
+			vs = lib;
+			break;
+		case eFragShader:
+			fs = lib;
+			break;
+		}
+
+		// Next!
+		++iter;
+	}
 
 	const std::string vertname( shaderpath + vertstr);
 	const std::string fragname( shaderpath + fragstr);
