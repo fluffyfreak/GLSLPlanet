@@ -9,8 +9,9 @@
 #include "utils.h"
 #include "TextFile.h"
 
-void LoadShader( unsigned int &prog, const std::string &vertstr, const std::string &fragstr, const vecBindings &includePaths /* = s_nullBindings */ )
+bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::string &fragstr, const vecBindings &includePaths /* = s_nullBindings */ )
 {
+	bool success = true;
 	GLuint v,f;
 	std::string vs, fs;
 	const int MaxInfoLogLength = 2048;
@@ -20,9 +21,14 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 
 	const std::string shaderpath("./shaders/");
 
+	printf("--------------------------\n");
+	printf("Loading: \n -- vertex prog \"%s\" \n and \n -- fragement prog \"%s\"\n", vertstr.c_str(), fragstr.c_str(), infoLog);
+	printf("With %d libraries:\n", includePaths.size());
+
 	vecBindings::const_iterator iter = includePaths.begin();
 	while (iter!=includePaths.end())
 	{
+		printf(" -- :\"%s\"\n", (*iter).first.c_str());
 		const std::string libpath( shaderpath + (*iter).first );
 		const std::string lib = textFileRead( libpath.c_str() );
 		switch ((*iter).second)
@@ -67,7 +73,8 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 			glGetShaderiv(v,GL_COMPILE_STATUS,&param);
 			if( param==GL_FALSE ) {
 				glGetShaderInfoLog(v,MaxInfoLogLength,&length,infoLog);
-				printf("GLSL Error: \n%s", infoLog);
+				printf("GLSL Error compiling \"%s\": \n%s\n", vertstr.c_str(), infoLog);
+				success = false;
 			}
 			checkGLError();
 		}
@@ -80,7 +87,8 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 			glGetShaderiv(f,GL_COMPILE_STATUS,&param);
 			if( param==GL_FALSE ) {
 				glGetShaderInfoLog(f,MaxInfoLogLength,&length,infoLog);
-				printf("GLSL Error: \n%s", infoLog);
+				printf("GLSL Error: compiling \"%s\"\n%s\n", fragstr.c_str(), infoLog);
+				success = false;
 			}
 			checkGLError();
 		}
@@ -98,8 +106,11 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 		glGetProgramiv(prog,GL_LINK_STATUS,&param);
 		if( param==GL_FALSE ) {
 			glGetProgramInfoLog(prog,MaxInfoLogLength,&length,infoLog);
-			printf("GLSL Link Error: \n%s", infoLog);
+			printf("GLSL Link Error with: \n -- vertex prog \"%s\" and \n -- fragement prog \"%s\": \n%s\n\n", vertstr.c_str(), fragstr.c_str(), infoLog);
+			success = false;
 		}
 		checkGLError();
 	}
+
+	return success;
 }

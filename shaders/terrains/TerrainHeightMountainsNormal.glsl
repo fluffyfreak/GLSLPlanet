@@ -30,20 +30,20 @@ float GetHeight(in vec3 p)
 		// This smoothes edges near the coast, we cant have vertical terrain its not handled correctly.
 		if (n < 0.4){
 			n += n*1.25*ridged_octavenoise(octaves[6],
-				Clamp(h*0.00002, 0.3, 0.7)*
+				clamp(h*0.00002, 0.3, 0.7)*
 				ridged_octavenoise(octaves[5], 0.5, lacunarity[5], p), lacunarity[6], p);
 		} else {
 			n += 0.5*ridged_octavenoise(octaves[6],
-				Clamp(h*0.00002, 0.3, 0.7)*
+				clamp(h*0.00002, 0.3, 0.7)*
 				ridged_octavenoise(octaves[5], 0.5, lacunarity[5], p), lacunarity[6], p);
 		}
 
 		if (n < 0.2){
 			n += n*15.0*river_octavenoise(octaves[6],
-				Clamp(h*0.00002, 0.5, 0.7), lacunarity[6], p);
+				clamp(h*0.00002, 0.5, 0.7), lacunarity[6], p);
 		} else {
 			n += 3.0*river_octavenoise(octaves[6],
-				Clamp(h*0.00002, 0.5, 0.7), lacunarity[6], p);
+				clamp(h*0.00002, 0.5, 0.7), lacunarity[6], p);
 		}
 
 		if (n < 0.4){
@@ -69,27 +69,27 @@ float GetHeight(in vec3 p)
 
 		//jagged surface for mountains
 		//This is probably using far too much noise, some of it is just not needed
-		// More specifically this: Clamp(h*0.0002*octavenoise(octaves[5], 0.5, p),
+		// More specifically this: clamp(h*0.0002*octavenoise(octaves[5], 0.5, p),
 		//		 0.5*octavenoise(octaves[3], 0.5, p),
 		//		 0.5*octavenoise(octaves[3], 0.5, p))
-		//should probably be: Clamp(h*0.0002*octavenoise(octaves[5], 0.5, p),
+		//should probably be: clamp(h*0.0002*octavenoise(octaves[5], 0.5, p),
 		//		 0.1,
 		//		 0.5)  But I have no time for testing
 		if (n > 0.25) {
 			n += (n-0.25)*0.1*octavenoise(octaves[3],
-				Clamp(h*0.0002*octavenoise(octaves[5], 0.5, lacunarity[5], p),
+				clamp(h*0.0002*octavenoise(octaves[5], 0.5, lacunarity[5], p),
 				 0.5*octavenoise(octaves[3], 0.5, lacunarity[3], p),
 				 0.5*octavenoise(octaves[3], 0.5, lacunarity[3], p)), lacunarity[3], p); //[4]?
 		}
 
 		if (n > 0.2 && n <= 0.25) {
 			n += (0.25-n)*0.2*ridged_octavenoise(octaves[3],
-				Clamp(h*0.0002*octavenoise(octaves[5], 0.5, lacunarity[5], p),
+				clamp(h*0.0002*octavenoise(octaves[5], 0.5, lacunarity[5], p),
 				 0.5*octavenoise(octaves[3], 0.5, lacunarity[3], p),
 				 0.5*octavenoise(octaves[4], 0.5, lacunarity[4], p)), lacunarity[3], p);
 		} else if (n > 0.05) {
 			n += ((n-0.05)/15)*ridged_octavenoise(octaves[3],
-				Clamp(h*0.0002*octavenoise(octaves[5], 0.5, lacunarity[5], p),
+				clamp(h*0.0002*octavenoise(octaves[5], 0.5, lacunarity[5], p),
 				 0.5*octavenoise(octaves[3], 0.5, lacunarity[3], p),
 				 0.5*octavenoise(octaves[4], 0.5, lacunarity[4], p)), lacunarity[3], p);
 		}
@@ -97,13 +97,13 @@ float GetHeight(in vec3 p)
 
 		if (n < 0.01){
 			n += n*voronoiscam_octavenoise(octaves[3],
-				Clamp(h*0.00002, 0.5, 0.5), lacunarity[3], p);
+				clamp(h*0.00002, 0.5, 0.5), lacunarity[3], p);
 		} else if (n <0.02){
 			n += 0.01*voronoiscam_octavenoise(octaves[3],
-				Clamp(h*0.00002, 0.5, 0.5), lacunarity[3], p);
+				clamp(h*0.00002, 0.5, 0.5), lacunarity[3], p);
 		} else {
 			n += (0.02/n)*0.01*voronoiscam_octavenoise(octaves[3],
-				Clamp(h*0.00002, 0.5, 0.5), lacunarity[3], p);
+				clamp(h*0.00002, 0.5, 0.5), lacunarity[3], p);
 		}
 
 		if (n < 0.001){
@@ -137,7 +137,7 @@ float GetHeight(in vec3 p)
 				river_octavenoise(octaves[2], 0.5, lacunarity[2], p), lacunarity[2], p);
 		} else {
 			n += (0.2/n)*0.005*dunes_octavenoise(octaves[2],
-				Clamp(0.7-(1-(5*n)), 0.0, 0.7)*
+				clamp(0.7-(1-(5*n)), 0.0, 0.7)*
 				river_octavenoise(octaves[2], 0.5, lacunarity[2], p), lacunarity[2], p);
 		}
 

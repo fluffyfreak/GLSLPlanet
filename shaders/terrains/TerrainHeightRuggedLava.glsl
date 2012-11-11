@@ -12,7 +12,7 @@ uniform float frequency[10];
 
 float GetHeight(in vec3 p)
 {
-	float continents = octavenoise(octaves[0], Clamp(0.725-(seaLevel/2), 0.1, 0.725), lacunarity[0], p) - seaLevel;
+	float continents = octavenoise(octaves[0], clamp(0.725-(seaLevel/2), 0.1, 0.725), lacunarity[0], p) - seaLevel;
 	if (continents < 0.0) return 0.0;
 	float mountain_distrib = octavenoise(octaves[1], 0.55, lacunarity[1], p);
 	float mountains = octavenoise(octaves[2], 0.5, lacunarity[2], p) * ridged_octavenoise(octaves[2], 0.575, lacunarity[2], p);

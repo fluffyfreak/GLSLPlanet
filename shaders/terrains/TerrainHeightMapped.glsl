@@ -23,8 +23,8 @@ float GetHeight(in vec3 p)
 	float py = ((m_heightMapSizeY-1)*(latitude + 0.5*M_PI)) / M_PI;
 	int ix = int(floor(px));
 	int iy = int(floor(py));
-	ix = Clamp(ix, 0, m_heightMapSizeX-1);
-	iy = Clamp(iy, 0, m_heightMapSizeY-1);
+	ix = clamp(ix, 0, m_heightMapSizeX-1);
+	iy = clamp(iy, 0, m_heightMapSizeY-1);
 	float dx = px-ix;
 	float dy = py-iy;
 
@@ -35,7 +35,7 @@ float GetHeight(in vec3 p)
 	float map[4][4];
 	for (int x=-1; x<3; x++) {
 		for (int y=-1; y<3; y++) {
-			map[x+1][y+1] = m_heightMap[Clamp(iy+y, 0, m_heightMapSizeY-1)*m_heightMapSizeX + Clamp(ix+x, 0, m_heightMapSizeX-1)];
+			map[x+1][y+1] = m_heightMap[clamp(iy+y, 0, m_heightMapSizeY-1)*m_heightMapSizeX + clamp(ix+x, 0, m_heightMapSizeX-1)];
 		}
 	}
 
@@ -100,11 +100,11 @@ float GetHeight(in vec3 p)
 		}
 
 		//ridges and bumps
-		v += h*0.2*voronoiscam_octavenoise(octaves[5-fracnum], Clamp(1.0-(h*0.0002), 0.0, 0.6), p)
-			* Clamp(1.0-(h*0.0006), 0.0, 1.0);
+		v += h*0.2*voronoiscam_octavenoise(octaves[5-fracnum], clamp(1.0-(h*0.0002), 0.0, 0.6), p)
+			* clamp(1.0-(h*0.0006), 0.0, 1.0);
 		//polar ice caps with cracks
-		if ((m_icyness*0.5)+(fabs(p.y*p.y*p.y*0.38)) > 0.6) {
-			h = Clamp(1.0-(v*10.0), 0.0, 1.0)*voronoiscam_octavenoise(octaves[5-fracnum], 0.5, p);
+		if ((m_icyness*0.5)+(abs(p.y*p.y*p.y*0.38)) > 0.6) {
+			h = clamp(1.0-(v*10.0), 0.0, 1.0)*voronoiscam_octavenoise(octaves[5-fracnum], 0.5, p);
 			h *= h*h*2.0;
 			h -= 3.0;
 			v += h;

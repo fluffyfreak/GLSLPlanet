@@ -14,7 +14,7 @@ float GetHeight(in vec3 p)
 {
 	float continents = 0.7*river_octavenoise(octaves[2], 0.5, lacunarity[2], p)-seaLevel;
 	continents = amplitude[0] * ridged_octavenoise(octaves[0],
-		Clamp(continents, 0.0, 0.6), lacunarity[0], p);
+		clamp(continents, 0.0, 0.6), lacunarity[0], p);
 	float mountains = ridged_octavenoise(octaves[2], 0.5, lacunarity[2], p);
 	float hills = octavenoise(octaves[2], 0.5, lacunarity[2], p) *
 		amplitude[1] * river_octavenoise(octaves[1], 0.5, lacunarity[1], p);

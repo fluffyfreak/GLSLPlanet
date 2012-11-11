@@ -284,29 +284,56 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	};*/
 	static const std::string shaderFilenames[] = {
 		"terrains/TerrainHeightAsteroid.glsl",
-		"terrains/TerrainHeightShaderFun.glsl",
+		"terrains/TerrainHeightAsteroid2.glsl",
+		"terrains/TerrainHeightAsteroid3.glsl",
+		"terrains/TerrainHeightAsteroid4.glsl",
+		"terrains/TerrainHeightBarrenRock.glsl",
+		"terrains/TerrainHeightBarrenRock2.glsl",
+		"terrains/TerrainHeightBarrenRock3.glsl",
+		"terrains/TerrainHeightFlat.glsl",
+		"terrains/TerrainHeightHillsCraters.glsl",
+		"terrains/TerrainHeightHillsCraters2.glsl",
+		"terrains/TerrainHeightHillsDunes.glsl",
+		"terrains/TerrainHeightHillsNormal.glsl",
+		"terrains/TerrainHeightHillsRidged.glsl",
+		"terrains/TerrainHeightHillsRivers.glsl",
+		//"terrains/TerrainHeightShaderFun.glsl",
 		""
 	};
 	vecBindings noiseyBinding;
+	noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
+	noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
 	int shdFnameIdx=0;
+	mCurrentHeightmapProg = 0;//mHeightmapProgs.size()-1;
 	while(shaderFilenames[shdFnameIdx][0] != '\0')
 	{
-		noiseyBinding.clear();
-		noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
-		noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
 		noiseyBinding.push_back( ShaderBindPair(shaderFilenames[shdFnameIdx],eFragShader) );
 		SHeightmapGen hProg;
-		LoadShader(hProg.prog, "heightmap_gen.vert", "heightmap_gen.frag", noiseyBinding);
-		hProg.v0		= glGetUniformLocation(hProg.prog, "v0");
-		hProg.v1		= glGetUniformLocation(hProg.prog, "v1");
-		hProg.v2		= glGetUniformLocation(hProg.prog, "v2");
-		hProg.v3		= glGetUniformLocation(hProg.prog, "v3");
-		hProg.fracStep	= glGetUniformLocation(hProg.prog, "fracStep");
+		const bool success = LoadShader(hProg.prog, "heightmap_gen.vert", "heightmap_gen.frag", noiseyBinding);
+		if(success) {
+			mCurrentHeightmapProg = shdFnameIdx;
+		}
+		hProg.v0			= glGetUniformLocation(hProg.prog, "v0");
+		hProg.v1			= glGetUniformLocation(hProg.prog, "v1");
+		hProg.v2			= glGetUniformLocation(hProg.prog, "v2");
+		hProg.v3			= glGetUniformLocation(hProg.prog, "v3");
+		hProg.fracStep		= glGetUniformLocation(hProg.prog, "fracStep");
+
+		hProg.maxHeight		= glGetUniformLocation(hProg.prog, "maxHeight");
+		hProg.seaLevel		= glGetUniformLocation(hProg.prog, "seaLevel");
+		hProg.fracnum		= glGetUniformLocation(hProg.prog, "fracnum");
+
+		hProg.octaves		= glGetUniformLocation(hProg.prog, "octaves");
+		hProg.amplitude		= glGetUniformLocation(hProg.prog, "amplitude");
+		hProg.lacunarity	= glGetUniformLocation(hProg.prog, "lacunarity");
+		hProg.frequency		= glGetUniformLocation(hProg.prog, "frequency");
+
 		checkGLError();
 		mHeightmapProgs.push_back(hProg);
+		noiseyBinding.pop_back();
 		shdFnameIdx++;
 	}
-	mCurrentHeightmapProg = 0;//mHeightmapProgs.size()-1;
+	
 
 	////////////////////////////////////////////////////////////////
 	// load the patch terrain shader
@@ -383,17 +410,32 @@ void GeoPatchContext::renderHeightmap(
 	// Clear the fbo
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	checkGLError();
+
+	const SHeightmapGen& rHGD = GetHeightmapGenData();
 		
 	// Use our fbo shader
-	glUseProgram(quadHeightmapProg());
+	glUseProgram(rHGD.prog);
 	checkGLError();
 
-	glUniform3fv(quadHeightmapV0ID(),		1, &v0[0]);
-	glUniform3fv(quadHeightmapV1ID(),		1, &v1[0]);
-	glUniform3fv(quadHeightmapV2ID(),		1, &v2[0]);
-	glUniform3fv(quadHeightmapV3ID(),		1, &v3[0]);
+	glUniform3fv(rHGD.v0,		1, &v0[0]);
+	glUniform3fv(rHGD.v1,		1, &v1[0]);
+	glUniform3fv(rHGD.v2,		1, &v2[0]);
+	glUniform3fv(rHGD.v3,		1, &v3[0]);
 	const float reciprocalFBOWidth = textureLerpStep();
-	glUniform1f(quadHeightmapFracStepID(), reciprocalFBOWidth);
+	glUniform1f(rHGD.fracStep, reciprocalFBOWidth);
+
+	glUniform1f(rHGD.maxHeight,	2.0f);
+	glUniform1f(rHGD.seaLevel,	0.01f);
+	glUniform1i(rHGD.fracnum,	3);
+	
+	int octaves[10] = {3};
+	float amplitude[10] = {3.0f};
+	float lacunarity[10] = {3.0f};
+	float frequency[10] = {3.0f};
+	glUniform1iv(rHGD.octaves,		10,		&octaves[0]);
+	glUniform1fv(rHGD.amplitude,	10,		&amplitude[0]);
+	glUniform1fv(rHGD.lacunarity,	10,		&lacunarity[0]);
+	glUniform1fv(rHGD.frequency,	10,		&frequency[0]);
 
 	// rendering our quad now should fill the render texture with the heightmap shaders output
 	renderQuad();

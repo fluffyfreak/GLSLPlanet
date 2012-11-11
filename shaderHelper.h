@@ -17,7 +17,7 @@ typedef std::pair<std::string,EShaderBinding> ShaderBindPair;
 typedef std::vector<ShaderBindPair> vecBindings;
 static const vecBindings s_nullBindings;
 
-void LoadShader( unsigned int &prog, const std::string &vertstr, const std::string &fragstr, const vecBindings &includePaths = s_nullBindings );
+bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::string &fragstr, const vecBindings &includePaths = s_nullBindings );
 
 #endif // __shaderHelper_h__
 

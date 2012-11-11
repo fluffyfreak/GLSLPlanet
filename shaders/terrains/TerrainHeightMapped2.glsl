@@ -25,8 +25,8 @@ float GetHeight(in vec3 p)
 	float py = ((m_heightMapSizeY-1)*(latitude + 0.5*M_PI)) / M_PI;
 	int ix = int(floor(px));
 	int iy = int(floor(py));
-	ix = Clamp(ix, 0, m_heightMapSizeX-1);
-	iy = Clamp(iy, 0, m_heightMapSizeY-1);
+	ix = clamp(ix, 0, m_heightMapSizeX-1);
+	iy = clamp(iy, 0, m_heightMapSizeY-1);
 	float dx = px-ix;
 	float dy = py-iy;
 
@@ -37,7 +37,7 @@ float GetHeight(in vec3 p)
 	float map[4][4];
 	for (int x=-1; x<3; x++) {
 		for (int y=-1; y<3; y++) {
-			map[x+1][y+1] = m_heightMapScaled[Clamp(iy+y, 0, m_heightMapSizeY-1)*m_heightMapSizeX + Clamp(ix+x, 0, m_heightMapSizeX-1)];
+			map[x+1][y+1] = m_heightMapScaled[clamp(iy+y, 0, m_heightMapSizeY-1)*m_heightMapSizeX + clamp(ix+x, 0, m_heightMapSizeX-1)];
 		}
 	}
 

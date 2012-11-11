@@ -10,8 +10,8 @@ void checkGLError()
 	if( err ) {
 		const char * errmsg = (const char *)gluErrorString(err);
 		if( errmsg == nullptr )
-			printf("GL Error: Unknown\n");
+			printf("GL Error: Unknown\n-----------------\n\n");
 		else
-			printf("GL Error: %s\n", errmsg);
+			printf("GL Error: %s\n-----------------\n\n", errmsg);
 	}
 }

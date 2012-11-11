@@ -13,7 +13,7 @@ uniform float frequency[10];
 // Banded/Ridged pattern mountainous terrain, could pass for desert
 float GetHeight(in vec3 p)
 {
-	float n = octavenoise(8, 0.5, 4.0, p) * ridged_octavenoise(8, 0.5, 4.0, p);
+	float n = octavenoise(8, 0.5, 4.0, p, 1.0, 1.0) * ridged_octavenoise(8, 0.5, 4.0, p, 1.0, 1.0);
 
 	return (n > 0.0? maxHeight*n : 0.0);
 }

@@ -14,7 +14,7 @@ uniform float frequency[10];
 // Could be used as a basis for terrains that should have erosion.
 float GetHeight(in vec3 p)
 {
-	float n = billow_octavenoise(16, 0.3*octavenoise(8, 0.4, 2.5, p),Clamp(5.0*ridged_octavenoise(8, 0.377, 4.0, p), 1.0, 5.0), p);
+	float n = billow_octavenoise(16, 0.3*octavenoise(8, 0.4, 2.5, p, 1.0, 1.0),clamp(5.0*ridged_octavenoise(8, 0.377, 4.0, p, 1.0, 1.0), 1.0, 5.0), p, 1.0, 1.0);
 
 	return (n > 0.0? maxHeight*n : 0.0);
 }

@@ -95,19 +95,22 @@ private:
 		GLuint v2;
 		GLuint v3;
 		GLuint fracStep;
+
+		GLuint maxHeight;
+		GLuint seaLevel;
+		GLuint fracnum;
+
+		GLuint octaves;
+		GLuint amplitude;
+		GLuint lacunarity;
+		GLuint frequency;
 	};
 	std::vector<SHeightmapGen> mHeightmapProgs;
 	size_t mCurrentHeightmapProg;
 public:
+	const SHeightmapGen& GetHeightmapGenData()	const { return mHeightmapProgs[mCurrentHeightmapProg]; }
 	void renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3, const uint32_t targetTex) const;
 	void renderQuad() const;
-
-	GLuint quadHeightmapProg()					const { return mHeightmapProgs[mCurrentHeightmapProg].prog; }
-	GLuint quadHeightmapV0ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v0; }
-	GLuint quadHeightmapV1ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v1; }
-	GLuint quadHeightmapV2ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v2; }
-	GLuint quadHeightmapV3ID()					const { return mHeightmapProgs[mCurrentHeightmapProg].v3; }
-	GLuint quadHeightmapFracStepID()			const { return mHeightmapProgs[mCurrentHeightmapProg].fracStep; }
 
 private:
 	GLuint patch_prog;
