@@ -25,8 +25,8 @@ void LoadShader( GLuint &prog, std::string vertstr, std::string fragstr )
 	vs = lib;
 	fs = lib;*/
 
-	const std::string vertname( shaderpath + vertstr + ".vert");
-	const std::string fragname( shaderpath + fragstr + ".frag");
+	const std::string vertname( shaderpath + vertstr);
+	const std::string fragname( shaderpath + fragstr);
 
 	vs += textFileRead( vertname.c_str() );
 	fs += textFileRead( fragname.c_str() );

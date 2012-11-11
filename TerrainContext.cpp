@@ -251,7 +251,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader
-	LoadShader(quad_heightmap_prog, "heightmap", "heightmap");
+	LoadShader(quad_heightmap_prog, "heightmap.vert", "heightmap.frag");
 	quad_heightmap_v0		= glGetUniformLocation(quad_heightmap_prog, "v0");
 	quad_heightmap_v1		= glGetUniformLocation(quad_heightmap_prog, "v1");
 	quad_heightmap_v2		= glGetUniformLocation(quad_heightmap_prog, "v2");
@@ -261,7 +261,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 
 	////////////////////////////////////////////////////////////////
 	// load the patch terrain shader
-	LoadShader(patch_prog, "patch", "patch");
+	LoadShader(patch_prog, "patch.vert", "patch.frag");
 	// Get a handle for our "MVP" uniform(s)
 	patch_MatrixID		= glGetUniformLocation(patch_prog, "MVP");
 	patch_ViewMatrixID	= glGetUniformLocation(patch_prog, "V");

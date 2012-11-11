@@ -10,11 +10,11 @@ float canyon_ridged_function(in int octaves, in float amplitude, in float freque
 	float inner2 = 0.715;
 	float outer2 = 0.72;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -34,11 +34,11 @@ float canyon2_ridged_function(in int octaves, in float amplitude, in float frequ
 	float inner2 = 0.72;
 	float outer2 = 0.73;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -81,11 +81,11 @@ float canyon_normal_function(in int octaves, in float amplitude, in float freque
 	float inner2 = 0.715;
 	float outer2 = 0.72;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -104,11 +104,11 @@ float canyon2_normal_function(in int octaves, in float amplitude, in float frequ
 	float inner2 = 0.72;
 	float outer2 = 0.73;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -150,11 +150,11 @@ float canyon_voronoi_function(in int octaves, in float amplitude, in float frequ
 	float inner2 = 0.715;
 	float outer2 = 0.72;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -173,11 +173,11 @@ float canyon2_voronoi_function(in int octaves, in float amplitude, in float freq
 	float inner2 = 0.72;
 	float outer2 = 0.73;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -219,11 +219,11 @@ float canyon_billow_function(in int octaves, in float amplitude, in float freque
 	float inner2 = 0.715;
 	float outer2 = 0.72;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -242,11 +242,11 @@ float canyon2_billow_function(in int octaves, in float amplitude, in float frequ
 	float inner2 = 0.72;
 	float outer2 = 0.73;
 	if (n > outer2) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2) {
 		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
 	} else if (n > inner) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer) {
 		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
@@ -433,7 +433,6 @@ float megavolcano_function(in int octaves, in float amplitude, in float frequenc
 
 float river_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p, int style)
 {
-	assert(style >= 0 && style < 2);
 	float h;
 	float n = octavenoise(octaves, 0.585, 2.0, frequency*p*0.5);
 	float outer[] = {0.67, 0.01};
@@ -441,11 +440,11 @@ float river_function(in int octaves, in float amplitude, in float frequency, in 
 	float inner2[] = {0.715, 0.51};
 	float outer2[] = {0.76, 0.99};
 	if (n > outer2[style]) {
-		h = 1;
+		h = 1.0;
 	} else if (n > inner2[style]) {
 		h = 0.0+1.0*(n-inner2[style])*(1.0/(outer2[style]-inner2[style]));
 	} else if (n > inner[style]) {
-		h = 0;
+		h = 0.0;
 	} else if (n > outer[style]) {
 		h = 1.0-1.0*(n-outer[style])*(1.0/(inner[style]-outer[style]));
 	} else {
