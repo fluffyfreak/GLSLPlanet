@@ -4,7 +4,7 @@ float canyon_ridged_function(in int octaves, in float amplitude, in float freque
 {
 	float h;
 	float n = 0.0;
-	n = ridged_octavenoise(octaves, 0.54, 2.0, frequency*p);
+	n = ridged_octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -27,8 +27,8 @@ float canyon_ridged_function(in int octaves, in float amplitude, in float freque
 float canyon2_ridged_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0; //octavenoise(octaves, 0.56, 2.0, frequency*p);
-	n = ridged_octavenoise(octaves, 0.56, 2.0, frequency*p);
+	float n = 0.0;
+	n = ridged_octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -51,8 +51,8 @@ float canyon2_ridged_function(in int octaves, in float amplitude, in float frequ
 float canyon3_ridged_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0; //octavenoise(octaves, 0.585, 2.0, frequency*p);
-	n = ridged_octavenoise(octaves, 0.585, 2.0, frequency*p);
+	float n = 0.0; //octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
+	n = ridged_octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -75,7 +75,7 @@ float canyon_normal_function(in int octaves, in float amplitude, in float freque
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.54, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -98,7 +98,7 @@ float canyon2_normal_function(in int octaves, in float amplitude, in float frequ
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.56, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -121,7 +121,7 @@ float canyon3_normal_function(in int octaves, in float amplitude, in float frequ
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.585, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -144,7 +144,7 @@ float canyon_voronoi_function(in int octaves, in float amplitude, in float frequ
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.54, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -167,7 +167,7 @@ float canyon2_voronoi_function(in int octaves, in float amplitude, in float freq
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.56, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -190,7 +190,7 @@ float canyon3_voronoi_function(in int octaves, in float amplitude, in float freq
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.585, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -213,7 +213,7 @@ float canyon_billow_function(in int octaves, in float amplitude, in float freque
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.54, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -236,7 +236,7 @@ float canyon2_billow_function(in int octaves, in float amplitude, in float frequ
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.56, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -259,7 +259,7 @@ float canyon3_billow_function(in int octaves, in float amplitude, in float frequ
 {
 	float h;
 	float n = 0.0;
-	n = octavenoise(octaves, 0.585, 2.0, frequency*p);
+	n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -281,7 +281,7 @@ float canyon3_billow_function(in int octaves, in float amplitude, in float frequ
 float crater_function_1pass(in vec3 p, float inp, float height)
 {
 	float res = inp;
-	float n = fabs(noise(p));
+	float n = abs(snoise(vec4(p, 1.0)));
 	float ejecta_outer = 0.6;
 	float outer = 0.9;
 	float inner = 0.94;
@@ -320,7 +320,8 @@ float crater_function(in int octaves, in float amplitude, in float frequency, in
 
 float impact_crater_function_1pass(in vec3 p, float inp, float height)
 {
-	float n = fabs(noise(p));
+	float res = inp;
+	float n = abs(snoise(vec4(p, 1.0)));
 	float ejecta_outer = 0.6;
 	float outer = 0.9;
 	float midrim = 0.93;
@@ -356,7 +357,8 @@ float impact_crater_function(in int octaves, in float amplitude, in float freque
 
 float volcano_function_1pass(in vec3 p, float inp, float height)
 {
-	float n = fabs(noise(p));
+	float res = inp;
+	float n = abs(snoise(vec4(p, 1.0)));
 	float ejecta_outer = 0.6;
 	float outer = 0.9;
 	float inner = 0.975;
@@ -395,7 +397,7 @@ float volcano_function(in int octaves, in float amplitude, in float frequency, i
 float megavolcano_function_1pass(in vec3 p, float inp, float height)
 {
 	float res = inp;
-	float n = fabs(noise(p));
+	float n = abs(snoise(vec4(p, 1.0)));
 	float ejecta_outer = 0.6;
 	float outer = 0.76;  //Radius
 	float inner = 0.98;
@@ -434,19 +436,27 @@ float megavolcano_function(in int octaves, in float amplitude, in float frequenc
 float river_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p, int style)
 {
 	float h;
-	float n = octavenoise(octaves, 0.585, 2.0, frequency*p*0.5);
-	float outer[2] = float[2](0.67, 0.01);
-	float inner[2] = float[2](0.715, 0.49);
-	float inner2[2] = float[2](0.715, 0.51);
-	float outer2[2] = float[2](0.76, 0.99);
-	if (n > outer2[style]) {
+	float n = octavenoise(octaves, 0.585, 2.0, p*0.5, frequency, 1.0);
+
+	float outer = 0.67;
+	float inner = 0.715;
+	float inner2 = 0.715;
+	float outer2 = 0.76;
+	if (1==style) {
+		outer = 0.01;
+		inner = 0.49;
+		inner2 = 0.51;
+		outer2 = 0.99;
+	}
+
+	if (n > outer2) {
 		h = 1.0;
-	} else if (n > inner2[style]) {
-		h = 0.0+1.0*(n-inner2[style])*(1.0/(outer2[style]-inner2[style]));
-	} else if (n > inner[style]) {
+	} else if (n > inner2) {
+		h = 0.0+1.0*(n-inner2)*(1.0/(outer2-inner2));
+	} else if (n > inner) {
 		h = 0.0;
-	} else if (n > outer[style]) {
-		h = 1.0-1.0*(n-outer[style])*(1.0/(inner[style]-outer[style]));
+	} else if (n > outer) {
+		h = 1.0-1.0*(n-outer)*(1.0/(inner-outer));
 	} else {
 		h = 1.0;
 	}

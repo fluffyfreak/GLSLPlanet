@@ -28,14 +28,14 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 		switch ((*iter).second)
 		{
 		case eBothShaders:
-			vs = lib;
-			fs = lib;
+			vs += lib;
+			fs += lib;
 			break;
 		case eVertShader:
-			vs = lib;
+			vs += lib;
 			break;
 		case eFragShader:
-			fs = lib;
+			fs += lib;
 			break;
 		}
 
@@ -67,7 +67,7 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 			glGetShaderiv(v,GL_COMPILE_STATUS,&param);
 			if( param==GL_FALSE ) {
 				glGetShaderInfoLog(v,MaxInfoLogLength,&length,infoLog);
-				printf("GLSL Error: %s", infoLog);
+				printf("GLSL Error: \n%s", infoLog);
 			}
 			checkGLError();
 		}
@@ -80,7 +80,7 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 			glGetShaderiv(f,GL_COMPILE_STATUS,&param);
 			if( param==GL_FALSE ) {
 				glGetShaderInfoLog(f,MaxInfoLogLength,&length,infoLog);
-				printf("GLSL Error: %s", infoLog);
+				printf("GLSL Error: \n%s", infoLog);
 			}
 			checkGLError();
 		}
@@ -98,7 +98,7 @@ void LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 		glGetProgramiv(prog,GL_LINK_STATUS,&param);
 		if( param==GL_FALSE ) {
 			glGetProgramInfoLog(prog,MaxInfoLogLength,&length,infoLog);
-			printf("GLSL Link Error: %s", infoLog);
+			printf("GLSL Link Error: \n%s", infoLog);
 		}
 		checkGLError();
 	}

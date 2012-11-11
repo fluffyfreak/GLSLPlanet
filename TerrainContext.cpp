@@ -262,6 +262,22 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	checkGLError();
 
 	////////////////////////////////////////////////////////////////
+	// load the quad terrain shader
+	noiseyBinding.clear();
+	noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
+	noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
+	noiseyBinding.push_back( ShaderBindPair("terrains/TerrainHeightAsteroid.glsl",eFragShader) );
+	SHeightmapGen hProg;
+	LoadShader(hProg.prog, "heightmap_gen.vert", "heightmap_gen.frag", noiseyBinding);
+	hProg.v0		= glGetUniformLocation(hProg.prog, "v0");
+	hProg.v1		= glGetUniformLocation(hProg.prog, "v1");
+	hProg.v2		= glGetUniformLocation(hProg.prog, "v2");
+	hProg.v3		= glGetUniformLocation(hProg.prog, "v3");
+	hProg.fracStep	= glGetUniformLocation(hProg.prog, "fracStep");
+	checkGLError();
+	mHeightmapProgs.push_back(hProg);
+
+	////////////////////////////////////////////////////////////////
 	// load the patch terrain shader
 	LoadShader(patch_prog, "patch.vert", "patch.frag");
 	// Get a handle for our "MVP" uniform(s)

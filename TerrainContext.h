@@ -94,6 +94,16 @@ private:
 	GLuint quad_heightmap_v2;
 	GLuint quad_heightmap_v3;
 	GLuint quad_heightmap_fracStep;
+
+	struct SHeightmapGen{
+		GLuint prog;
+		GLuint v0;
+		GLuint v1;
+		GLuint v2;
+		GLuint v3;
+		GLuint fracStep;
+	};
+	std::vector<SHeightmapGen> mHeightmapProgs;
 public:
 	void renderHeightmap(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3, const uint32_t targetTex) const;
 	void renderQuad() const;

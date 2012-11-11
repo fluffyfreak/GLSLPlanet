@@ -16,6 +16,9 @@
     <Filter Include="Resource Files\shaders">
       <UniqueIdentifier>{d07a3304-7063-44eb-a8cf-088aebe6f822}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\shaders\terrains">
+      <UniqueIdentifier>{e6dbfc56-fdef-4599-8993-f91976ef36e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\textfile.cpp">
@@ -137,6 +140,96 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="..\shaders\debugHeightmap.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightAsteroid.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightAsteroid2.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightAsteroid3.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightAsteroid4.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightBarrenRock.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightBarrenRock2.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightBarrenRock3.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightFlat.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightHillsCraters.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightHillsCraters2.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightHillsDunes.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightHillsNormal.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightHillsRidged.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightHillsRivers.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMapped.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMapped2.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMountainsCraters.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMountainsCraters2.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMountainsNormal.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMountainsRidged.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMountainsRivers.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMountainsRiversVolcano.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightMountainsVolcano.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightRuggedDesert.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightRuggedLava.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightWaterSolid.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightWaterSolidCanyons.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\shaders\heightmap_gen.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\heightmap_gen.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\noise_feature_lib.glsl">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>

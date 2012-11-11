@@ -129,27 +129,27 @@ float snoise(vec4 v)
                     + dot(m1*m1, vec2( dot( p3, x3 ), dot( p4, x4 ) ) ) ) ;
 }
 
-float octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float freq, in float time)
 {
     float n = 0.0;
     float octaveAmplitude = 1.0/(1.0-pow(roughness,(float(octaves))));
     for (int i = 0; i < octaves; i++) {
-        n += octaveAmplitude * snoise(vec4(jizm*p.x, jizm*p.y, jizm*p.z, time));
+        n += octaveAmplitude * snoise(vec4(freq*p, time));
         octaveAmplitude *= roughness;
-        jizm *= lacunarity;
+        freq *= lacunarity;
     }
     return (n+1.0)*0.5;
 }
 
-float combo_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float combo_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float freq, in float time)
 {
     float n = 0.0;
     float n1 = 0.0;
     float octaveAmplitude = 1.0/(1.0-pow(roughness,(float(octaves))));
     for (int i = 0; i < octaves; i++) {
-        n += octaveAmplitude * snoise(vec4(jizm*p.x, jizm*p.y, jizm*p.z, time));
+        n += octaveAmplitude * snoise(vec4(freq*p, time));
         octaveAmplitude *= roughness;
-        jizm *= lacunarity;
+        freq *= lacunarity;
     }
     //ridged noise
     n1 = 1.0 - abs(n);
@@ -161,28 +161,28 @@ float combo_octavenoise(in int octaves, in float roughness, in float lacunarity,
     return n1;
 }
 
-float ridged_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float ridged_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float freq, in float time)
 {
     float n = 0.0;
     float octaveAmplitude = 1.0/(1.0-pow(roughness,(float(octaves))));
     for (int i = 0; i < octaves; i++) {
-        n += octaveAmplitude * snoise(vec4(jizm*p.x, jizm*p.y, jizm*p.z, time));
+        n += octaveAmplitude * snoise(vec4(freq*p, time));
         octaveAmplitude *= roughness;
-        jizm *= lacunarity;
+        freq *= lacunarity;
     }
     //ridged noise
     n = 1.0 - abs(n);
     return(n*n);
 }
 
-float billow_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float jizm, in float time)
+float billow_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float freq, in float time)
 {
     float n = 0.0;
     float octaveAmplitude = 1.0/(1.0-pow(roughness,(float(octaves))));
     for (int i = 0; i < octaves; i++) {
-        n += octaveAmplitude * snoise(vec4(jizm*p.x, jizm*p.y, jizm*p.z, time));
+        n += octaveAmplitude * snoise(vec4(freq*p, time));
         octaveAmplitude *= roughness;
-        jizm *= lacunarity;
+        freq *= lacunarity;
     }
     //ridged noise
     n = (2.0 * abs(n) - 1.0)+1.0;
@@ -192,11 +192,11 @@ float billow_octavenoise(in int octaves, in float roughness, in float lacunarity
 float dunes_octavenoise(in int octaves, in float roughness, in float frequency, in float lacunarity, in vec3 p) {
 	float n = 0.0;
 	float octaveAmplitude = roughness;
-	float jizm = frequency;
+	float freq = frequency;
 	for (int i=0; i<octaves; i++) {
-		n += octaveAmplitude * snoise(vec4(jizm*p,1.0));
+		n += octaveAmplitude * snoise(vec4(freq*p,1.0));
 		octaveAmplitude *= roughness;
-		jizm *= lacunarity;
+		freq *= lacunarity;
 	}
 	return 1.0 - abs(n);
 }
@@ -204,11 +204,11 @@ float dunes_octavenoise(in int octaves, in float roughness, in float frequency, 
 float river_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p) {
 	float n = 0.0;
 	float octaveAmplitude = roughness;
-	float jizm = 1.0;
+	float freq = 1.0;
 	for (int i=0; i<octaves; i++) {
-		n += octaveAmplitude * abs(snoise(vec4(jizm*p,1.0)));
+		n += octaveAmplitude * abs(snoise(vec4(freq*p,1.0)));
 		octaveAmplitude *= roughness;
-		jizm *= lacunarity;
+		freq *= lacunarity;
 	}
 	return n;
 }
@@ -216,11 +216,11 @@ float river_octavenoise(in int octaves, in float roughness, in float lacunarity,
 float voronoiscam_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p) {
 	float n = 0.0;
 	float octaveAmplitude = roughness;
-	float jizm = 1.0;
+	float freq = 1.0;
 	for (int i=0; i<octaves; i++) {
-		n += octaveAmplitude * snoise(vec4(jizm*p,1.0));
+		n += octaveAmplitude * snoise(vec4(freq*p,1.0));
 		octaveAmplitude *= roughness;
-		jizm *= lacunarity;
+		freq *= lacunarity;
 	}
 	return sqrt(10.0 * abs(n));
 }
