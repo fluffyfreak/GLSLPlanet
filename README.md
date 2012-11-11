@@ -1,9 +1,9 @@
 GLSLPlanet
 ==========
 
-This is my attempt to create an environment where I could work on several things.
+An environment where I could work on CPU terrain generation for Pioneer Space Sim, without the overhead of Pioneer Space Sim!
 
-1. The GeoSphere code from Pioneer Space Sim (https://github.com/pioneerspacesim/pioneer) without the rest of Pioneer!
+1. The GeoSphere code from Pioneer Space Sim (https://github.com/pioneerspacesim/pioneer)!
 2. GLSL generation of heightmaps using Framebuffer Objects and rendering to textures.
 
 Please see the AUTHORS.txt for further copyright information and a list of authors and contributing libraries.
