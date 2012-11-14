@@ -10,6 +10,8 @@ uniform float amplitude[10];
 uniform float lacunarity[10];
 uniform float frequency[10];
 
+uniform sampler2D texHeightmap;
+
 float GetHeight(in vec3 p)
 {
     // This is all used for Earth and Earth alone
@@ -35,7 +37,9 @@ float GetHeight(in vec3 p)
 	float map[4][4];
 	for (int x=-1; x<3; x++) {
 		for (int y=-1; y<3; y++) {
-			map[x+1][y+1] = m_heightMap[clamp(iy+y, 0, m_heightMapSizeY-1)*m_heightMapSizeX + clamp(ix+x, 0, m_heightMapSizeX-1)];
+			vec2 hmuv = vec2(clamp(ix+x, 0, m_heightMapSizeX-1), clamp(iy+y, 0, m_heightMapSizeY-1));
+			map[x+1][y+1] = texture2D(texHeightmap, hmuv).x;
+			//map[x+1][y+1] = m_heightMap[clamp(iy+y, 0, m_heightMapSizeY-1)*m_heightMapSizeX + clamp(ix+x, 0, m_heightMapSizeX-1)];
 		}
 	}
 

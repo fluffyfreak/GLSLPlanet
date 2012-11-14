@@ -283,34 +283,9 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		""
 	};*/
 	static const std::string shaderFilenames[] = {
-		"terrains/TerrainHeightAsteroid.glsl",
-		"terrains/TerrainHeightAsteroid2.glsl",
-		"terrains/TerrainHeightAsteroid3.glsl",
-		"terrains/TerrainHeightAsteroid4.glsl",
-		"terrains/TerrainHeightBarrenRock.glsl",
-		"terrains/TerrainHeightBarrenRock2.glsl",
-		"terrains/TerrainHeightBarrenRock3.glsl",
-		"terrains/TerrainHeightFlat.glsl",
-		"terrains/TerrainHeightHillsCraters.glsl",
-		"terrains/TerrainHeightHillsCraters2.glsl",
-		"terrains/TerrainHeightHillsDunes.glsl",
-		"terrains/TerrainHeightHillsNormal.glsl",
-		"terrains/TerrainHeightHillsRidged.glsl",
-		"terrains/TerrainHeightHillsRivers.glsl",
-		//"terrains/TerrainHeightMapped.glsl",		// wtf to do with this?
-		//"terrains/TerrainHeightMapped2.glsl",		// wtf to do with this?
-		"terrains/TerrainHeightMountainsCraters.glsl",
-		"terrains/TerrainHeightMountainsCraters2.glsl",
-		"terrains/TerrainHeightMountainsNormal.glsl",
-		"terrains/TerrainHeightMountainsRidged.glsl",
-		"terrains/TerrainHeightMountainsRivers.glsl",
-		//"terrains/TerrainHeightMountainsRiversVolcano.glsl",	// requires m_seed and bit shifting
-		//"terrains/TerrainHeightMountainsVolcano.glsl",		// requires m_seed and bit shifting
-		"terrains/TerrainHeightRuggedDesert.glsl",
-		"terrains/TerrainHeightRuggedLava.glsl",
+			"terrains/TerrainHeightMapped.glsl",		// wtf to do with this?
+			"terrains/TerrainHeightMapped2.glsl",		// wtf to do with this?
 		"terrains/TerrainHeightShaderFun.glsl",
-		"terrains/TerrainHeightWaterSolid.glsl",
-		"terrains/TerrainHeightWaterSolidCanyons.glsl",
 		""
 	};
 	vecBindings noiseyBinding;
@@ -340,6 +315,9 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		hProg.amplitude		= glGetUniformLocation(hProg.prog, "amplitude");
 		hProg.lacunarity	= glGetUniformLocation(hProg.prog, "lacunarity");
 		hProg.frequency		= glGetUniformLocation(hProg.prog, "frequency");
+
+		hProg.heightmap		= glGetUniformLocation(hProg.prog, "texHeightmap");
+		hProg.usesHeightmap = ((-1)!=hProg.heightmap);
 
 		checkGLError();
 		mHeightmapProgs.push_back(hProg);

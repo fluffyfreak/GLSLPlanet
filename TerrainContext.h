@@ -90,20 +90,23 @@ public:
 private:
 	struct SHeightmapGen{
 		GLuint prog;
-		GLuint v0;
-		GLuint v1;
-		GLuint v2;
-		GLuint v3;
-		GLuint fracStep;
+		GLint v0;
+		GLint v1;
+		GLint v2;
+		GLint v3;
+		GLint fracStep;
 
-		GLuint maxHeight;
-		GLuint seaLevel;
-		GLuint fracnum;
+		GLint maxHeight;
+		GLint seaLevel;
+		GLint fracnum;
 
-		GLuint octaves;
-		GLuint amplitude;
-		GLuint lacunarity;
-		GLuint frequency;
+		GLint octaves;
+		GLint amplitude;
+		GLint lacunarity;
+		GLint frequency;
+
+		bool usesHeightmap;
+		GLint heightmap;
 	};
 	std::vector<SHeightmapGen> mHeightmapProgs;
 	size_t mCurrentHeightmapProg;
