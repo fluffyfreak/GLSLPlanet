@@ -58,12 +58,8 @@ public:
 		tri_indices.push_back(tri);
 	}
 
-	TVertexCacheData()
+	TVertexCacheData() : position_in_cache(-1), current_score(0.0f), total_valence(0), remaining_valence(0), calculated(false)
 	{
-		position_in_cache = -1;
-		current_score = 0.0f;
-		total_valence = 0;
-		remaining_valence = 0;
 	}
 };
 typedef TVertexCacheData<int, INT_MAX >					VertexCacheDataInt;

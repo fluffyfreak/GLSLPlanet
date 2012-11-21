@@ -40,7 +40,7 @@ void GeoSphere::Update(const glm::vec3 &campos)
 {
 	if(nullptr==mGeoPatches[0]) {
 		BuildFirstPatches();
-	} else if(mSplitRequestDescriptions.size()==0) {
+	} else if(mSplitRequestDescriptions.empty()) {
 		ProcessSplitResults();
 		for (int i=0; i<NUM_PATCHES; i++) {
 			mGeoPatches[i]->LODUpdate(campos);

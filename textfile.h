@@ -9,4 +9,4 @@
 
 
 char *textFileRead( const char *fn);
-int textFileWrite(char *fn, char *s);
+int textFileWrite( const char *fn, const char *s );

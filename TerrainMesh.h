@@ -31,7 +31,7 @@ struct SSplitRequestDescription {
 							const glm::vec3 &v3_,
 							const glm::vec3 &cn,
 							const uint32_t depth_,
-							const GeoPatchID patchID_)
+							const GeoPatchID &patchID_)
 							: v0(v0_), v1(v1_), v2(v2_), v3(v3_), centroid(cn), depth(depth_), patchID(patchID_)
 	{
 	}
@@ -47,7 +47,7 @@ struct SSplitRequestDescription {
 
 struct SSplitResult {
 	struct SSplitResultData {
-		SSplitResultData(const GLuint texID_, const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const GeoPatchID patchID_) :
+		SSplitResultData(const GLuint texID_, const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const GeoPatchID &patchID_) :
 			texID(texID_), v0(v0_), v1(v1_), v2(v2_), v3(v3_), patchID(patchID_)
 		{
 		}
@@ -63,7 +63,7 @@ struct SSplitResult {
 	{
 	}
 
-	void addResult(const GLuint tex, const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const GeoPatchID patchID_)
+	void addResult(const GLuint tex, const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, const GeoPatchID &patchID_)
 	{
 		data.push_back(SSplitResultData(tex, v0_, v1_, v2_, v3_, patchID_));
 		assert(data.size()<=4);

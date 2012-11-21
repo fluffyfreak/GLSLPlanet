@@ -47,6 +47,9 @@ private:
 	inline int VBO_COUNT_HI_EDGE() const { return 3*(mEdgeLen-1); }
 	inline int VBO_COUNT_MID_IDX() const { return (4*3*(mEdgeLen-3)) + 2*(mEdgeLen-3)*(mEdgeLen-3)*3; }
 
+	// private copy ctor, done to prevent copying/cloning of GeoPatchContext.
+	GeoPatchContext(const GeoPatchContext &ref) : mEdgeLen(ref.mEdgeLen), mHalfEdgeLen(ref.mHalfEdgeLen), mQuad(false, true), mFBO(mEdgeLen,mEdgeLen) {};
+
 public:
 	////////////////////////////////////////////////////////////////
 	// public members
