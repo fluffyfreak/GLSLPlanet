@@ -4,6 +4,7 @@
 uniform float maxHeight;
 uniform float seaLevel;
 uniform int fracnum;
+uniform int seed;
 
 uniform int octaves[10];
 uniform float amplitude[10];
@@ -31,11 +32,11 @@ float GetHeight(in vec3 p)
 
 	n = (n > 0.0 ? n : 0.0);
 
-	if ((m_seed>>2)%3 > 2) {
+	if ((seed>>2)%3 > 2) {
 		if (n < 0.2) n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2;
 		else if (n < 0.4) n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * 0.4;
 		else n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (.4/n) * 0.4;
-	} else if ((m_seed>>2)%3 > 1) {
+	} else if ((seed>>2)%3 > 1) {
 		if (n < 0.2) n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2;
 		else if (n < 0.4) n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * 0.4;
 		else n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (.4/n) * 0.4;

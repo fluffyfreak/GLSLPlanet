@@ -251,7 +251,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader(s)
-	/*static const std::string shaderFilenames[] = {
+	static const std::string shaderFilenames[] = {
 		"terrains/TerrainHeightAsteroid.glsl",
 		"terrains/TerrainHeightAsteroid2.glsl",
 		"terrains/TerrainHeightAsteroid3.glsl",
@@ -281,13 +281,15 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		"terrains/TerrainHeightWaterSolid.glsl",
 		"terrains/TerrainHeightWaterSolidCanyons.glsl",
 		""
-	};*/
-	static const std::string shaderFilenames[] = {
-			"terrains/TerrainHeightMapped.glsl",		// wtf to do with this?
-			"terrains/TerrainHeightMapped2.glsl",		// wtf to do with this?
-		"terrains/TerrainHeightShaderFun.glsl",
-		""
 	};
+	/*static const std::string shaderFilenames[] = {
+		"terrains/TerrainHeightAsteroid2.glsl",
+		"terrains/TerrainHeightAsteroid4.glsl",
+		"terrains/TerrainHeightMountainsRiversVolcano.glsl",
+		"terrains/TerrainHeightMountainsVolcano.glsl",
+		"terrains/TerrainHeightWaterSolidCanyons.glsl",
+		""
+	};*/
 	vecBindings noiseyBinding;
 	noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
 	noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
