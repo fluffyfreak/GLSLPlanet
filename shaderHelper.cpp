@@ -6,8 +6,34 @@
 #include <gl\GLU.h>
 #include <cstdio>
 
+#include <sstream>
+
 #include "utils.h"
 #include "TextFile.h"
+
+std::string GetBaseFilename(const char *filename)
+{
+    std::string fName(filename);
+    size_t pos = fName.rfind(".");
+    if(pos == std::string::npos)  //No extension.
+        return fName;
+
+    if(pos == 0)    //. is at the front. Not an extension.
+        return fName;
+
+    return fName.substr(0, pos);
+}
+
+const std::string RemovePath(const std::string& filename)
+{
+  const int sz = static_cast<int>(filename.size());
+  const int path_sz_fwd = filename.rfind("/",filename.size());
+  const int path_sz_bak = filename.rfind("\\",filename.size());
+  const int path_sz = max(path_sz_fwd, path_sz_bak);
+  if (path_sz == sz) 
+	  return filename;
+  return filename.substr(path_sz + 1,sz - 1 - path_sz);
+}
 
 bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::string &fragstr, const vecBindings &includePaths /* = s_nullBindings */ )
 {
@@ -19,18 +45,22 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 	GLsizei length=0;
 	GLint param = GL_TRUE;
 
+	std::stringstream log;
+
 	const std::string shaderpath("./shaders/");
 
-	printf("--------------------------\n");
-	printf("Loading: \n -- vertex prog \"%s\" \n and \n -- fragement prog \"%s\"\n", vertstr.c_str(), fragstr.c_str());
-	printf("With %d libraries:\n", includePaths.size());
+	log << "--------------------------\n" << 
+		"Loading: \n -- vertex prog \"" << vertstr.c_str() << "\" \n and \n -- fragement prog \"" << fragstr.c_str() << "\"\n" <<
+		"With " << includePaths.size() << " libraries:\n" << std::endl;
 
+	std::string lastLibLoadedName;
 	vecBindings::const_iterator iter = includePaths.begin();
 	while (iter!=includePaths.end())
 	{
-		printf(" -- :\"%s\"\n", (*iter).first.c_str());
+		log << " -- :\"" << (*iter).first.c_str() << "\"" << std::endl;
 		const std::string libpath( shaderpath + (*iter).first );
 		const std::string lib = textFileRead( libpath.c_str() );
+		lastLibLoadedName = libpath;
 		switch ((*iter).second)
 		{
 		case eBothShaders:
@@ -76,7 +106,7 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 			glGetShaderiv(v,GL_COMPILE_STATUS,&param);
 			if( param==GL_FALSE ) {
 				glGetShaderInfoLog(v,MaxInfoLogLength,&length,infoLog);
-				printf("GLSL Error compiling \"%s\": \n%s\n", vertstr.c_str(), infoLog);
+				log << "GLSL Error compiling \"" << vertstr.c_str() << "\": \n" << infoLog << "\n";
 				success = false;
 			}
 			checkGLError();
@@ -90,7 +120,7 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 			glGetShaderiv(f,GL_COMPILE_STATUS,&param);
 			if( param==GL_FALSE ) {
 				glGetShaderInfoLog(f,MaxInfoLogLength,&length,infoLog);
-				printf("GLSL Error: compiling \"%s\"\n%s\n", fragstr.c_str(), infoLog);
+				log << "GLSL Error compiling \"" << fragstr.c_str() << "\": \n" << infoLog << "\n";
 				success = false;
 			}
 			checkGLError();
@@ -109,15 +139,21 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 		glGetProgramiv(prog,GL_LINK_STATUS,&param);
 		if( param==GL_FALSE && success ) {
 			glGetProgramInfoLog(prog,MaxInfoLogLength,&length,infoLog);
-			printf("GLSL Link Error with: \n -- vertex prog \"%s\" and \n -- fragement prog \"%s\": \n%s\n\n", vertstr.c_str(), fragstr.c_str(), infoLog);
+			log << "GLSL Link Error with: \n -- vertex prog \"" << vertstr.c_str() << "\" and \n";
+			log << " -- fragement prog \"" << fragstr.c_str() << "\": \n" << infoLog << "\n\n";
 			success = false;
 		}
 		checkGLError();
 
 		if(!success) {
-			printf("Number of lines in: \n -- vertex prog \"%s\" == \"%d\" and in \n -- fragement prog \"%s\" == \"%d\": \n\n", vertstr.c_str(), vsn, fragstr.c_str(), fsn);
+			log << "Number of lines in: \n -- vertex prog \"" << vertstr.c_str() << "\" == \"" << vsn << "\" and in \n -- fragement prog \"" << fragstr.c_str() << "\" == \"" << fsn << "\" \n\n";
 		}
 	}
+
+	const std::string outfile = RemovePath(GetBaseFilename(lastLibLoadedName.c_str()));
+	const std::string logExt = success ? ".log" : ".err";
+	
+	textFileWrite( ("./logs/"+outfile+logExt).c_str(), log.str().c_str() );
 
 	return success;
 }
