@@ -3,8 +3,7 @@
 float canyon_ridged_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = ridged_octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
+	float n = ridged_octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -27,8 +26,7 @@ float canyon_ridged_function(in int octaves, in float amplitude, in float freque
 float canyon2_ridged_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = ridged_octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
+	float n = ridged_octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -51,8 +49,7 @@ float canyon2_ridged_function(in int octaves, in float amplitude, in float frequ
 float canyon3_ridged_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0; //octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
-	n = ridged_octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
+	float n = ridged_octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -74,8 +71,7 @@ float canyon3_ridged_function(in int octaves, in float amplitude, in float frequ
 float canyon_normal_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -97,8 +93,7 @@ float canyon_normal_function(in int octaves, in float amplitude, in float freque
 float canyon2_normal_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -120,8 +115,7 @@ float canyon2_normal_function(in int octaves, in float amplitude, in float frequ
 float canyon3_normal_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -143,8 +137,7 @@ float canyon3_normal_function(in int octaves, in float amplitude, in float frequ
 float canyon_voronoi_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -166,8 +159,7 @@ float canyon_voronoi_function(in int octaves, in float amplitude, in float frequ
 float canyon2_voronoi_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -189,8 +181,7 @@ float canyon2_voronoi_function(in int octaves, in float amplitude, in float freq
 float canyon3_voronoi_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -212,8 +203,7 @@ float canyon3_voronoi_function(in int octaves, in float amplitude, in float freq
 float canyon_billow_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.54, 2.0, p, frequency, 1.0);
 	float outer = 0.71;
 	float inner = 0.715;
 	float inner2 = 0.715;
@@ -235,8 +225,7 @@ float canyon_billow_function(in int octaves, in float amplitude, in float freque
 float canyon2_billow_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.56, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
@@ -258,8 +247,7 @@ float canyon2_billow_function(in int octaves, in float amplitude, in float frequ
 float canyon3_billow_function(in int octaves, in float amplitude, in float frequency, in float lacunarity, in vec3 p)
 {
 	float h;
-	float n = 0.0;
-	n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
+	float n = octavenoise(octaves, 0.585, 2.0, p, frequency, 1.0);
 	float outer = 0.7;
 	float inner = 0.71;
 	float inner2 = 0.72;
