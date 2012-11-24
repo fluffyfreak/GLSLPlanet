@@ -6,6 +6,8 @@
 #include <gl\GLU.h>
 #include <cstdio>
 
+#include <direct.h>
+
 #include <sstream>
 
 #include "utils.h"
@@ -53,7 +55,7 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 		"Loading: \n -- vertex prog \"" << vertstr.c_str() << "\" \n and \n -- fragement prog \"" << fragstr.c_str() << "\"\n" <<
 		"With " << includePaths.size() << " libraries:\n" << std::endl;
 
-	std::string lastLibLoadedName;
+	std::string lastLibLoadedName = RemovePath(GetBaseFilename(vertstr.c_str())) + RemovePath(GetBaseFilename(fragstr.c_str()));
 	vecBindings::const_iterator iter = includePaths.begin();
 	while (iter!=includePaths.end())
 	{
@@ -153,6 +155,7 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 	const std::string outfile = RemovePath(GetBaseFilename(lastLibLoadedName.c_str()));
 	const std::string logExt = success ? ".log" : ".err";
 	
+	mkdir("./logs");
 	textFileWrite( ("./logs/"+outfile+logExt).c_str(), log.str().c_str() );
 
 	return success;
