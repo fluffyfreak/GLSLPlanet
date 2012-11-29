@@ -88,6 +88,15 @@ void CGLfbo::Release() const {
 //	checkGLError();
 //}
 
+void CGLfbo::SetTexture(const uint32_t tex) const
+{
+	glFramebufferTexture2D(GL_FRAMEBUFFER,
+ 		GL_COLOR_ATTACHMENT0,
+ 		GL_TEXTURE_2D,
+ 		tex,
+ 		0);
+}
+
 void CGLfbo::CopyTexture(const uint32_t target) const
 {
 	glBindTexture(GL_TEXTURE_2D, target);

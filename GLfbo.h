@@ -25,6 +25,7 @@ public:
 	inline uint32_t Height()	const { return mHeight; }
 
 	//void GetData(float *data) const;
+	void SetTexture(const uint32_t tex) const;
 	void CopyTexture(const uint32_t target) const;
 };
 

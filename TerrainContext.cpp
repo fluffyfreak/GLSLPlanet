@@ -252,7 +252,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader(s)
 	static const std::string shaderFilenames[] = {
-		"terrains/TerrainHeightAsteroid.glsl",
+		/*"terrains/TerrainHeightAsteroid.glsl",
 		"terrains/TerrainHeightAsteroid2.glsl",
 		"terrains/TerrainHeightAsteroid3.glsl",
 		"terrains/TerrainHeightAsteroid4.glsl",
@@ -277,9 +277,9 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		"terrains/TerrainHeightMountainsVolcano.glsl",
 		"terrains/TerrainHeightRuggedDesert.glsl",
 		"terrains/TerrainHeightRuggedLava.glsl",
-		"terrains/TerrainHeightShaderFun.glsl",
 		"terrains/TerrainHeightWaterSolid.glsl",
-		"terrains/TerrainHeightWaterSolidCanyons.glsl",
+		"terrains/TerrainHeightWaterSolidCanyons.glsl",*/
+		"terrains/TerrainHeightShaderFun.glsl",
 		""
 	};
 	/*static const std::string shaderFilenames[] = {
@@ -400,6 +400,9 @@ void GeoPatchContext::renderHeightmap(
 	glViewport(0, 0, mFBO.Width(), mFBO.Height());
 	checkGLError();
 
+	mFBO.SetTexture(targetTex);
+	checkGLError();
+
 	// Clear the fbo
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	checkGLError();
@@ -433,7 +436,8 @@ void GeoPatchContext::renderHeightmap(
 	// rendering our quad now should fill the render texture with the heightmap shaders output
 	renderQuad();
 
-	mFBO.CopyTexture(targetTex);
+	//mFBO.CopyTexture(targetTex);
+	mFBO.SetTexture(0);
 
 	// the framebuffer is automatically released
 #endif
