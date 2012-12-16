@@ -12,7 +12,7 @@ uniform float frequency[10];
 
 float GetHeight(in vec3 p)
 {
-	float continents = octavenoise(octaves[0], clamp(0.725-(seaLevel/2), 0.1, 0.725), lacunarity[0], p, 1.0, 1.0) - seaLevel;
+	float continents = octavenoise(octaves[0], clamp(0.725-(seaLevel/2.0), 0.1, 0.725), lacunarity[0], p, 1.0, 1.0) - seaLevel;
 	if (continents < 0.0) return 0.0;
 	float mountain_distrib = octavenoise(octaves[1], 0.55, lacunarity[1], p, 1.0, 1.0);
 	float mountains = octavenoise(octaves[2], 0.5, lacunarity[2], p, 1.0, 1.0) * ridged_octavenoise(octaves[2], 0.575, lacunarity[2], p, 1.0, 1.0);
@@ -43,13 +43,11 @@ float GetHeight(in vec3 p)
 
 	n += continents*hills*hill_distrib*mountain_distrib;
 
-	mountains  = octavenoise(octaves[1], 0.5, lacunarity[1], p, 1.0, 1.0) *
-			amplitude[2] * mountains*mountains*mountains;
-	mountains2 = octavenoise(octaves[4], 0.5, lacunarity[4], p, 1.0, 1.0) *
-			amplitude[3] * mountains2*mountains2*mountains2;
+	mountains  = octavenoise(octaves[1], 0.5, lacunarity[1], p, 1.0, 1.0) *	amplitude[2] * mountains*mountains*mountains;
+	mountains2 = octavenoise(octaves[4], 0.5, lacunarity[4], p, 1.0, 1.0) *	amplitude[3] * mountains2*mountains2*mountains2;
 
 	n += continents*mountains*hill_distrib ;
-	if (n < 0.01) n += continents*mountains2 * n * 40.0 ;
+	if (n < 0.01) n += continents*mountains2 * n * 40.0;
 	else n += continents*mountains2*0.4 ;
 	n *= 0.2;
 	n += mountains*mountains2*mountains2*hills*hills*hill_distrib*mountain_distrib*20.0;

@@ -252,7 +252,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader(s)
 	static const std::string shaderFilenames[] = {
-		/*"terrains/TerrainHeightAsteroid.glsl",
+		"terrains/TerrainHeightAsteroid.glsl",
 		"terrains/TerrainHeightAsteroid2.glsl",
 		"terrains/TerrainHeightAsteroid3.glsl",
 		"terrains/TerrainHeightAsteroid4.glsl",
@@ -278,7 +278,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		"terrains/TerrainHeightRuggedDesert.glsl",
 		"terrains/TerrainHeightRuggedLava.glsl",
 		"terrains/TerrainHeightWaterSolid.glsl",
-		"terrains/TerrainHeightWaterSolidCanyons.glsl",*/
+		"terrains/TerrainHeightWaterSolidCanyons.glsl",
 		"terrains/TerrainHeightShaderFun.glsl",
 		""
 	};

@@ -19,6 +19,21 @@ const float PI = 3.141592653589793238462643383279502;
 const float HALF_PI = 1.570796326794897;
 const float PI_2 = 6.283185307179586;
 
+int imax(in int a, in int b)
+{
+	return a>b ? a : b;
+}
+
+int imin(in int a, in int b)
+{
+	return a<b ? a : b;
+}
+
+int iclamp(in int x, in int lo, in int hi)
+{
+	return imin( hi, imax(lo,x) );
+}
+
 float GetHeight(in vec3 p)
 {
 	float latitude = -asin(p.y);
@@ -26,15 +41,16 @@ float GetHeight(in vec3 p)
 		latitude = -HALF_PI;
 	if (p.y > 1.0) 
 		latitude = HALF_PI;
+		
 	float longitude = atan(p.z,p.x);
-	float px = (((2048-1) * (longitude + PI)) / (PI_2));
-	float py = ((1024-1) * (latitude + HALF_PI)) / PI;
+	float px = (((2048.0-1.0) * (longitude + PI)) / (PI_2));
+	float py = ((1024.0-1.0) * (latitude + HALF_PI)) / PI;
 	int ix = int(floor(px));
 	int iy = int(floor(py));
-	ix = clamp(ix, 0, 2048-1);
-	iy = clamp(iy, 0, 1024-1);
-	float dx = px-ix;
-	float dy = py-iy;
+	ix = iclamp(ix, 0, 2048-1);
+	iy = iclamp(iy, 0, 1024-1);
+	float dx = px-float(ix);
+	float dy = py-float(iy);
 
 	// p0,3 p1,3 p2,3 p3,3
 	// p0,2 p1,2 p2,2 p3,2
@@ -46,26 +62,26 @@ float GetHeight(in vec3 p)
 	float map3[4];
 	int limiy[4];
 	for (int y=-1; y<3; y++) {
-		limiy[y+1] = clamp(iy+y, 0, 1024-1);
+		limiy[y+1] = iclamp(iy+y, 0, 1024-1);
 	}
-	int limix = clamp(ix+0, 0, 2048-1);
+	int limix = iclamp(ix+0, 0, 2048-1);
 	for (int y=0; y<4; y++) {
-		vec2 hmuv = vec2(limix, limiy[y]);
+		vec2 hmuv = vec2(float(limix), float(limiy[y]));
 		map0[y] = texture2D(texHeightmap, hmuv).x;
 	}
-	limix = clamp(ix+1, 0, 2048-1);
+	limix = iclamp(ix+1, 0, 2048-1);
 	for (int y=0; y<4; y++) {
-		vec2 hmuv = vec2(limix, limiy[y]);
+		vec2 hmuv = vec2(float(limix), float(limiy[y]));
 		map1[y] = texture2D(texHeightmap, hmuv).x;
 	}
-	limix = clamp(ix+2, 0, 2048-1);
+	limix = iclamp(ix+2, 0, 2048-1);
 	for (int y=0; y<4; y++) {
-		vec2 hmuv = vec2(limix, limiy[y]);
+		vec2 hmuv = vec2(float(limix), float(limiy[y]));
 		map2[y] = texture2D(texHeightmap, hmuv).x;
 	}
-	limix = clamp(ix+3, 0, 2048-1);
+	limix = iclamp(ix+3, 0, 2048-1);
 	for (int y=0; y<4; y++) {
-		vec2 hmuv = vec2(limix, limiy[y]);
+		vec2 hmuv = vec2(float(limix), float(limiy[y]));
 		map3[y] = texture2D(texHeightmap, hmuv).x;
 	}
 

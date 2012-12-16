@@ -11,6 +11,11 @@ uniform float amplitude[10];
 uniform float lacunarity[10];
 uniform float frequency[10];
 
+int imod(in int a, in int n)
+{
+	return a - (n * int(a/n));
+}
+
 float GetHeight(in vec3 p)
 {
 	float continents = octavenoise(octaves[0], 0.5, lacunarity[0], p, 1.0, 1.0) - seaLevel;
@@ -22,28 +27,25 @@ float GetHeight(in vec3 p)
 	float hills = hill_distrib * amplitude[5] * octavenoise(octaves[5], 0.5, lacunarity[5], p, 1.0, 1.0);
 	float hills2 = hill_distrib * amplitude[6] * octavenoise(octaves[6], 0.5, lacunarity[6], p, 1.0, 1.0);
 
-
-
 	float n = continents - (amplitude[0]*seaLevel);
-
 
 	if (n < 0.01) n += megavolcano_function(octaves[7], amplitude[7], frequency[7], lacunarity[7], p) * n * 3000.0;
 	else n += megavolcano_function(octaves[7], amplitude[7], frequency[7], lacunarity[7], p) * 30.0;
 
 	n = (n > 0.0 ? n : 0.0);
 
-	if ((seed>>2)%3 > 2) {
-		if (n < 0.2) n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2;
+	if (imod(seed/4,3) > 2) {
+		if (n < 0.2) n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2.0;
 		else if (n < 0.4) n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * 0.4;
-		else n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (.4/n) * 0.4;
-	} else if ((seed>>2)%3 > 1) {
-		if (n < 0.2) n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2;
+		else n += canyon3_ridged_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (0.4/n) * 0.4;
+	} else if (imod(seed/4,3) > 1) {
+		if (n < 0.2) n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2.0;
 		else if (n < 0.4) n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * 0.4;
-		else n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (.4/n) * 0.4;
+		else n += canyon3_billow_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (0.4/n) * 0.4;
 	} else {
-		if (n < 0.2) n += canyon3_voronoi_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2;
+		if (n < 0.2) n += canyon3_voronoi_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * n * 2.0;
 		else if (n < 0.4) n += canyon3_voronoi_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * 0.4;
-		else n += canyon3_voronoi_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (.4/n) * 0.4;
+		else n += canyon3_voronoi_function(octaves[8], amplitude[8], frequency[8], lacunarity[8], p) * (0.4/n) * 0.4;
 	}
 
 	n += -0.05;

@@ -24,7 +24,7 @@ float GetHeight(in vec3 p)
 	m += mountains*mountains*0.02*ridged_octavenoise(octaves[2], 0.6*mountains*mountains*distrib, lacunarity[2], p, 1.0, 1.0);
 	m *= m*m*m*10.0;
 	// smooth cliffs at shore
-	if (continents < 0.01) n += m * continents * 100.0f;
+	if (continents < 0.01) n += m * continents * 100.0;
 	else n += m;
 	n += continents*clamp(0.5-m, 0.0, 0.5)*0.2*river_octavenoise(octaves[6], 0.6*distrib, lacunarity[6], p, 1.0, 1.0);
 	n += continents*clamp(0.05-n, 0.0, 0.01)*0.2*dunes_octavenoise(octaves[2], clamp(0.5-n, 0.0, 0.5), lacunarity[2], p, 1.0, 1.0);

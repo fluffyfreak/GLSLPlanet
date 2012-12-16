@@ -15,7 +15,7 @@ float GetHeight(in vec3 p)
 	float continents = octavenoise(octaves[0], 0.5, lacunarity[0], p, 1.0, 1.0) - seaLevel;
 	if (continents < 0.0) return 0.0;
 	float n = 0.3 * continents;
-	float m = 0;//amplitude[1] * octavenoise(octaves[1], 0.5, p);
+	float m = 0.0;//amplitude[1] * octavenoise(octaves[1], 0.5, p);
 	float distrib = 0.5*ridged_octavenoise(octaves[1], 0.5*octavenoise(octaves[2], 0.5, lacunarity[2], p, 1.0, 1.0), lacunarity[1], p, 1.0, 1.0);
 	distrib += 0.7*billow_octavenoise(octaves[2], 0.5*ridged_octavenoise(octaves[1], 0.5, lacunarity[1], p, 1.0, 1.0), lacunarity[2], p, 1.0, 1.0) +
 		0.1*octavenoise(octaves[3], 0.5*ridged_octavenoise(octaves[2], 0.5, lacunarity[2], p, 1.0, 1.0), lacunarity[3], p, 1.0, 1.0);
