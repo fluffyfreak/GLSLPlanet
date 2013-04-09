@@ -41,7 +41,7 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 {
 	bool success = true;
 	GLuint v,f;
-	std::string vs, fs;
+	std::string vs("#version 120\n\n"), fs("#version 120\n\n");
 	const int MaxInfoLogLength = 2048;
 	GLchar infoLog[MaxInfoLogLength];
 	GLsizei length=0;
