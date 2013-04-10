@@ -155,7 +155,7 @@ bool LoadShader( unsigned int &prog, const std::string &vertstr, const std::stri
 	const std::string outfile = RemovePath(GetBaseFilename(lastLibLoadedName.c_str()));
 	const std::string logExt = success ? ".log" : ".err";
 	
-	mkdir("./logs");
+	_mkdir("./logs");
 	textFileWrite( ("./logs/"+outfile+logExt).c_str(), log.str().c_str() );
 
 	return success;
