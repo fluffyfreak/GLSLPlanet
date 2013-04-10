@@ -64,7 +64,7 @@ int GeoPatchContext::getIndices(std::vector<unsigned short> &pl, const unsigned 
 // constructor
 GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) : 
 	mEdgeLen(edgeLen), mHalfEdgeLen(edgeLen>>1), 
-	mQuad(false, true), mFBO(edgeLen,edgeLen)//, mVBO(nullptr)
+	mQuad(false, true), mFBO(edgeLen,edgeLen), mVBO(nullptr)
 {
 	mVertexs = new glm::vec3[NUM_MESH_VERTS()];
 	mNormals = new glm::vec3[NUM_MESH_VERTS()];
@@ -349,26 +349,26 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 
 	////////////////////////////////////////////////////////////////
 	// create a dummy set of verts, the UVs are the only important part
-	//glm::vec3 *vts = vertexs();
-	//GLfloat *pUV = uvs();
-	//assert(nullptr!=vts);
-	//float xfrac = 0.0f;
-	//float yfrac = 0.0f;
-	//for (uint32_t y=0; y<mEdgeLen; y++) {
-	//	xfrac = 0.0f;
-	//	for (uint32_t x=0; x<mEdgeLen; x++) {
-	//		*(vts++) = glm::vec3(1.0f,1.0f,1.0f);
-	//		*(pUV++) = xfrac;
-	//		*(pUV++) = yfrac;
-	//		xfrac += reciprocalEdgeLen();
-	//	}
-	//	yfrac += reciprocalEdgeLen();
-	//}
-	//assert(vts == &vertexs()[NUM_MESH_VERTS()]);
+	glm::vec3 *vts = vertexs();
+	GLfloat *pUV = uvs();
+	assert(nullptr!=vts);
+	float xfrac = 0.0f;
+	float yfrac = 0.0f;
+	for (uint32_t y=0; y<mEdgeLen; y++) {
+		xfrac = 0.0f;
+		for (uint32_t x=0; x<mEdgeLen; x++) {
+			*(vts++) = glm::vec3(1.0f,1.0f,1.0f);
+			*(pUV++) = xfrac;
+			*(pUV++) = yfrac;
+			xfrac += meshLerpStep();
+		}
+		yfrac += meshLerpStep();
+	}
+	assert(vts == &vertexs()[NUM_MESH_VERTS()]);
 
-	//// now create the VBO
-	//assert(nullptr==mVBO);
-	//mVBO = new CGLvbo( NUM_MESH_VERTS(), &vertexs()[0], nullptr, uvs() );
+	// now create the VBO
+	assert(nullptr==mVBO);
+	mVBO = new CGLvbo( NUM_MESH_VERTS(), &vertexs()[0], nullptr, uvs() );
 }
 
 // destructor

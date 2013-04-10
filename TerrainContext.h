@@ -32,7 +32,7 @@ private:
 	const uint32_t mHalfEdgeLen;
 
 	CGLquad	mQuad;
-	//CGLvbo *mVBO;
+	CGLvbo *mVBO;
 	CGLfbo	mFBO;
 	
 	glm::vec3 * mVertexs;
