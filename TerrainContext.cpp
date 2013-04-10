@@ -252,7 +252,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader(s)
 	static const std::string shaderFilenames[] = {
-		"terrains/TerrainHeightAsteroid.glsl",
+		/*"terrains/TerrainHeightAsteroid.glsl",
 		"terrains/TerrainHeightAsteroid2.glsl",
 		"terrains/TerrainHeightAsteroid3.glsl",
 		"terrains/TerrainHeightAsteroid4.glsl",
@@ -278,7 +278,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		"terrains/TerrainHeightRuggedDesert.glsl",
 		"terrains/TerrainHeightRuggedLava.glsl",
 		"terrains/TerrainHeightWaterSolid.glsl",
-		"terrains/TerrainHeightWaterSolidCanyons.glsl",
+		"terrains/TerrainHeightWaterSolidCanyons.glsl",*/
 		"terrains/TerrainHeightShaderFun.glsl",
 		""
 	};
@@ -295,11 +295,14 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
 	int shdFnameIdx=0;
 	mCurrentHeightmapProg = 0;//mHeightmapProgs.size()-1;
+	const std::string hmap_gen_vert_program("heightmap_gen.vert");
+	const std::string hmap_gen_frag_program("heightmap_gen.frag");
 	while(shaderFilenames[shdFnameIdx][0] != '\0')
 	{
 		noiseyBinding.push_back( ShaderBindPair(shaderFilenames[shdFnameIdx],eFragShader) );
 		SHeightmapGen hProg;
-		const bool success = LoadShader(hProg.prog, "heightmap_gen.vert", "heightmap_gen.frag", noiseyBinding);
+		
+		const bool success = LoadShader(hProg.prog, hmap_gen_vert_program, hmap_gen_frag_program, noiseyBinding);
 		if(success) {
 			mCurrentHeightmapProg = shdFnameIdx;
 		}
