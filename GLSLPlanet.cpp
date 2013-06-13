@@ -24,6 +24,10 @@ using namespace glm;
 #include "shaderHelper.h"
 #include "TerrainMesh.h"
 
+#include "TextFile.h"
+#include <direct.h>
+#include <sstream>
+
 namespace NKeyboard {
 	enum EKeyStates {
 		eKeyUnset=0,
@@ -72,6 +76,7 @@ int main()
 
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
+	//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
 	// Open a window and create its OpenGL context
 	if( !glfwOpenWindow( screen_width, screen_height, 0,0,0,0,24,0, GLFW_WINDOW ) )
@@ -80,6 +85,22 @@ int main()
 		glfwTerminate();
 		return -1;
 	}
+
+	int major, minor, rev;
+	glfwGetVersion(&major, &minor, &rev);
+
+	const char* pVerStr = (char*)glGetString(GL_VERSION);
+	const char* pVenStr = (char*)glGetString(GL_VENDOR);
+	const char* pRenStr = (char*)glGetString(GL_RENDERER);
+	const char* pSLVStr = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+	std::stringstream log;
+	log << "--------------------------\n" << 
+		"OpenGL details: \n -- VERSION: \"" << pVerStr << "\"\n -- VENDOR: \"" << pVenStr << "\"\n" <<
+		" -- RENDERER: " << pRenStr << "\"\n -- SHADING LANGUAGE VERSION: " << pSLVStr << std::endl;
+
+	_mkdir("./logs");
+	textFileWrite( "./logs/opengl.log", log.str().c_str() );
 
 	const GLboolean bInitOk = GLeeInit();
 	assert(bInitOk == GL_TRUE);

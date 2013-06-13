@@ -6,7 +6,7 @@
 #include "utils.h"
 
 // Include GLM
-#include <glm/glm.hpp>
+#include "glm/glm.hpp"
 
 //#define UINT_MAX (unsigned int (-1))
 
