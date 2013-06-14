@@ -34,6 +34,16 @@
     <ClInclude Include="..\GLfbo.h" />
     <ClInclude Include="..\GLprimitives.h" />
     <ClInclude Include="..\GLvbo.h" />
+    <ClInclude Include="..\rapidjson\document.h" />
+    <ClInclude Include="..\rapidjson\filestream.h" />
+    <ClInclude Include="..\rapidjson\internal\pow10.h" />
+    <ClInclude Include="..\rapidjson\internal\stack.h" />
+    <ClInclude Include="..\rapidjson\internal\strfunc.h" />
+    <ClInclude Include="..\rapidjson\prettywriter.h" />
+    <ClInclude Include="..\rapidjson\rapidjson.h" />
+    <ClInclude Include="..\rapidjson\reader.h" />
+    <ClInclude Include="..\rapidjson\stringbuffer.h" />
+    <ClInclude Include="..\rapidjson\writer.h" />
     <ClInclude Include="..\shaderHelper.h" />
     <ClInclude Include="..\shader_heightmap.h" />
     <ClInclude Include="..\TerrainContext.h" />

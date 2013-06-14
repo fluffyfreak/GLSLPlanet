@@ -23,6 +23,9 @@ using namespace glm;
 #include "utils.h"
 #include "shaderHelper.h"
 #include "TerrainMesh.h"
+#include "TextFile.h"
+
+#include "rapidjson\document.h"
 
 namespace NKeyboard {
 	enum EKeyStates {
@@ -127,6 +130,16 @@ int main()
 	double cal = ((PI*rpm)/30.0);
 	double g = 9.81;
 	double R = g / (cal*cal);*/
+
+	const std::string lithospherepath("./lithosphere/examples/");
+	const std::string JSONpath( lithospherepath + "snowy_mountains.lth" );
+	const std::string lithoJSON = textFileRead( JSONpath.c_str() );
+
+	rapidjson::Document d;
+	if( !d.Parse<0>(lithoJSON.c_str()).HasParseError() )
+	{
+		// load stuff here
+	}
 
 	GeoSphere *pSphere = new GeoSphere();
 	checkGLError();

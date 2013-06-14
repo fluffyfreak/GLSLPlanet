@@ -19,6 +19,12 @@
     <Filter Include="Resource Files\shaders\terrains">
       <UniqueIdentifier>{e6dbfc56-fdef-4599-8993-f91976ef36e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rapidjson">
+      <UniqueIdentifier>{8283d9c4-af5e-4cfb-b31f-8d7c94efb6fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rapidjson\internal">
+      <UniqueIdentifier>{b5f6421d-5a35-457e-ad58-9adf4e2643ff}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\textfile.cpp">
@@ -100,6 +106,36 @@
     </ClInclude>
     <ClInclude Include="..\TerrainPatchID.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\internal\pow10.h">
+      <Filter>rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\internal\stack.h">
+      <Filter>rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\internal\strfunc.h">
+      <Filter>rapidjson\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\document.h">
+      <Filter>rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\filestream.h">
+      <Filter>rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\prettywriter.h">
+      <Filter>rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\rapidjson.h">
+      <Filter>rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\reader.h">
+      <Filter>rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\stringbuffer.h">
+      <Filter>rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rapidjson\writer.h">
+      <Filter>rapidjson</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

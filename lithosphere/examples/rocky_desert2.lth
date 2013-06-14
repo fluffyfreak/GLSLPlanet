@@ -1,0 +1,277 @@
+{
+    "ambient_occlusion": 0.20454545454545456, 
+    "nodes": {
+        "22e433c2d1e5620aa61569991ce564ee": {
+            "offset": {
+                "x": 682, 
+                "y": -254
+            }, 
+            "parameters": {
+                "hue": 0.078863636363636344, 
+                "lightness": 0.35159090909090807, 
+                "saturdation": 0.69727272727272671
+            }, 
+            "sources": {}, 
+            "type": "Color"
+        }, 
+        "2561b2998f3e5d90ff1d8fa2a9e61e23": {
+            "offset": {
+                "x": 679, 
+                "y": -135
+            }, 
+            "parameters": {}, 
+            "sources": {
+                "alpha": "9147961376f7c8e224a79968dce2df0f", 
+                "op1": "cc9dec0810a2b7c687d83fd56161c9df", 
+                "op2": "43d5a88adc089540da2bb8b834cd84f7"
+            }, 
+            "type": "Mix"
+        }, 
+        "35837d2ad519ed858b15afb415f0ff74": {
+            "offset": {
+                "x": 451, 
+                "y": 330
+            }, 
+            "parameters": {
+                "falloff": 0.02318181818181822, 
+                "height": 0.88568181818181591, 
+                "octaves": 0.27295454545453879, 
+                "offset": 0.0, 
+                "size": 0.29999999999999849, 
+                "step": 0.80000000000000004
+            }, 
+            "sources": {}, 
+            "type": "Simplex"
+        }, 
+        "43d5a88adc089540da2bb8b834cd84f7": {
+            "offset": {
+                "x": 489, 
+                "y": -139
+            }, 
+            "parameters": {
+                "hue": 0.074318181818181936, 
+                "lightness": 0.38340909090909292, 
+                "saturdation": 0.75227272727272465
+            }, 
+            "sources": {}, 
+            "type": "Color"
+        }, 
+        "464fec274aeed6f935fc545158e37205": {
+            "offset": {
+                "x": 885, 
+                "y": 298
+            }, 
+            "parameters": {
+                "clamp": false, 
+                "factor": 0.5, 
+                "invert": false, 
+                "offset": 0.49409090909090947
+            }, 
+            "sources": {
+                "input": "5382156767f03de79fd71b88631f0188"
+            }, 
+            "type": "Adjust"
+        }, 
+        "5382156767f03de79fd71b88631f0188": {
+            "offset": {
+                "x": 677, 
+                "y": 297
+            }, 
+            "parameters": {
+                "invert": false, 
+                "repeat": 0.2634090909090907, 
+                "rough": false, 
+                "shallow": false, 
+                "slope": true
+            }, 
+            "sources": {
+                "input": "7124b520dc89c24f76e6b64ad674a9e8", 
+                "weight": "35837d2ad519ed858b15afb415f0ff74"
+            }, 
+            "type": "Erode"
+        }, 
+        "57e90f6ab5c6d33d21feae9aca8357e3": {
+            "offset": {
+                "x": 250, 
+                "y": 235
+            }, 
+            "parameters": {
+                "falloff": 0.29159090909090624, 
+                "height": 0.51181818181818262, 
+                "octaves": 0.38840909090909093, 
+                "offset": 0.0, 
+                "size": 0.084999999999999909, 
+                "step": 0.82840909090908621
+            }, 
+            "sources": {}, 
+            "type": "Simplex"
+        }, 
+        "7124b520dc89c24f76e6b64ad674a9e8": {
+            "offset": {
+                "x": 442, 
+                "y": 236
+            }, 
+            "parameters": {
+                "clamp": false, 
+                "factor": 0.51522727272727287, 
+                "invert": false, 
+                "offset": 0.49363636363636376
+            }, 
+            "sources": {
+                "input": "57e90f6ab5c6d33d21feae9aca8357e3"
+            }, 
+            "type": "Adjust"
+        }, 
+        "76ca8765c9831c837696f1dbf5889e4e": {
+            "offset": {
+                "x": 914, 
+                "y": -42
+            }, 
+            "parameters": {
+                "repeat": 0.011363636363636364
+            }, 
+            "sources": {
+                "input": "d05914cdf33dbbaae0a93daabbee114d", 
+                "weight": null
+            }, 
+            "type": "Gaussian"
+        }, 
+        "895c1662ad8a3acfb2cde5d3447f83f0": {
+            "offset": {
+                "x": 914, 
+                "y": 170
+            }, 
+            "parameters": {}, 
+            "sources": {
+                "op1": "464fec274aeed6f935fc545158e37205", 
+                "op2": "8da89c3202fc3e240b3869289103c046"
+            }, 
+            "type": "Max"
+        }, 
+        "8da89c3202fc3e240b3869289103c046": {
+            "offset": {
+                "x": 679, 
+                "y": -30
+            }, 
+            "parameters": {
+                "direction": 0.0, 
+                "repeat": 0.54522727272727212, 
+                "strengh": 0.94022727272727213, 
+                "strengh2": 0.075000000000000067
+            }, 
+            "sources": {
+                "input": "8dabe850dac56429ffb12b51fa3d13c0", 
+                "weight": null
+            }, 
+            "type": "Wind"
+        }, 
+        "8dabe850dac56429ffb12b51fa3d13c0": {
+            "offset": {
+                "x": 452, 
+                "y": 59
+            }, 
+            "parameters": {
+                "falloff": 0.25068181818181695, 
+                "height": 0.25522727272726814, 
+                "octaves": 0.24931818181818202, 
+                "offset": 0.0, 
+                "size": 0.18863636363636249, 
+                "step": 0.78409090909090928
+            }, 
+            "sources": {}, 
+            "type": "Simplex"
+        }, 
+        "9147961376f7c8e224a79968dce2df0f": {
+            "offset": {
+                "x": 676, 
+                "y": 129
+            }, 
+            "parameters": {
+                "clamp": false, 
+                "factor": 0.82136363636362841, 
+                "invert": false, 
+                "offset": 0.59500000000000142
+            }, 
+            "sources": {
+                "input": "c794d0d18ad31bedd042139c959ede24"
+            }, 
+            "type": "Adjust"
+        }, 
+        "bded5e4cb46469e7bdcd7da0acb8a45d": {
+            "offset": {
+                "x": 915, 
+                "y": -160
+            }, 
+            "parameters": {}, 
+            "sources": {
+                "alpha": "76ca8765c9831c837696f1dbf5889e4e", 
+                "op1": "2561b2998f3e5d90ff1d8fa2a9e61e23", 
+                "op2": "22e433c2d1e5620aa61569991ce564ee"
+            }, 
+            "type": "Mix"
+        }, 
+        "c794d0d18ad31bedd042139c959ede24": {
+            "offset": {
+                "x": 679, 
+                "y": 220
+            }, 
+            "parameters": {}, 
+            "sources": {
+                "op1": "5382156767f03de79fd71b88631f0188", 
+                "op2": "7124b520dc89c24f76e6b64ad674a9e8"
+            }, 
+            "type": "Subtract"
+        }, 
+        "cc9dec0810a2b7c687d83fd56161c9df": {
+            "offset": {
+                "x": 298, 
+                "y": -139
+            }, 
+            "parameters": {
+                "hue": 0.050909090909090876, 
+                "lightness": 0.20272727272727725, 
+                "saturdation": 0.96590909090909005
+            }, 
+            "sources": {}, 
+            "type": "Color"
+        }, 
+        "d05914cdf33dbbaae0a93daabbee114d": {
+            "offset": {
+                "x": 914, 
+                "y": 63
+            }, 
+            "parameters": {}, 
+            "sources": {
+                "op1": "895c1662ad8a3acfb2cde5d3447f83f0", 
+                "op2": "8da89c3202fc3e240b3869289103c046"
+            }, 
+            "type": "Equal"
+        }
+    }, 
+    "terrain": {
+        "input_height": "895c1662ad8a3acfb2cde5d3447f83f0", 
+        "material": "bded5e4cb46469e7bdcd7da0acb8a45d", 
+        "offset": {
+            "x": 1435, 
+            "y": 74
+        }
+    }, 
+    "viewport": {
+        "position": [
+            0.49058621568626398, 
+            0.09614431555510089, 
+            0.46497328370826779
+        ], 
+        "rotation": [
+            41.654099999999978, 
+            0.0, 
+            0.28939999999999666
+        ]
+    }, 
+    "workspace": {
+        "offset": {
+            "x": -35, 
+            "y": -16
+        }
+    }
+}
