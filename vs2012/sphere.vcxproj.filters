@@ -25,6 +25,9 @@
     <Filter Include="rapidjson\internal">
       <UniqueIdentifier>{b5f6421d-5a35-457e-ad58-9adf4e2643ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\lithosphere">
+      <UniqueIdentifier>{e9d45197-5f41-4b5a-bfa6-529482aa537b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\textfile.cpp">
@@ -189,6 +192,24 @@
     </None>
     <None Include="..\shaders\terrains\TerrainHeightShaderFun.glsl">
       <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+    <None Include="..\lithosphere\examples\eroded_hills.lth">
+      <Filter>Resource Files\lithosphere</Filter>
+    </None>
+    <None Include="..\lithosphere\examples\hills.lth">
+      <Filter>Resource Files\lithosphere</Filter>
+    </None>
+    <None Include="..\lithosphere\examples\mountains.lth">
+      <Filter>Resource Files\lithosphere</Filter>
+    </None>
+    <None Include="..\lithosphere\examples\rocky_desert.lth">
+      <Filter>Resource Files\lithosphere</Filter>
+    </None>
+    <None Include="..\lithosphere\examples\rocky_desert2.lth">
+      <Filter>Resource Files\lithosphere</Filter>
+    </None>
+    <None Include="..\lithosphere\examples\snowy_mountains.lth">
+      <Filter>Resource Files\lithosphere</Filter>
     </None>
   </ItemGroup>
 </Project>

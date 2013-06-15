@@ -55,6 +55,12 @@
     <ClInclude Include="..\vcacheopt.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\lithosphere\examples\eroded_hills.lth" />
+    <None Include="..\lithosphere\examples\hills.lth" />
+    <None Include="..\lithosphere\examples\mountains.lth" />
+    <None Include="..\lithosphere\examples\rocky_desert.lth" />
+    <None Include="..\lithosphere\examples\rocky_desert2.lth" />
+    <None Include="..\lithosphere\examples\snowy_mountains.lth" />
     <None Include="..\shaders\colourAndLit.frag" />
     <None Include="..\shaders\colourAndLit.vert" />
     <None Include="..\shaders\debugHeightmap.frag" />

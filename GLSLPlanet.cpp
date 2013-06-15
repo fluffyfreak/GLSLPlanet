@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <map>
 #include <cassert>
 
 // Include GLEE
@@ -55,6 +56,202 @@ namespace NKeyboard {
 		return eKeyUnset;
 	}
 };
+
+typedef std::pair<bool, int> intPair;
+typedef std::pair<bool, double> dblPair;
+typedef std::pair<bool, glm::vec3> vec3Pair;
+typedef std::pair<bool, std::string> strPair;
+typedef std::pair<bool, bool> booPair;
+
+struct TParameterNode
+{
+	dblPair factor;
+	dblPair falloff;
+    dblPair height;
+    dblPair octaves;
+    dblPair offset;
+    dblPair size;
+    dblPair step;
+	dblPair hue;
+    dblPair lightness;
+    dblPair saturdation;
+	dblPair repeat;
+	booPair invert;
+    booPair rough;
+    booPair shallow;
+    booPair slope;
+};
+
+struct TSourcesNode
+{
+	strPair alpha;
+    strPair op1;
+    strPair op2;
+	strPair input;
+    strPair weight;
+};
+
+
+struct TTerrainData {
+	strPair input_height;
+	strPair material;
+	intPair offsetx;
+	intPair offsety;
+}; 
+
+struct TViewportData {
+	vec3Pair position;
+	vec3Pair rotation;
+}; 
+
+struct TWorkspaceData {
+	intPair offsetx;
+	intPair offsety;
+};
+
+void SetPair(intPair &pair, const std::string &name, const rapidjson::Value &val)
+{
+	const char* pName = name.c_str();
+	if( val.HasMember(pName) && !val[pName].IsNull() ) {
+		const int iVal = val[pName].GetInt();
+		pair.first = true;
+		pair.second = iVal;
+	} else {
+		pair.first = false;
+		pair.second = 0;
+	}
+}
+
+void SetPair(dblPair &pair, const std::string &name, const rapidjson::Value &val)
+{
+	const char* pName = name.c_str();
+	if( val.HasMember(pName) && !val[pName].IsNull() ) {
+		const double dbl = val[pName].GetDouble();
+		pair.first = true;
+		pair.second = dbl;
+	} else {
+		pair.first = false;
+		pair.second = 0.0;
+	}
+}
+
+void SetPair(vec3Pair &pair, const std::string &name, const rapidjson::Value &val)
+{
+	const char* pName = name.c_str();
+	if( val.HasMember(pName) && !val[pName].IsNull() ) {
+		if( val[pName].IsArray() )
+		{
+			glm::vec3 vec;
+			int i=0;
+			for( rapidjson::Document::ConstValueIterator iter = val[pName].Begin(), itEnd = val[pName].End(); iter!=itEnd; ++iter, ++i ) {
+				assert(i<3);
+				vec[i] = (*iter).GetDouble();
+			}
+			
+			pair.first = true;
+			pair.second = vec;
+			return;
+		}
+	}
+
+	pair.first = false;
+	pair.second = glm::vec3(0.0f);
+}
+
+void SetPair(strPair &pair, const std::string &name, const rapidjson::Value &val)
+{
+	const char* pName = name.c_str();
+	if( val.HasMember(pName) && !val[pName].IsNull() ) {
+		const std::string str = val[pName].GetString();
+		pair.first = true;
+		pair.second = str;
+	} else {
+		pair.first = false;
+	}
+}
+
+void SetPair(booPair &pair, const std::string &name, const rapidjson::Value &val)
+{
+	const char* pName = name.c_str();
+	if( val.HasMember(pName) && !val[pName].IsNull() ) {
+		const bool boo = val[pName].GetBool();
+		pair.first = true;
+		pair.second = boo;
+	} else {
+		pair.first = false;
+		pair.second = false;
+	}
+}
+
+class CNode
+{
+public:
+	CNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) : mNodeTypeName(nodeTypeName) {}
+	virtual ~CNode() {}
+
+	const std::string &NodeTypeName() const { return mNodeTypeName; }
+private:
+	const std::string mNodeTypeName;
+};
+
+enum ENodeType {
+	eTypeSimplex = 0,
+	eTypeMix,
+	eTypeColor,
+	eTypeSubtract,
+	eTypeAdjust,
+	eTypeErode,
+	eTypeAdd,
+	eTypeMultiply,
+	eTypeIncline,
+	eTypeMax,
+	eTypeGaussian,
+	eTypeEqual,
+	eTypeWind
+};
+
+static std::map<std::string, ENodeType> gs_ETypeMap;
+
+static CNode* CreateNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources)
+{
+	// lazy create
+	if( gs_ETypeMap.empty() )
+	{
+		gs_ETypeMap["Simplex"]	= eTypeSimplex;
+		gs_ETypeMap["Mix"]		= eTypeMix;
+		gs_ETypeMap["Color"]	= eTypeColor;
+		gs_ETypeMap["Subtract"] = eTypeSubtract;
+		gs_ETypeMap["Adjust"]	= eTypeAdjust;
+		gs_ETypeMap["Erode"]	= eTypeErode;
+		gs_ETypeMap["Add"]		= eTypeAdd;
+		gs_ETypeMap["Multiply"] = eTypeMultiply;
+		gs_ETypeMap["Incline"]	= eTypeIncline;
+		gs_ETypeMap["Max"]		= eTypeMax;
+		gs_ETypeMap["Gaussian"] = eTypeGaussian;
+		gs_ETypeMap["Equal"]	= eTypeEqual;
+		gs_ETypeMap["Wind"]		= eTypeWind;
+	}
+	const int32_t type = gs_ETypeMap[nodeTypeName];
+	CNode* pNode = nullptr;
+	switch(type)
+	{
+		case eTypeSimplex:	pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeMix:		pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeColor:	pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeSubtract: pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeAdjust:	pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeErode:	pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeAdd:		pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeMultiply: pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeIncline:	pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeMax:		pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeGaussian: pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeEqual:	pNode = new CNode(nodeTypeName, parameters, sources); break;
+		case eTypeWind:		pNode = new CNode(nodeTypeName, parameters, sources); break;
+	}
+	
+	return pNode;
+}
 
 int main()
 {
@@ -139,6 +336,100 @@ int main()
 	if( !d.Parse<0>(lithoJSON.c_str()).HasParseError() )
 	{
 		// load stuff here
+		//d.FindMember("ambient_occlusion");
+		const double ambient_occlusion = d["ambient_occlusion"].GetDouble();
+		//"nodes":
+		const rapidjson::Value& a = d["nodes"];	// Using a reference for consecutive access is handy and faster.
+		assert(a.IsObject());
+		for(rapidjson::Document::ConstMemberIterator iter=a.MemberBegin(), itEnd=a.MemberEnd(); iter!=itEnd; ++iter)
+		{
+			const std::string name = (*iter).name.GetString();
+
+			const rapidjson::Value& curNode = (*iter).value;
+
+			assert(curNode.HasMember("offset"));
+			{
+				const rapidjson::Value& offset = curNode["offset"];
+				const int xoffset = offset["x"].GetInt();
+				const int yoffset = offset["y"].GetInt();
+			}
+
+			assert(curNode.HasMember("parameters"));
+			TParameterNode params;
+			{
+				const rapidjson::Value& parameters = curNode["parameters"];
+
+				SetPair(params.factor, "factor", parameters);
+                SetPair(params.invert, "invert", parameters);
+				SetPair(params.falloff, "falloff", parameters);
+                SetPair(params.height, "height", parameters);
+                SetPair(params.octaves, "octaves", parameters);
+                SetPair(params.offset, "offset", parameters);
+                SetPair(params.size, "size", parameters);
+                SetPair(params.step, "step", parameters);
+				SetPair(params.hue, "hue", parameters);
+                SetPair(params.lightness, "lightness", parameters);
+                SetPair(params.saturdation, "saturdation", parameters);
+				SetPair(params.invert, "invert", parameters);
+                SetPair(params.repeat, "repeat", parameters);
+                SetPair(params.rough, "rough", parameters);
+                SetPair(params.shallow, "shallow", parameters);
+                SetPair(params.slope, "slope", parameters);
+				SetPair(params.repeat, "repeat", parameters);
+			}
+
+			assert(curNode.HasMember("sources"));
+			TSourcesNode sources;
+			{
+				const rapidjson::Value& valSources = curNode["sources"];
+				
+				SetPair(sources.alpha,	"alpha",	valSources);
+                SetPair(sources.op1,	"op1",		valSources);
+                SetPair(sources.op2,	"op2",		valSources);
+				SetPair(sources.input,	"input",	valSources);
+				SetPair(sources.weight,	"weight",	valSources);
+			}
+
+			assert(curNode.HasMember("type"));
+			const std::string type =  curNode["type"].GetString();
+			CNode* pNewNode = CreateNode(type, params, sources);
+			if( pNewNode ) {
+				delete pNewNode;
+				pNewNode = nullptr;
+			}
+		}
+		
+		assert(d.HasMember("terrain"));
+		TTerrainData terrain;
+		{
+			const rapidjson::Value& valTerrain = d["terrain"];
+				
+			SetPair(terrain.input_height,	"input_height",	valTerrain);
+            SetPair(terrain.material,		"material",		valTerrain);
+
+			const rapidjson::Value& valOffset = valTerrain["offset"];
+            SetPair(terrain.offsetx,	"x",	valOffset);
+			SetPair(terrain.offsetx,	"y",	valOffset);
+		}
+
+		assert(d.HasMember("viewport"));
+		TViewportData vd;
+		{
+			const rapidjson::Value& valViewport = d["viewport"];
+
+			SetPair(vd.position,	"position",		valViewport);
+            SetPair(vd.rotation,	"rotation",		valViewport);
+		}
+
+		assert(d.HasMember("workspace"));
+		TWorkspaceData wd;
+		{
+			const rapidjson::Value& valWorkspace = d["workspace"];
+
+			const rapidjson::Value& valOffset = valWorkspace["offset"];
+            SetPair(wd.offsetx,	"x",	valOffset);
+			SetPair(wd.offsetx,	"y",	valOffset);
+		}
 	}
 
 	GeoSphere *pSphere = new GeoSphere();
