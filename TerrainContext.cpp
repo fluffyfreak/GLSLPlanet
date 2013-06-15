@@ -252,44 +252,9 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader(s)
 	static const std::string shaderFilenames[] = {
-		/*"terrains/TerrainHeightAsteroid.glsl",
-		"terrains/TerrainHeightAsteroid2.glsl",
-		"terrains/TerrainHeightAsteroid3.glsl",
-		"terrains/TerrainHeightAsteroid4.glsl",
-		"terrains/TerrainHeightBarrenRock.glsl",
-		"terrains/TerrainHeightBarrenRock2.glsl",
-		"terrains/TerrainHeightBarrenRock3.glsl",
-		"terrains/TerrainHeightFlat.glsl",
-		"terrains/TerrainHeightHillsCraters.glsl",
-		"terrains/TerrainHeightHillsCraters2.glsl",
-		"terrains/TerrainHeightHillsDunes.glsl",
-		"terrains/TerrainHeightHillsNormal.glsl",
-		"terrains/TerrainHeightHillsRidged.glsl",
-		"terrains/TerrainHeightHillsRivers.glsl",
-		"terrains/TerrainHeightMapped.glsl",
-		"terrains/TerrainHeightMapped2.glsl",
-		"terrains/TerrainHeightMountainsCraters.glsl",
-		"terrains/TerrainHeightMountainsCraters2.glsl",
-		"terrains/TerrainHeightMountainsNormal.glsl",
-		"terrains/TerrainHeightMountainsRidged.glsl",
-		"terrains/TerrainHeightMountainsRivers.glsl",
-		"terrains/TerrainHeightMountainsRiversVolcano.glsl",
-		"terrains/TerrainHeightMountainsVolcano.glsl",
-		"terrains/TerrainHeightRuggedDesert.glsl",
-		"terrains/TerrainHeightRuggedLava.glsl",
-		"terrains/TerrainHeightWaterSolid.glsl",
-		"terrains/TerrainHeightWaterSolidCanyons.glsl",*/
 		"terrains/TerrainHeightShaderFun.glsl",
 		""
 	};
-	/*static const std::string shaderFilenames[] = {
-		"terrains/TerrainHeightAsteroid2.glsl",
-		"terrains/TerrainHeightAsteroid4.glsl",
-		"terrains/TerrainHeightMountainsRiversVolcano.glsl",
-		"terrains/TerrainHeightMountainsVolcano.glsl",
-		"terrains/TerrainHeightWaterSolidCanyons.glsl",
-		""
-	};*/
 	vecBindings noiseyBinding;
 	noiseyBinding.push_back( ShaderBindPair("noise_lib.glsl",eFragShader) );
 	noiseyBinding.push_back( ShaderBindPair("noise_feature_lib.glsl",eFragShader) );
@@ -423,7 +388,7 @@ void GeoPatchContext::renderHeightmap(
 	const float reciprocalFBOWidth = textureLerpStep();
 	glUniform1f(rHGD.fracStep, reciprocalFBOWidth);
 
-	glUniform1f(rHGD.maxHeight,	2.0f);
+	glUniform1f(rHGD.maxHeight,	0.1f);
 	glUniform1f(rHGD.seaLevel,	0.01f);
 	glUniform1i(rHGD.fracnum,	3);
 	

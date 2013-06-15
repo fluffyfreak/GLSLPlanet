@@ -25,7 +25,7 @@ void main()
 	float intensity = dot(lightDir,n) * texture2D(texHeightmap, uv).r;
 	gl_FragColor = in_colour * (1.0+intensity)*0.5;
 #else
-	float intensity = texture2D(texHeightmap, uv).r;
+	float intensity = texture2D(texHeightmap, uv).r + 0.25;
 	gl_FragColor = in_colour * intensity;
 #endif
 } 
