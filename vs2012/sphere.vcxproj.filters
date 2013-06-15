@@ -28,6 +28,9 @@
     <Filter Include="Resource Files\lithosphere">
       <UniqueIdentifier>{e9d45197-5f41-4b5a-bfa6-529482aa537b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="nodes">
+      <UniqueIdentifier>{82da8789-ac5f-4f6c-bc20-dc7a0f2f74f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\textfile.cpp">
@@ -68,6 +71,48 @@
     </ClCompile>
     <ClCompile Include="..\TerrainPatchID.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\node.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeSimplex.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeAdd.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeAdjust.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeColour.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeEqual.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeErode.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeGaussian.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeIncline.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeMax.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeMix.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeMultiply.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeSubtract.cpp">
+      <Filter>nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nodes\nodeWind.cpp">
+      <Filter>nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +184,51 @@
     </ClInclude>
     <ClInclude Include="..\rapidjson\writer.h">
       <Filter>rapidjson</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\node.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\createNode.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeSimplex.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeAdd.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeAdjust.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeColour.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeEqual.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeErode.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeGaussian.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeIncline.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeMax.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeMix.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeMultiply.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeSubtract.h">
+      <Filter>nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nodes\nodeWind.h">
+      <Filter>nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
