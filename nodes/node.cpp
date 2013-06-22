@@ -2,6 +2,7 @@
 // Licensed under the terms of the GPL v3. See licenses/GPL-3.txt
 
 #include "node.h"
+#include "../utils.h"
 
 void SetPair(intPair &pair, const std::string &name, const rapidjson::Value &val)
 {
@@ -74,5 +75,36 @@ void SetPair(booPair &pair, const std::string &name, const rapidjson::Value &val
 	} else {
 		pair.first = false;
 		pair.second = false;
+	}
+}
+
+CNode::CNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) : mNodeTypeName(nodeTypeName) 
+{
+	// Now we need to create the texture which will contain the heightmap. 
+	glGenTextures(1, &mTextureID);
+	checkGLError();
+ 
+	// Bind the newly created texture : all future texture functions will modify this texture
+	glBindTexture(GL_TEXTURE_2D, mTextureID);
+	checkGLError();
+ 
+	// Create the texture itself without any data
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 512, 512, 0, GL_RGBA, GL_FLOAT, nullptr);
+	checkGLError();
+		
+	// Bad filtering needed
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	checkGLError();
+}
+
+CNode::~CNode() 
+{
+	if(glIsTexture(mTextureID)==GL_TRUE) {
+		glDeleteTextures(1, &mTextureID);
+		checkGLError();
 	}
 }

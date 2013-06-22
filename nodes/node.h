@@ -6,6 +6,11 @@
 
 #include "../rapidjson/document.h"
 #include <glm/glm.hpp>
+// Include GLEE
+#include "../glee.h"
+
+// Include GLFW
+#include <GL/glfw.h>
 #include <utility>
 #include <string>
 
@@ -70,12 +75,13 @@ void SetPair(booPair &pair, const std::string &name, const rapidjson::Value &val
 class CNode
 {
 public:
-	CNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) : mNodeTypeName(nodeTypeName) {}
-	virtual ~CNode() {}
+	CNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources);
+	virtual ~CNode();
 
 	const std::string &NodeTypeName() const { return mNodeTypeName; }
 private:
 	const std::string mNodeTypeName;
+	GLuint mTextureID;
 };
 
 #endif // __node_h__
