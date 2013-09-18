@@ -75,12 +75,15 @@ void SetPair(booPair &pair, const std::string &name, const rapidjson::Value &val
 class CNode
 {
 public:
-	CNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources);
+	CNode(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources);
 	virtual ~CNode();
 
 	const std::string &NodeTypeName() const { return mNodeTypeName; }
 private:
+	const std::string mNodeID;
 	const std::string mNodeTypeName;
+	const TParameterNode mParameters;
+	const TSourcesNode mSources;
 	GLuint mTextureID;
 };
 

@@ -9,8 +9,8 @@
 class CNodeMix : public CNode
 {
 public:
-	CNodeMix(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
-		: CNode(nodeTypeName, parameters, sources)
+	CNodeMix(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
+		: CNode(nodeID, nodeTypeName, parameters, sources)
 	{
 	}
 	virtual ~CNodeMix() 

@@ -9,8 +9,8 @@
 class CNodeSubtract : public CNode
 {
 public:
-	CNodeSubtract(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
-		: CNode(nodeTypeName, parameters, sources)
+	CNodeSubtract(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
+		: CNode(nodeID, nodeTypeName, parameters, sources)
 	{
 	}
 	virtual ~CNodeSubtract() 

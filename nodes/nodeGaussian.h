@@ -9,8 +9,8 @@
 class CNodeGaussian : public CNode
 {
 public:
-	CNodeGaussian(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
-		: CNode(nodeTypeName, parameters, sources)
+	CNodeGaussian(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
+		: CNode(nodeID, nodeTypeName, parameters, sources)
 	{
 	}
 	virtual ~CNodeGaussian() 

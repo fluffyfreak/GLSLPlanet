@@ -40,7 +40,7 @@ enum ENodeType {
 
 static std::map<std::string, ENodeType> gs_ETypeMap;
 
-static CNode* CreateNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources)
+static CNode* CreateNode(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources)
 {
 	// lazy create
 	if( gs_ETypeMap.empty() )
@@ -63,19 +63,19 @@ static CNode* CreateNode(const std::string &nodeTypeName, const TParameterNode &
 	CNode* pNode = nullptr;
 	switch(type)
 	{
-		case eTypeSimplex:	pNode = new CNodeSimplex(nodeTypeName, parameters, sources); break;
-		case eTypeMix:		pNode = new CNodeMix(nodeTypeName, parameters, sources); break;
-		case eTypeColour:	pNode = new CNodeColour(nodeTypeName, parameters, sources); break;
-		case eTypeSubtract: pNode = new CNodeSubtract(nodeTypeName, parameters, sources); break;
-		case eTypeAdjust:	pNode = new CNodeAdjust(nodeTypeName, parameters, sources); break;
-		case eTypeErode:	pNode = new CNodeErode(nodeTypeName, parameters, sources); break;
-		case eTypeAdd:		pNode = new CNodeAdd(nodeTypeName, parameters, sources); break;
-		case eTypeMultiply: pNode = new CNodeMultiply(nodeTypeName, parameters, sources); break;
-		case eTypeIncline:	pNode = new CNodeIncline(nodeTypeName, parameters, sources); break;
-		case eTypeMax:		pNode = new CNodeMax(nodeTypeName, parameters, sources); break;
-		case eTypeGaussian: pNode = new CNodeGaussian(nodeTypeName, parameters, sources); break;
-		case eTypeEqual:	pNode = new CNodeEqual(nodeTypeName, parameters, sources); break;
-		case eTypeWind:		pNode = new CNodeWind(nodeTypeName, parameters, sources); break;
+		case eTypeSimplex:	pNode = new CNodeSimplex(nodeID, nodeTypeName, parameters, sources);	break;
+		case eTypeMix:		pNode = new CNodeMix(nodeID, nodeTypeName, parameters, sources);		break;
+		case eTypeColour:	pNode = new CNodeColour(nodeID, nodeTypeName, parameters, sources);		break;
+		case eTypeSubtract: pNode = new CNodeSubtract(nodeID, nodeTypeName, parameters, sources);	break;
+		case eTypeAdjust:	pNode = new CNodeAdjust(nodeID, nodeTypeName, parameters, sources);		break;
+		case eTypeErode:	pNode = new CNodeErode(nodeID, nodeTypeName, parameters, sources);		break;
+		case eTypeAdd:		pNode = new CNodeAdd(nodeID, nodeTypeName, parameters, sources);		break;
+		case eTypeMultiply: pNode = new CNodeMultiply(nodeID, nodeTypeName, parameters, sources);	break;
+		case eTypeIncline:	pNode = new CNodeIncline(nodeID, nodeTypeName, parameters, sources);	break;
+		case eTypeMax:		pNode = new CNodeMax(nodeID, nodeTypeName, parameters, sources);		break;
+		case eTypeGaussian: pNode = new CNodeGaussian(nodeID, nodeTypeName, parameters, sources);	break;
+		case eTypeEqual:	pNode = new CNodeEqual(nodeID, nodeTypeName, parameters, sources);		break;
+		case eTypeWind:		pNode = new CNodeWind(nodeID, nodeTypeName, parameters, sources);		break;
 	}
 	
 	return pNode;

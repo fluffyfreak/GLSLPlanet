@@ -9,8 +9,8 @@
 class CNodeMax : public CNode
 {
 public:
-	CNodeMax(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
-		: CNode(nodeTypeName, parameters, sources)
+	CNodeMax(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
+		: CNode(nodeID, nodeTypeName, parameters, sources)
 	{
 	}
 	virtual ~CNodeMax() 

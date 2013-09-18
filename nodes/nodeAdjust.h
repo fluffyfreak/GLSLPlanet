@@ -9,8 +9,8 @@
 class CNodeAdjust : public CNode
 {
 public:
-	CNodeAdjust(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
-		: CNode(nodeTypeName, parameters, sources)
+	CNodeAdjust(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) 
+		: CNode(nodeID, nodeTypeName, parameters, sources)
 	{
 	}
 	virtual ~CNodeAdjust() 

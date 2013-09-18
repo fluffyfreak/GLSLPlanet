@@ -139,6 +139,7 @@ int main()
 	const std::string JSONpath( lithospherepath + "snowy_mountains.lth" );
 	const std::string lithoJSON = textFileRead( JSONpath.c_str() );
 
+	std::map<std::string, CNode*> nodes;
 	rapidjson::Document d;
 	if( !d.Parse<0>(lithoJSON.c_str()).HasParseError() )
 	{
@@ -199,10 +200,9 @@ int main()
 
 			assert(curNode.HasMember("type"));
 			const std::string type =  curNode["type"].GetString();
-			CNode* pNewNode = CreateNode(type, params, sources);
+			CNode* pNewNode = CreateNode(name, type, params, sources);
 			if( pNewNode ) {
-				delete pNewNode;
-				pNewNode = nullptr;
+				nodes[name] = pNewNode;
 			}
 		}
 		

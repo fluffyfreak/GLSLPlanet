@@ -78,7 +78,8 @@ void SetPair(booPair &pair, const std::string &name, const rapidjson::Value &val
 	}
 }
 
-CNode::CNode(const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) : mNodeTypeName(nodeTypeName) 
+CNode::CNode(const std::string &nodeID, const std::string &nodeTypeName, const TParameterNode &parameters, const TSourcesNode &sources) : 
+	mNodeID(nodeID), mParameters(parameters), mSources(sources), mNodeTypeName(nodeTypeName) 
 {
 	// Now we need to create the texture which will contain the heightmap. 
 	glGenTextures(1, &mTextureID);
