@@ -11,6 +11,7 @@
 #include "shaderHelper.h"
 #include "GLfbo.h"
 #include "GLprimitives.h"
+#include <algorithm>
 
 // Include GLM
 #include <glm/glm.hpp>
