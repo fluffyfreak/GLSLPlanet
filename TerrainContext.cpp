@@ -239,6 +239,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short)*mElementBuffersTriangleCounts[i]*3, &(pl_short[i][0]), GL_STATIC_DRAW);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
+	checkGLError();
 
 	// delete temporary buffers
 	if (midIndices) {
@@ -271,6 +272,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 		if(success) {
 			mCurrentHeightmapProg = shdFnameIdx;
 		}
+		glUseProgram(hProg.prog);
 		hProg.v0			= glGetUniformLocation(hProg.prog, "v0");
 		hProg.v1			= glGetUniformLocation(hProg.prog, "v1");
 		hProg.v2			= glGetUniformLocation(hProg.prog, "v2");
@@ -288,6 +290,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 
 		hProg.heightmap		= glGetUniformLocation(hProg.prog, "texHeightmap");
 		hProg.usesHeightmap = ((-1)!=hProg.heightmap);
+		glUseProgram(0);
 
 		checkGLError();
 		mHeightmapProgs.push_back(hProg);
@@ -299,6 +302,9 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	////////////////////////////////////////////////////////////////
 	// load the patch terrain shader
 	LoadShader(patch_prog, "patch.vert", "patch.frag");
+	checkGLError();
+	glUseProgram(patch_prog);
+	checkGLError();
 	// Get a handle for our "MVP" uniform(s)
 	patch_MatrixID		= glGetUniformLocation(patch_prog, "MVP");
 	patch_ViewMatrixID	= glGetUniformLocation(patch_prog, "V");
@@ -311,6 +317,8 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	patch_fracStep		= glGetUniformLocation(patch_prog, "fracStep");
 	patch_colour		= glGetUniformLocation(patch_prog, "in_colour");
 	patch_texHeightmap	= glGetUniformLocation(patch_prog, "texHeightmap");
+	glUseProgram(0);
+	checkGLError();
 
 	////////////////////////////////////////////////////////////////
 	// create a dummy set of verts, the UVs are the only important part

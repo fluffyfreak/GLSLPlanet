@@ -40,13 +40,17 @@ void GeoSphere::Update(const glm::vec3 &campos)
 {
 	if(nullptr==mGeoPatches[0]) {
 		BuildFirstPatches();
+		checkGLError();
 	} else if(mSplitRequestDescriptions.empty()) {
 		ProcessSplitResults();
+		checkGLError();
 		for (int i=0; i<NUM_PATCHES; i++) {
 			mGeoPatches[i]->LODUpdate(campos);
+		checkGLError();
 		}
 	} else {
 		ProcessSplitRequests();
+		checkGLError();
 	}
 }
 
@@ -55,6 +59,7 @@ void GeoSphere::Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix
 	// setup the basics for the patch shader,
 	// individual patches will change settings to match their own parameters
 	mGeoPatchContext->UsePatchShader(ViewMatrix, ModelMatrix, MVP);
+	checkGLError();
 
 #if TEST_CASE
 	mGeoPatches[0]->Render();	// red
@@ -63,6 +68,7 @@ void GeoSphere::Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix
 	checkGLError();
 	for (int i=0; i<NUM_PATCHES; i++) {
 		mGeoPatches[i]->Render();
+		checkGLError();
 	}
 #endif
 }

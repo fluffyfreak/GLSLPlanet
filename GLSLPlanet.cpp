@@ -320,16 +320,15 @@ int main()
 		glm::mat4 ProjectionMatrix = perspective(90.0f, aspect, 0.1f, 1000.f);
 
 		// Polar Camera matrix
-		glm::mat4 matty;
-		matty = translate(matty, glm::vec3(0.f, 0.f, (-geoSphereRadius) + zoomDist));
-		matty = rotate(matty, phi, glm::vec3(1.f, 0.f, 0.f));
-		matty = rotate(matty, theta, glm::vec3(0.f, 1.f, 0.f));
+		glm::mat4 ViewMatrix;
+		ViewMatrix = translate(ViewMatrix, glm::vec3(0.f, 0.f, (-geoSphereRadius) + zoomDist));
+		ViewMatrix = rotate(ViewMatrix, phi, glm::vec3(1.f, 0.f, 0.f));
+		ViewMatrix = rotate(ViewMatrix, theta, glm::vec3(0.f, 1.f, 0.f));
 		//glm::mat4 ViewMatrix       = lookAt(
 		//								glm::vec3(0.f, 0.f, -20.f),	// Camera is here
 		//								glm::vec3(0.f, 0.f, 0.f),	// and looks here : at the same position, plus "direction"
 		//								glm::vec3(0.f, 1.f, 0.f)	// Head is up (set to 0,-1,0 to look upside-down)
 		//						   );
-		glm::mat4 ViewMatrix	= matty;
 		glm::mat4 ModelMatrix	= glm::mat4(1.0);
 		glm::mat4 MVP			= ProjectionMatrix * ViewMatrix * ModelMatrix;
 
@@ -340,6 +339,7 @@ int main()
 		samplePtMat = rotate(samplePtMat, sample_pt_theta, glm::vec3(0.f, 1.f, 0.f));
 		const glm::vec4 campos(1.0f, 0.0f, 0.0f, 1.0f);
 		pSphere->Update(vec3(campos*samplePtMat));
+		checkGLError();
 
 		////////////////////////////////////////////////////////////////
 		// Render the main scene
@@ -356,6 +356,7 @@ int main()
 			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 		}
 		pSphere->Render(ViewMatrix,ModelMatrix,MVP);
+		checkGLError();
 		if(bUseWireframe) {
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
