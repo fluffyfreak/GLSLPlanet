@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Resource Files\shaders">
+      <UniqueIdentifier>{d07a3304-7063-44eb-a8cf-088aebe6f822}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\shaders\terrains">
+      <UniqueIdentifier>{e6dbfc56-fdef-4599-8993-f91976ef36e0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\textfile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TerrainMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GLee.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shaderHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GLfbo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GLvbo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GLprimitives.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\GLSLPlanet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\shader_heightmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TerrainContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TerrainPatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\TerrainPatchID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\TerrainMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\textfile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GLee.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\vcacheopt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shaderHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GLfbo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GLvbo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\GLprimitives.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\shader_heightmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TerrainContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TerrainPatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\TerrainPatchID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\shaders\colourAndLit.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\colourAndLit.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\red.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\red.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\test.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\test.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\noise_lib.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\heightmap.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\heightmap.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\patch.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\patch.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\debugHeightmap.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\debugHeightmap.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\heightmap_gen.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\heightmap_gen.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\noise_feature_lib.glsl">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="..\shaders\terrains\TerrainHeightShaderFun.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
+  </ItemGroup>
+</Project>
