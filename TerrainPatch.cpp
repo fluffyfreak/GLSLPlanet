@@ -17,6 +17,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 using namespace glm;
 
+#include <algorithm>
+
 // constructor
 GeoPatch::GeoPatch(const GeoPatchContext &context_, GeoSphere *pGeoSphere_, 
 	const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, 
