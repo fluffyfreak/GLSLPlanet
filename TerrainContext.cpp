@@ -13,7 +13,6 @@
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-using namespace glm;
 
 #if TEST_CASE
 #define USE_CPP_HEIGHTMAP_SHADER 0

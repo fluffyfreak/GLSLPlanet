@@ -12,12 +12,11 @@
 #include "glee.h"
 
 // Include GLFW
-#include <GL/glfw.h>
+#include "glfw3.h"
 
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-using namespace glm;
 
 #include "GLvbo.h"
 #include "utils.h"
@@ -38,11 +37,11 @@ namespace NKeyboard {
 	#define NUM_KEYS 256
 	EKeyStates g_keys[NUM_KEYS] = {eKeyUnset};
 	EKeyStates g_keysPrev[NUM_KEYS] = {eKeyUnset};
-	void UpdateKeyStates() {
+	void UpdateKeyStates(GLFWwindow *window) {
 		for( int k=0; k<NUM_KEYS; k++ ) 
 		{
 			g_keysPrev[k] = g_keys[k];
-			g_keys[k] = (glfwGetKey(k)==GLFW_PRESS) ? eKeyPressed : eKeyReleased;
+			g_keys[k] = (glfwGetKey(window, k)==GLFW_PRESS) ? eKeyPressed : eKeyReleased;
 		}
 	}
 	EKeyStates GetKeyState( const uint8_t c )
@@ -57,6 +56,12 @@ namespace NKeyboard {
 	}
 };
 
+static bool s_bShouldClose = false;
+void windowclosefun(GLFWwindow*)
+{
+	s_bShouldClose = true;
+}
+
 int main()
 {
 	const int screen_width = 800;
@@ -69,22 +74,23 @@ int main()
 		return -1;
 	}
 
-	/*glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
-	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
-
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+	
+	GLFWmonitor *PrimaryMonitor = glfwGetPrimaryMonitor();
+	GLFWwindow *PrimaryWindow = glfwCreateWindow( screen_width, screen_height, "GLSLPlanet", NULL, NULL);
 
 	// Open a window and create its OpenGL context
-	if( !glfwOpenWindow( screen_width, screen_height, 0,0,0,0,24,0, GLFW_WINDOW ) )
+	if( !PrimaryWindow )
 	{
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		glfwTerminate();
 		return -1;
 	}
+
+	glfwMakeContextCurrent(PrimaryWindow);
+	glfwSetWindowCloseCallback(PrimaryWindow, windowclosefun);
 
 	int major, minor, rev;
 	glfwGetVersion(&major, &minor, &rev);
@@ -110,17 +116,16 @@ int main()
 	int MaxCombinedTextureImageUnits;
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxCombinedTextureImageUnits);
 
-	glfwSetWindowTitle( "Sphere" );
+	glfwSetWindowTitle( PrimaryWindow, "Sphere" );
 
-	GLFWvidmode mode;
-	glfwGetDesktopMode( &mode );
-	const int screen_x_offset = (mode.Width - screen_width)>>1;
-	const int screen_y_offset = (mode.Height - screen_height)>>1;
-	glfwSetWindowPos( screen_x_offset, screen_y_offset );
+	const GLFWvidmode *mode = glfwGetVideoMode(PrimaryMonitor);
+	const int screen_x_offset = (mode->width - screen_width)>>1;
+	const int screen_y_offset = (mode->height - screen_height)>>1;
+	glfwSetWindowPos( PrimaryWindow, screen_x_offset, screen_y_offset );
 
 	// Ensure we can capture the escape key being pressed below
-	glfwEnable( GLFW_STICKY_KEYS );
-	glfwSetMousePos(screen_width/2, screen_height/2);
+	glfwSetInputMode( PrimaryWindow, GLFW_STICKY_KEYS, GL_TRUE );
+	glfwSetCursorPos( PrimaryWindow, screen_width/2, screen_height/2);
 
 	// Set color and depth clear value
     glClearDepth(1.0f);
@@ -166,7 +171,7 @@ int main()
 #endif
 	float sample_pt_theta=0.0f, sample_pt_phi=0.0f;
 
-	int mouseWPrev = glfwGetMouseWheel();
+	//int mouseWPrev = glfwGetMouseWheel();
 	float zoomDist = -15.0f;
 	const float geoSphereRadius = 25.0f;
 
@@ -175,35 +180,35 @@ int main()
 	do {
 		////////////////////////////////////////////////////////////////
 		// handle resizing the screen/window
-		glfwGetWindowSize(&screenWide, &screenHigh);
+		glfwGetWindowSize(PrimaryWindow, &screenWide, &screenHigh);
 		screenWidef = float(screenWide);
 		screenHighf = float(screenHigh);
 		aspect = screenWidef / screenHighf;
 
 		////////////////////////////////////////////////////////////////
 		// update the user input
-		{
+		/*{
 			const int mouseW = glfwGetMouseWheel();
 			const int mouseWDiff = mouseW - mouseWPrev;
 			mouseWPrev = mouseW;
 			zoomDist += float(mouseWDiff) * 0.1f;
 			zoomDist = Clamp<float>(zoomDist, -100.0f, 0.0f);
-		}
+		}*/
 
 		{
-			int x, y;
-			glfwGetMousePos(&x, &y);
+			double x, y;
+			glfwGetCursorPos(PrimaryWindow, &x, &y);
 			const int xDiff = x - xprev;
 			const int yDiff = y - yprev;
 			xprev = x;
 			yprev = y;
 			static const float phi_limit = 80.0f;
-			if(GLFW_PRESS==glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
+			if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_LEFT)) {
 				theta += float(xDiff) * 0.1f;
 				//theta = Clamp<float>(theta, -45.0f, 45.0f);
 				phi += float(yDiff) * 0.1f;
 				phi = Clamp<float>(phi, -phi_limit, phi_limit);
-			} else if(GLFW_PRESS==glfwGetMouseButton(GLFW_MOUSE_BUTTON_RIGHT)) {
+			} else if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_RIGHT)) {
 #ifdef _DEBUG
 				// rotate/move the campos (cube marker)
 				cube_theta += float(xDiff) * 0.2f;
@@ -211,7 +216,7 @@ int main()
 				cube_phi += float(yDiff) * 0.2f;
 				cube_phi = Clamp<float>(cube_phi, -phi_limit, phi_limit);
 #endif
-			} else if(GLFW_PRESS==glfwGetMouseButton(GLFW_MOUSE_BUTTON_MIDDLE)) {
+			} else if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_MIDDLE)) {
 				// rotate/move the campos (cube marker)
 				sample_pt_theta -= float(xDiff) * 0.2f;
 				//theta = Clamp<float>(theta, -45.0f, 45.0f);
@@ -227,13 +232,13 @@ int main()
 		////////////////////////////////////////////////////////////////
 		// Compute the MVP matrix from keyboard and mouse input
 		// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 1000 units
-		glm::mat4 ProjectionMatrix = perspective(90.0f, aspect, 0.1f, 1000.f);
+		glm::mat4 ProjectionMatrix = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
 
 		// Polar Camera matrix
 		glm::mat4 matty;
-		matty = translate(matty, glm::vec3(0.f, 0.f, (-geoSphereRadius) + zoomDist));
-		matty = rotate(matty, phi, glm::vec3(1.f, 0.f, 0.f));
-		matty = rotate(matty, theta, glm::vec3(0.f, 1.f, 0.f));
+		matty = glm::translate(matty, glm::vec3(0.f, 0.f, (-geoSphereRadius) + zoomDist));
+		matty = glm::rotate(matty, phi, glm::vec3(1.f, 0.f, 0.f));
+		matty = glm::rotate(matty, theta, glm::vec3(0.f, 1.f, 0.f));
 		//glm::mat4 ViewMatrix       = lookAt(
 		//								glm::vec3(0.f, 0.f, -20.f),	// Camera is here
 		//								glm::vec3(0.f, 0.f, 0.f),	// and looks here : at the same position, plus "direction"
@@ -246,10 +251,10 @@ int main()
 		////////////////////////////////////////////////////////////////
 		// update, and possibly render the terrain for the sphere
 		glm::mat4 samplePtMat;
-		samplePtMat = rotate(samplePtMat, sample_pt_phi, glm::vec3(0.f, 0.f, 1.f));
-		samplePtMat = rotate(samplePtMat, sample_pt_theta, glm::vec3(0.f, 1.f, 0.f));
+		samplePtMat = glm::rotate(samplePtMat, sample_pt_phi, glm::vec3(0.f, 0.f, 1.f));
+		samplePtMat = glm::rotate(samplePtMat, sample_pt_theta, glm::vec3(0.f, 1.f, 0.f));
 		const glm::vec4 campos(1.0f, 0.0f, 0.0f, 1.0f);
-		pSphere->Update(vec3(campos*samplePtMat));
+		pSphere->Update(glm::vec3(campos*samplePtMat));
 
 		////////////////////////////////////////////////////////////////
 		// Render the main scene
@@ -274,13 +279,14 @@ int main()
 		checkGLError();
 
 		// Swap buffers
-		glfwSwapBuffers();
+		glfwSwapBuffers(PrimaryWindow);
 		checkGLError();
+        glfwPollEvents();
 
-		NKeyboard::UpdateKeyStates();
+		NKeyboard::UpdateKeyStates(PrimaryWindow);
 
 	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
+	while( glfwGetKey( PrimaryWindow, GLFW_KEY_ESCAPE ) != GLFW_PRESS && (false == s_bShouldClose) );
 
 	checkGLError();
 	if(pSphere) {

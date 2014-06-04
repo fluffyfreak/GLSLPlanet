@@ -161,8 +161,8 @@ namespace NCppHeightmapShader
 		p4 *= taylorInvSqrt(dot(p4,p4));
 
 		// Mix contributions from the five corners
-		vec3 m0 = max(0.6f - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), 0.0f);
-		vec2 m1 = max(0.6f - vec2(dot(x3,x3), dot(x4,x4)            ), 0.0f);
+		vec3 m0 = glm::max(0.6f - vec3(dot(x0,x0), dot(x1,x1), dot(x2,x2)), vec3(0.0f));
+		vec2 m1 = glm::max(0.6f - vec2(dot(x3,x3), dot(x4,x4)            ), vec2(0.0f));
 		m0 = m0 * m0;
 		m1 = m1 * m1;
 		return 49.0f * ( dot(m0*m0, vec3( dot( p0, x0 ), dot( p1, x1 ), dot( p2, x2 )))
@@ -197,7 +197,7 @@ namespace NCppHeightmapShader
 		//billow noise
 		n1 *= (2.0f * abs(n) - 1.0f)+1.0f;
 		//voronoiscam noise
-		n1 *= sqrt(10.0f * abs(n));
+		n1 *= glm::sqrt(10.0f * fabs(n));
 		return n1;
 	}
 
