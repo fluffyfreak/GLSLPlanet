@@ -62,6 +62,12 @@ void windowclosefun(GLFWwindow*)
 	s_bShouldClose = true;
 }
 
+static int mouseW = 0;
+void scroll(GLFWwindow *pWnd, double x, double y)
+{
+	mouseW = int(y) * 10;
+}
+
 int main()
 {
 	const int screen_width = 800;
@@ -171,11 +177,12 @@ int main()
 #endif
 	float sample_pt_theta=0.0f, sample_pt_phi=0.0f;
 
-	//int mouseWPrev = glfwGetMouseWheel();
 	float zoomDist = -15.0f;
 	const float geoSphereRadius = 25.0f;
 
 	bool bUseWireframe = false;
+
+	glfwSetScrollCallback(PrimaryWindow, scroll);
 
 	do {
 		////////////////////////////////////////////////////////////////
@@ -187,13 +194,11 @@ int main()
 
 		////////////////////////////////////////////////////////////////
 		// update the user input
-		/*{
-			const int mouseW = glfwGetMouseWheel();
-			const int mouseWDiff = mouseW - mouseWPrev;
-			mouseWPrev = mouseW;
-			zoomDist += float(mouseWDiff) * 0.1f;
+		{
+			zoomDist += float(mouseW) * 0.1f;
 			zoomDist = Clamp<float>(zoomDist, -100.0f, 0.0f);
-		}*/
+			mouseW = 0;
+		}
 
 		{
 			double x, y;
