@@ -141,6 +141,18 @@ float octavenoise(in int octaves, in float roughness, in float lacunarity, in ve
     return (n+1.0)*0.5;
 }
 
+float fbm(in vec3 p)
+{
+	float n = 0.0;
+	float scale = 1.0;
+	for(int i=0; i<8; i++) {
+		n += snoise(vec4(p, 1.0)) * scale;
+		p *= vec3(2.0, 2.0, 2.0);
+		scale *= 0.5;
+	}
+	return n;
+}
+
 float combo_octavenoise(in int octaves, in float roughness, in float lacunarity, in vec3 p, in float freq, in float time)
 {
     float n = 0.0;

@@ -251,7 +251,8 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	////////////////////////////////////////////////////////////////
 	// load the quad terrain shader(s)
 	static const std::string shaderFilenames[] = {
-		"terrains/TerrainHeightShaderFun.glsl",
+		"terrains/Warping.glsl",
+		//"terrains/TerrainHeightShaderFun.glsl",
 		""
 	};
 	vecBindings noiseyBinding;
