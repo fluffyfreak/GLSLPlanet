@@ -105,17 +105,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)..\</OutDir>
-    <TargetName>$(ProjectName)_vc2012_debug</TargetName>
+    <TargetName>$(ProjectName)_vc2013_debug</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PreRelease|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\</OutDir>
-    <TargetName>$(ProjectName)_vc2012_prerelease</TargetName>
+    <TargetName>$(ProjectName)_vc2013_prerelease</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)..\</OutDir>
-    <TargetName>$(ProjectName)_vc2012</TargetName>
+    <TargetName>$(ProjectName)_vc2013</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
