@@ -13,6 +13,6 @@ uniform float frequency[10];
 // Example used for the animated Star surface in s20dan's ShaderFun branch
 float GetHeight(in vec3 p)
 {	
-	float height = fbm( p + fbm( p + fbm( p ) ) ) * 0.1;
+	float height = fbm( p + fbm( p + fbm( p ) ) );
 	return height;
 }

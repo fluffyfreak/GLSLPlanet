@@ -124,6 +124,7 @@ private:
 	GLuint patch_ViewMatrixID;
 	GLuint patch_ModelMatrixID;
 	GLuint patch_radius;
+	GLuint patch_heightscale;
 	GLuint patch_v0;
 	GLuint patch_v1;
 	GLuint patch_v2;

@@ -10,6 +10,7 @@ uniform mat4 MVP;
 uniform mat4 V;
 uniform mat4 M;
 uniform float radius;
+uniform float heightscale;
 uniform vec3 v0;
 uniform vec3 v1;
 uniform vec3 v2;
@@ -29,7 +30,6 @@ vec3 GetSpherePoint(const float x, const float y) {
 
 void main()
 {
-	const float heightscale = 0.05;
 	uv = vertexUVs;
 
 	// get the uv offsets

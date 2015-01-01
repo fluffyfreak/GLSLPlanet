@@ -15,7 +15,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #if TEST_CASE
-#define USE_CPP_HEIGHTMAP_SHADER 0
+#define USE_CPP_HEIGHTMAP_SHADER 1
 #else
 #define USE_CPP_HEIGHTMAP_SHADER 0
 #endif
@@ -304,6 +304,7 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 	patch_ViewMatrixID	= glGetUniformLocation(patch_prog, "V");
 	patch_ModelMatrixID	= glGetUniformLocation(patch_prog, "M");
 	patch_radius		= glGetUniformLocation(patch_prog, "radius");
+	patch_heightscale	= glGetUniformLocation(patch_prog, "heightscale");
 	patch_v0			= glGetUniformLocation(patch_prog, "v0");
 	patch_v1			= glGetUniformLocation(patch_prog, "v1");
 	patch_v2			= glGetUniformLocation(patch_prog, "v2");
@@ -356,7 +357,7 @@ void GeoPatchContext::renderHeightmap(
 		for (uint32_t x=0; x<mEdgeLen; x++) {
 			const float xfrac = float(x) * fracStep;
 			const float yfrac = float(y) * fracStep;
-			const float blah = NCppHeightmapShader::shader_heightmap_frag(vec2(float(x)+0.5f, float(y)+0.5f));
+			const float blah = NCppHeightmapShader::shader_heightmap_frag(glm::vec2(float(x) + 0.5f, float(y) + 0.5f));
 			mpHeightmapData[x + (y * mEdgeLen)] = blah;
 		}
 	}
@@ -431,5 +432,6 @@ void GeoPatchContext::UsePatchShader(const glm::mat4 &ViewMatrix, const glm::mat
 	const float fracStep = textureLerpStep();
 	glUniform1f(patch_fracStep, fracStep);
 	glUniform1f(patch_radius, 25.0f);
+	glUniform1f(patch_heightscale, 0.005f);
 	checkGLError();
 }
