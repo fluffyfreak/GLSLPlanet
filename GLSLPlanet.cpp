@@ -68,6 +68,12 @@ void scroll(GLFWwindow *pWnd, double x, double y)
 	mouseW = int(y) * 10;
 }
 
+struct TFPSCamera
+{
+	glm::vec3 pos;
+	glm::vec3 rot;
+} fpsCamera;
+
 int main()
 {
 	const int screen_width = 800;
@@ -164,6 +170,12 @@ int main()
 	checkGLError();
 
 	////////////////////////////////////////////////////////////////
+
+	fpsCamera.pos = glm::vec3(0.f, 0.f, -37.5f); // Camera is here
+	fpsCamera.rot = glm::vec3(0.f, 0.f, 0.f);    // Orientation
+
+	////////////////////////////////////////////////////////////////
+
     int		screenWide = screen_width;
 	int		screenHigh = screen_height;
 	float	screenWidef = float(screen_width);
@@ -203,34 +215,31 @@ int main()
 		{
 			double x, y;
 			glfwGetCursorPos(PrimaryWindow, &x, &y);
-			const int xDiff = x - xprev;
-			const int yDiff = y - yprev;
-			xprev = x;
-			yprev = y;
+			const int xDiff = int(x - double(xprev));
+			const int yDiff = int(y - double(yprev));
+			xprev = int(x);
+			yprev = int(y);
 			static const float phi_limit = 80.0f;
 			if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_LEFT)) {
 				theta += float(xDiff) * 0.1f;
-				//theta = Clamp<float>(theta, -45.0f, 45.0f);
 				phi += float(yDiff) * 0.1f;
 				phi = Clamp<float>(phi, -phi_limit, phi_limit);
+				fpsCamera.rot.x = phi;
+				fpsCamera.rot.y = theta;
 			} else if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_RIGHT)) {
-#ifdef _DEBUG
-				// rotate/move the campos (cube marker)
-				cube_theta += float(xDiff) * 0.2f;
-				//theta = Clamp<float>(theta, -45.0f, 45.0f);
-				cube_phi += float(yDiff) * 0.2f;
-				cube_phi = Clamp<float>(cube_phi, -phi_limit, phi_limit);
-#endif
-			} else if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_MIDDLE)) {
-				// rotate/move the campos (cube marker)
+				// rotate/move the campos
 				sample_pt_theta -= float(xDiff) * 0.2f;
-				//theta = Clamp<float>(theta, -45.0f, 45.0f);
+				sample_pt_phi += float(yDiff) * 0.2f;
+				sample_pt_phi = Clamp<float>(sample_pt_phi, -phi_limit, phi_limit);
+			} else if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_MIDDLE)) {
+				// rotate/move the campos
+				sample_pt_theta -= float(xDiff) * 0.2f;
 				sample_pt_phi += float(yDiff) * 0.2f;
 				sample_pt_phi = Clamp<float>(sample_pt_phi, -phi_limit, phi_limit);
 			}
 		}
 		
-		if( NKeyboard::GetKeyState('W') == NKeyboard::eKeyPressed ) {
+		if( NKeyboard::GetKeyState('q') == NKeyboard::eKeyPressed ) {
 			bUseWireframe = !bUseWireframe;
 		}
 
@@ -238,26 +247,48 @@ int main()
 		// Compute the MVP matrix from keyboard and mouse input
 		// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 1000 units
 		glm::mat4 ProjectionMatrix = glm::perspective(90.0f, aspect, 0.1f, 1000.f);
-
+		
+#if 1
 		// Polar Camera matrix
-		glm::mat4 matty;
-		matty = glm::translate(matty, glm::vec3(0.f, 0.f, (-geoSphereRadius) + zoomDist));
-		matty = glm::rotate(matty, phi, glm::vec3(1.f, 0.f, 0.f));
-		matty = glm::rotate(matty, theta, glm::vec3(0.f, 1.f, 0.f));
-		//glm::mat4 ViewMatrix       = lookAt(
-		//								glm::vec3(0.f, 0.f, -20.f),	// Camera is here
-		//								glm::vec3(0.f, 0.f, 0.f),	// and looks here : at the same position, plus "direction"
-		//								glm::vec3(0.f, 1.f, 0.f)	// Head is up (set to 0,-1,0 to look upside-down)
-		//						   );
-		glm::mat4 ViewMatrix	= matty;
+		glm::mat4 ViewMatrix;
+		ViewMatrix = glm::translate(ViewMatrix, glm::vec3(0.f, 0.f, (-geoSphereRadius) + zoomDist));
+		ViewMatrix = glm::rotate(ViewMatrix, glm::radians(phi), glm::vec3(1.f, 0.f, 0.f));
+		ViewMatrix = glm::rotate(ViewMatrix, glm::radians(theta), glm::vec3(0.f, 1.f, 0.f));
+#else
+		// fps camera stuff
+		glm::mat4 matty(1.0f);
+		//matty = glm::rotate(matty, glm::radians(fpsCamera.rot.z), glm::vec3(0.f, 0.f, 1.f));
+		matty = glm::rotate(matty, glm::radians(fpsCamera.rot.y), glm::vec3(0.f, 1.f, 0.f));
+		matty = glm::rotate(matty, glm::radians(fpsCamera.rot.x), glm::vec3(1.f, 0.f, 0.f));
+
+		const glm::vec3 dir = glm::vec3(matty * glm::vec4(0.f, 0.f, 1.f, 1.f));
+		const glm::vec3 up = glm::vec3(matty * glm::vec4(0.f, 1.f, 0.f, 1.f));
+		const glm::vec3 right = glm::cross(dir, up);
+
+		if (NKeyboard::GetKeyState('W') == NKeyboard::eKeyHeld)
+			fpsCamera.pos += dir;
+		else if (NKeyboard::GetKeyState('A') == NKeyboard::eKeyHeld)
+			fpsCamera.pos -= right;
+		else if (NKeyboard::GetKeyState('S') == NKeyboard::eKeyHeld)
+			fpsCamera.pos -= dir;
+		else if (NKeyboard::GetKeyState('D') == NKeyboard::eKeyHeld)
+			fpsCamera.pos += right;
+		
+		const glm::vec3 tar = fpsCamera.pos + dir;
+		const glm::mat4 ViewMatrix =	glm::lookAt(
+											fpsCamera.pos,	// Camera is here
+											tar,			// and looks here : at the same position, plus "direction"
+											up				// Head is up (set to 0,-1,0 to look upside-down)
+										);
+#endif
 		glm::mat4 ModelMatrix	= glm::mat4(1.0);
 		glm::mat4 MVP			= ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		////////////////////////////////////////////////////////////////
 		// update, and possibly render the terrain for the sphere
 		glm::mat4 samplePtMat;
-		samplePtMat = glm::rotate(samplePtMat, sample_pt_phi, glm::vec3(0.f, 0.f, 1.f));
-		samplePtMat = glm::rotate(samplePtMat, sample_pt_theta, glm::vec3(0.f, 1.f, 0.f));
+		samplePtMat = glm::rotate(samplePtMat, glm::radians(sample_pt_phi), glm::vec3(0.f, 0.f, 1.f));
+		samplePtMat = glm::rotate(samplePtMat, glm::radians(sample_pt_theta), glm::vec3(0.f, 1.f, 0.f));
 		const glm::vec4 campos(1.0f, 0.0f, 0.0f, 1.0f);
 		pSphere->Update(glm::vec3(campos*samplePtMat));
 
