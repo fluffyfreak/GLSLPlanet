@@ -239,7 +239,7 @@ int main()
 			}
 		}
 		
-		if( NKeyboard::GetKeyState('q') == NKeyboard::eKeyPressed ) {
+		if( NKeyboard::GetKeyState(GLFW_KEY_Q) == NKeyboard::eKeyPressed ) {
 			bUseWireframe = !bUseWireframe;
 		}
 
