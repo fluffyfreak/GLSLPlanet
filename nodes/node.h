@@ -10,7 +10,7 @@
 #include "../glee.h"
 
 // Include GLFW
-#include <GL/glfw.h>
+#include "GLFW/glfw3.h"
 #include <utility>
 #include <string>
 

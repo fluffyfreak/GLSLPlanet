@@ -13,7 +13,7 @@
 #include "glee.h"
 
 // Include GLFW
-#include <GL/glfw.h>
+#include "GLFW/glfw3.h"
 
 // Include GLM
 #include <glm/glm.hpp>
@@ -31,6 +31,8 @@ using namespace glm;
 #include "nodes\node.h"
 #include "nodes\createNode.h"
 
+static GLFWwindow* window = nullptr;
+
 namespace NKeyboard {
 	enum EKeyStates {
 		eKeyUnset=0,
@@ -45,7 +47,7 @@ namespace NKeyboard {
 		for( int k=0; k<NUM_KEYS; k++ ) 
 		{
 			g_keysPrev[k] = g_keys[k];
-			g_keys[k] = (glfwGetKey(k)==GLFW_PRESS) ? eKeyPressed : eKeyReleased;
+			g_keys[k] = (glfwGetKey(window, k)==GLFW_PRESS) ? eKeyPressed : eKeyReleased;
 		}
 	}
 	EKeyStates GetKeyState( const uint8_t c )
@@ -76,17 +78,21 @@ int main()
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 3);
 	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 3);
 	glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);*/
-
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
+	
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 	// Open a window and create its OpenGL context
-	if( !glfwOpenWindow( screen_width, screen_height, 0,0,0,0,24,0, GLFW_WINDOW ) )
+	window = glfwCreateWindow( screen_width, screen_height, "GLSLPLanet", nullptr, nullptr );
+	if( !window )
 	{
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		glfwTerminate();
 		return -1;
 	}
+
+	/* Make the window's context current */
+    glfwMakeContextCurrent(window);
 
 	const GLboolean bInitOk = GLeeInit();
 	assert(bInitOk == GL_TRUE);
@@ -96,17 +102,10 @@ int main()
 	int MaxCombinedTextureImageUnits;
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &MaxCombinedTextureImageUnits);
 
-	glfwSetWindowTitle( "Sphere" );
-
-	GLFWvidmode mode;
-	glfwGetDesktopMode( &mode );
-	const int screen_x_offset = (mode.Width - screen_width)>>1;
-	const int screen_y_offset = (mode.Height - screen_height)>>1;
-	glfwSetWindowPos( screen_x_offset, screen_y_offset );
+	glfwSetWindowTitle( window, "GLSLPLanet - GPUGen" );
 
 	// Ensure we can capture the escape key being pressed below
-	glfwEnable( GLFW_STICKY_KEYS );
-	glfwSetMousePos(screen_width/2, screen_height/2);
+	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 
 	// Set color and depth clear value
     glClearDepth(1.0f);
@@ -256,7 +255,7 @@ int main()
 #endif
 	float sample_pt_theta=0.0f, sample_pt_phi=0.0f;
 
-	int mouseWPrev = glfwGetMouseWheel();
+	int mouseWPrev = 0;//glfwGetMouseWheel();
 	float zoomDist = -15.0f;
 	const float geoSphereRadius = 25.0f;
 
@@ -265,7 +264,7 @@ int main()
 	do {
 		////////////////////////////////////////////////////////////////
 		// handle resizing the screen/window
-		glfwGetWindowSize(&screenWide, &screenHigh);
+		glfwGetWindowSize(window, &screenWide, &screenHigh);
 		screenWidef = float(screenWide);
 		screenHighf = float(screenHigh);
 		aspect = screenWidef / screenHighf;
@@ -273,7 +272,7 @@ int main()
 		////////////////////////////////////////////////////////////////
 		// update the user input
 		{
-			const int mouseW = glfwGetMouseWheel();
+			const int mouseW = 0;//glfwGetMouseWheel();
 			const int mouseWDiff = mouseW - mouseWPrev;
 			mouseWPrev = mouseW;
 			zoomDist += float(mouseWDiff) * 0.1f;
@@ -281,19 +280,19 @@ int main()
 		}
 
 		{
-			int x, y;
-			glfwGetMousePos(&x, &y);
+			double x, y;
+			glfwGetCursorPos(window, &x, &y);
 			const int xDiff = x - xprev;
 			const int yDiff = y - yprev;
 			xprev = x;
 			yprev = y;
 			static const float phi_limit = 80.0f;
-			if(GLFW_PRESS==glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT)) {
+			if(GLFW_PRESS==glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
 				theta += float(xDiff) * 0.1f;
 				//theta = Clamp<float>(theta, -45.0f, 45.0f);
 				phi += float(yDiff) * 0.1f;
 				phi = Clamp<float>(phi, -phi_limit, phi_limit);
-			} else if(GLFW_PRESS==glfwGetMouseButton(GLFW_MOUSE_BUTTON_RIGHT)) {
+			} else if(GLFW_PRESS==glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT)) {
 #ifdef _DEBUG
 				// rotate/move the campos (cube marker)
 				cube_theta += float(xDiff) * 0.2f;
@@ -301,7 +300,7 @@ int main()
 				cube_phi += float(yDiff) * 0.2f;
 				cube_phi = Clamp<float>(cube_phi, -phi_limit, phi_limit);
 #endif
-			} else if(GLFW_PRESS==glfwGetMouseButton(GLFW_MOUSE_BUTTON_MIDDLE)) {
+			} else if(GLFW_PRESS==glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE)) {
 				// rotate/move the campos (cube marker)
 				sample_pt_theta -= float(xDiff) * 0.2f;
 				//theta = Clamp<float>(theta, -45.0f, 45.0f);
@@ -365,13 +364,15 @@ int main()
 		checkGLError();
 
 		// Swap buffers
-		glfwSwapBuffers();
+		glfwSwapBuffers(window);
 		checkGLError();
 
 		NKeyboard::UpdateKeyStates();
+		/* Poll for and process events */
+        glfwPollEvents();
 
 	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS && glfwGetWindowParam( GLFW_OPENED ) );
+	while( glfwGetKey( window, GLFW_KEY_ESCAPE ) != GLFW_PRESS );
 
 	checkGLError();
 	if(pSphere) {

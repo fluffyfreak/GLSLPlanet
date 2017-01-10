@@ -15,3 +15,4 @@ void checkGLError()
 			printf("GL Error: %s\n-----------------\n\n", errmsg);
 	}
 }
+#pragma optimize( "", on )
