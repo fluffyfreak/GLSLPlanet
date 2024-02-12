@@ -18,6 +18,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include "GLvbo.h"
 #include "utils.h"
 #include "shaderHelper.h"
@@ -220,6 +224,17 @@ int main()
 
 	glfwSetScrollCallback(PrimaryWindow, ScrollFunc);
 
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(PrimaryWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+	ImGui_ImplOpenGL3_Init();
+
 	do {
 		////////////////////////////////////////////////////////////////
 		// handle resizing the screen/window
@@ -227,6 +242,12 @@ int main()
 		screenWidef = float(screenWide);
 		screenHighf = float(screenHigh);
 		aspect = screenWidef / screenHighf;
+
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		ImGui::ShowDemoWindow(); // Show demo window! :)
 
 		////////////////////////////////////////////////////////////////
 		// update the user input
@@ -338,6 +359,9 @@ int main()
 		glUseProgram(0);
 		checkGLError();
 
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		// Swap buffers
 		glfwSwapBuffers(PrimaryWindow);
 		checkGLError();
@@ -354,6 +378,10 @@ int main()
 		pSphere = nullptr;
 	}
 	checkGLError();
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
