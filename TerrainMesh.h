@@ -4,8 +4,7 @@
 #ifndef __TERRAINMESH_H__
 #define __TERRAINMESH_H__
 
-// Include GLEE
-#include "glee.h"
+#include "glew.h"
 
 #include "TerrainPatchID.h"
 

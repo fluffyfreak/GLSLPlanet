@@ -8,8 +8,8 @@
 #include <string>
 #include <cassert>
 
-// Include GLEE
-#include "glee.h"
+// GLew
+#include "glew.h"
 
 // Include GLFW
 #include "glfw3.h"
@@ -26,6 +26,21 @@
 #include "TextFile.h"
 #include <direct.h>
 #include <sstream>
+
+// Making this run in nVidia fixes everything, it's fucked on Intel UHD... suspect there's something wrong with the shaders in that case
+#if 1
+typedef unsigned long       DWORD;
+extern "C" {
+	// This is the quickest and easiest way to enable using the nVidia GPU on a Windows laptop with a dedicated nVidia GPU and Optimus tech.
+	// enable optimus!
+	// https://docs.nvidia.com/gameworks/content/technologies/desktop/optimus.htm
+	__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+
+	// AMD have one too!!!
+	// https://gpuopen.com/amdpowerxpressrequesthighperformance/
+	__declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
+}
+#endif
 
 namespace NKeyboard {
 	enum EKeyStates {
@@ -63,7 +78,7 @@ void WindowCloseFunc(GLFWwindow*)
 }
 
 static int mouseW = 0;
-void scroll(GLFWwindow *pWnd, double x, double y)
+void ScrollFunc(GLFWwindow *pWnd, double x, double y)
 {
 	mouseW = int(y) * 10;
 }
@@ -76,9 +91,6 @@ struct TFPSCamera
 
 int main()
 {
-	const int screen_width = 800;
-	const int screen_height = 600;
-
 	// Initialise GLFW
 	if( !glfwInit() )
 	{
@@ -91,6 +103,13 @@ int main()
 	//glfwOpenWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 	
 	GLFWmonitor *PrimaryMonitor = glfwGetPrimaryMonitor();
+
+	const GLFWvidmode* mode = glfwGetVideoMode(PrimaryMonitor);
+	const int screen_width = mode->width >> 1;
+	const int screen_height = mode->height >> 1;
+	const int screen_x_offset = (mode->width - screen_width) >> 1;
+	const int screen_y_offset = (mode->height - screen_height) >> 1;
+
 	GLFWwindow *PrimaryWindow = glfwCreateWindow( screen_width, screen_height, "GLSLPlanet", NULL, NULL);
 
 	// Open a window and create its OpenGL context
@@ -117,11 +136,19 @@ int main()
 		"OpenGL details: \n -- VERSION: \"" << pVerStr << "\"\n -- VENDOR: \"" << pVenStr << "\"\n" <<
 		" -- RENDERER: " << pRenStr << "\"\n -- SHADING LANGUAGE VERSION: " << pSLVStr << std::endl;
 
-	_mkdir("./logs");
-	textFileWrite( "./logs/opengl.log", log.str().c_str() );
 
-	const GLboolean bInitOk = GLeeInit();
-	assert(bInitOk == GL_TRUE);
+	//const GLboolean bInitOk = GLeeInit();
+	//assert(bInitOk == GL_TRUE);
+
+	glewExperimental = true;
+	GLenum glew_err;
+	if ((glew_err = glewInit()) != GLEW_OK) {
+		log << "GLEW initialisation failed: " << glewGetErrorString(glew_err) << std::endl;
+		assert(false);
+	}
+
+	_mkdir("./logs");
+	textFileWrite("./logs/opengl.log", log.str().c_str());
 
 	int MaxVertexTextureImageUnits;
 	glGetIntegerv(GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS, &MaxVertexTextureImageUnits);
@@ -130,9 +157,6 @@ int main()
 
 	glfwSetWindowTitle( PrimaryWindow, "Sphere" );
 
-	const GLFWvidmode *mode = glfwGetVideoMode(PrimaryMonitor);
-	const int screen_x_offset = (mode->width - screen_width)>>1;
-	const int screen_y_offset = (mode->height - screen_height)>>1;
 	glfwSetWindowPos( PrimaryWindow, screen_x_offset, screen_y_offset );
 
 	// Ensure we can capture the escape key being pressed below
@@ -194,7 +218,7 @@ int main()
 
 	bool bUseWireframe = false;
 
-	glfwSetScrollCallback(PrimaryWindow, scroll);
+	glfwSetScrollCallback(PrimaryWindow, ScrollFunc);
 
 	do {
 		////////////////////////////////////////////////////////////////

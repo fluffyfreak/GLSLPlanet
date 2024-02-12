@@ -6,7 +6,7 @@
 
 #include <cstdio>
 
-#include "glee.h"
+#include "glew.h"
 #include <gl\GLU.h>
 
 void checkGLError();

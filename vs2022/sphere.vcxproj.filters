@@ -30,9 +30,6 @@
     <ClCompile Include="..\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\GLee.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\shaderHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -60,6 +57,9 @@
     <ClCompile Include="..\TerrainPatchID.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\libs\glew\glew.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\TerrainMesh.h">
@@ -69,9 +69,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\utils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\GLee.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\vcacheopt.h">

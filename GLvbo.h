@@ -5,7 +5,7 @@
 #define __glvbo_h__
 
 // Include GLEE to get definitions for GLuint and GLenum... yes Andy you should do this cleaner!
-#include "glee.h"
+#include "glew.h"
 
 class CGLvbo
 {

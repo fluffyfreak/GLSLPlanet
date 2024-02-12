@@ -2,7 +2,7 @@
 // Licensed under the terms of the GPL v3. See licenses/GPL-3.txt
 
 #include "shaderHelper.h"
-#include "glee.h"
+#include "glew.h"
 #include <gl\GLU.h>
 #include <cstdio>
 
@@ -31,7 +31,7 @@ const std::string RemovePath(const std::string& filename)
   const int sz = static_cast<int>(filename.size());
   const int path_sz_fwd = filename.rfind("/",filename.size());
   const int path_sz_bak = filename.rfind("\\",filename.size());
-  const int path_sz = max(path_sz_fwd, path_sz_bak);
+  const int path_sz = std::max(path_sz_fwd, path_sz_bak);
   if (path_sz == sz) 
 	  return filename;
   return filename.substr(path_sz + 1,sz - 1 - path_sz);

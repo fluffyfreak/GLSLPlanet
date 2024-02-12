@@ -2,7 +2,8 @@
 // Licensed under the terms of the GPL v3. See licenses/GPL-3.txt
 
 #include "GLprimitives.h"
-#include "GLee.h"
+// GLew
+#include "glew.h"
 #include "utils.h"
 
 // Include GLM

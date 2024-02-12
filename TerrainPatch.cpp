@@ -97,7 +97,7 @@ void GeoPatch::GenerateMesh() {
 
 void GeoPatch::ReceiveHeightmaps(const SSplitResult *psr)
 {
-	if (mDepth<psr->depth) {
+	if (mDepth < psr->depth) {
 		// this should work because each depth should have a common history
 		const uint32_t kidIdx = psr->data[0].patchID.GetPatchIdx(mDepth+1);
 		kids[kidIdx]->ReceiveHeightmaps(psr);
