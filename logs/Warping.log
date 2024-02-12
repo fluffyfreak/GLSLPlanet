@@ -1,0 +1,10 @@
+--------------------------
+Loading: 
+ -- vertex prog "heightmap_gen.vert" 
+ and 
+ -- fragement prog "heightmap_gen.frag"
+With 3 libraries:
+
+ -- :"noise_lib.glsl"
+ -- :"noise_feature_lib.glsl"
+ -- :"terrains/Warping.glsl"

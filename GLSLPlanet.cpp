@@ -57,7 +57,7 @@ namespace NKeyboard {
 };
 
 static bool s_bShouldClose = false;
-void windowclosefun(GLFWwindow*)
+void WindowCloseFunc(GLFWwindow*)
 {
 	s_bShouldClose = true;
 }
@@ -102,7 +102,7 @@ int main()
 	}
 
 	glfwMakeContextCurrent(PrimaryWindow);
-	glfwSetWindowCloseCallback(PrimaryWindow, windowclosefun);
+	glfwSetWindowCloseCallback(PrimaryWindow, WindowCloseFunc);
 
 	int major, minor, rev;
 	glfwGetVersion(&major, &minor, &rev);
@@ -142,8 +142,8 @@ int main()
 	// Set color and depth clear value
     glClearDepth(1.0f);
 	// Dark blue background
-	//glClearColor(0.0f, 0.05f, 0.1f, 0.0f);
-	glClearColor(100/255.f, 149/255.f, 237/255.f, 0.0f);
+	glClearColor(0.0f, 0.05f, 0.1f, 0.0f);
+	//glClearColor(100/255.f, 149/255.f, 237/255.f, 0.0f);
 	checkGLError();
 
 	// Enable depth test
