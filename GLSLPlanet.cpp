@@ -109,8 +109,8 @@ int main()
 	GLFWmonitor *PrimaryMonitor = glfwGetPrimaryMonitor();
 
 	const GLFWvidmode* mode = glfwGetVideoMode(PrimaryMonitor);
-	const int screen_width = mode->width >> 1;
-	const int screen_height = mode->height >> 1;
+	const int screen_width = mode->width - (mode->width >> 2);
+	const int screen_height = mode->height - (mode->height >> 2);
 	const int screen_x_offset = (mode->width - screen_width) >> 1;
 	const int screen_y_offset = (mode->height - screen_height) >> 1;
 
@@ -247,7 +247,7 @@ int main()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		ImGui::ShowDemoWindow(); // Show demo window! :)
+		//ImGui::ShowDemoWindow(); // Show demo window! :)
 
 		////////////////////////////////////////////////////////////////
 		// update the user input
