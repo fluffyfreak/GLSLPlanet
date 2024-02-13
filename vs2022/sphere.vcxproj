@@ -78,6 +78,7 @@
     <None Include="..\shaders\red.frag" />
     <None Include="..\shaders\red.vert" />
     <None Include="..\shaders\terrains\TerrainHeightShaderFun.glsl" />
+    <None Include="..\shaders\terrains\Warping.glsl" />
     <None Include="..\shaders\test.frag" />
     <None Include="..\shaders\test.vert" />
   </ItemGroup>

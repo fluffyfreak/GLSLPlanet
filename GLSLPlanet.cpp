@@ -93,6 +93,38 @@ struct TFPSCamera
 	glm::vec3 rot;
 } fpsCamera;
 
+void ShowImguiWindow()
+{
+	// Exceptionally add an extra assert here for people confused about initial Dear ImGui setup
+	// Most functions would normally just assert/crash if the context is missing.
+	IM_ASSERT(ImGui::GetCurrentContext() != NULL && "Missing Dear ImGui context. Refer to examples app!");
+	
+	bool* p_open = nullptr;
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar;
+	//if (no_titlebar)        window_flags |= ImGuiWindowFlags_NoTitleBar;
+	//if (no_scrollbar)       window_flags |= ImGuiWindowFlags_NoScrollbar;
+	//if (!no_menu)           window_flags |= ImGuiWindowFlags_MenuBar;
+	//if (no_move)            window_flags |= ImGuiWindowFlags_NoMove;
+	//if (no_resize)          window_flags |= ImGuiWindowFlags_NoResize;
+	//if (no_collapse)        window_flags |= ImGuiWindowFlags_NoCollapse;
+	//if (no_nav)             window_flags |= ImGuiWindowFlags_NoNav;
+	//if (no_background)      window_flags |= ImGuiWindowFlags_NoBackground;
+	//if (no_bring_to_front)  window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
+	//if (unsaved_document)   window_flags |= ImGuiWindowFlags_UnsavedDocument;
+	//if (no_close)           p_open = NULL; // Don't pass our bool* to Begin
+
+	// Main body of the Demo window starts here.
+	if (!ImGui::Begin("Menu", p_open, window_flags))
+	{
+		// Early out if the window is collapsed, as an optimization.
+		ImGui::End();
+		return;
+	}
+
+	// Always end
+	ImGui::End();
+}
+
 int main()
 {
 	// Initialise GLFW
@@ -221,6 +253,8 @@ int main()
 	const float geoSphereRadius = 25.0f;
 
 	bool bUseWireframe = false;
+	bool bShowDemo = false;
+	bool bShowMenu = false;
 
 	glfwSetScrollCallback(PrimaryWindow, ScrollFunc);
 
@@ -247,45 +281,60 @@ int main()
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
-		//ImGui::ShowDemoWindow(); // Show demo window! :)
+		if (bShowDemo) ImGui::ShowDemoWindow(); // Show demo window! :)
+		if (bShowMenu) ShowImguiWindow();
 
 		////////////////////////////////////////////////////////////////
-		// update the user input
-		{
-			zoomDist += float(mouseW) * 0.1f;
-			zoomDist = Clamp<float>(zoomDist, -100.0f, 0.0f);
-			mouseW = 0;
+		// update the key input
+		if (NKeyboard::GetKeyState(GLFW_KEY_Q) == NKeyboard::eKeyPressed) {
+			bUseWireframe = !bUseWireframe;
 		}
 
-		{
-			double x, y;
-			glfwGetCursorPos(PrimaryWindow, &x, &y);
-			const int xDiff = int(x - double(xprev));
-			const int yDiff = int(y - double(yprev));
-			xprev = int(x);
-			yprev = int(y);
-			static const float phi_limit = 80.0f;
-			if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_LEFT)) {
-				theta += float(xDiff) * 0.1f;
-				phi += float(yDiff) * 0.1f;
-				phi = Clamp<float>(phi, -phi_limit, phi_limit);
-				fpsCamera.rot.x = phi;
-				fpsCamera.rot.y = theta;
-			} else if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_RIGHT)) {
-				// rotate/move the campos
-				sample_pt_theta -= float(xDiff) * 0.2f;
-				sample_pt_phi += float(yDiff) * 0.2f;
-				sample_pt_phi = Clamp<float>(sample_pt_phi, -phi_limit, phi_limit);
-			} else if(GLFW_PRESS==glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_MIDDLE)) {
-				// rotate/move the campos
-				sample_pt_theta -= float(xDiff) * 0.2f;
-				sample_pt_phi += float(yDiff) * 0.2f;
-				sample_pt_phi = Clamp<float>(sample_pt_phi, -phi_limit, phi_limit);
-			}
+		if (NKeyboard::GetKeyState(GLFW_KEY_R) == NKeyboard::eKeyPressed) {
+			bShowDemo = !bShowDemo;
 		}
-		
-		if( NKeyboard::GetKeyState(GLFW_KEY_Q) == NKeyboard::eKeyPressed ) {
-			bUseWireframe = !bUseWireframe;
+		if (NKeyboard::GetKeyState(GLFW_KEY_E) == NKeyboard::eKeyPressed) {
+			bShowMenu = !bShowMenu;
+		}
+
+		////////////////////////////////////////////////////////////////
+		// update the user mouse input
+		if (!bShowDemo && !bShowMenu)
+		{
+			{
+				zoomDist += float(mouseW) * 0.1f;
+				zoomDist = Clamp<float>(zoomDist, -100.0f, 0.0f);
+				mouseW = 0;
+			}
+
+			{
+				double x, y;
+				glfwGetCursorPos(PrimaryWindow, &x, &y);
+				const int xDiff = int(x - double(xprev));
+				const int yDiff = int(y - double(yprev));
+				xprev = int(x);
+				yprev = int(y);
+				static const float phi_limit = 80.0f;
+				if (GLFW_PRESS == glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_LEFT)) {
+					theta += float(xDiff) * 0.1f;
+					phi += float(yDiff) * 0.1f;
+					phi = Clamp<float>(phi, -phi_limit, phi_limit);
+					fpsCamera.rot.x = phi;
+					fpsCamera.rot.y = theta;
+				}
+				else if (GLFW_PRESS == glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_RIGHT)) {
+					// rotate/move the campos
+					sample_pt_theta -= float(xDiff) * 0.2f;
+					sample_pt_phi += float(yDiff) * 0.2f;
+					sample_pt_phi = Clamp<float>(sample_pt_phi, -phi_limit, phi_limit);
+				}
+				else if (GLFW_PRESS == glfwGetMouseButton(PrimaryWindow, GLFW_MOUSE_BUTTON_MIDDLE)) {
+					// rotate/move the campos
+					sample_pt_theta -= float(xDiff) * 0.2f;
+					sample_pt_phi += float(yDiff) * 0.2f;
+					sample_pt_phi = Clamp<float>(sample_pt_phi, -phi_limit, phi_limit);
+				}
+			}
 		}
 
 		////////////////////////////////////////////////////////////////

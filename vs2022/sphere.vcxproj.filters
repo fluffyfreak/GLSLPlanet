@@ -175,5 +175,8 @@
     <None Include="..\shaders\terrains\TerrainHeightShaderFun.glsl">
       <Filter>Resource Files\shaders\terrains</Filter>
     </None>
+    <None Include="..\shaders\terrains\Warping.glsl">
+      <Filter>Resource Files\shaders\terrains</Filter>
+    </None>
   </ItemGroup>
 </Project>
