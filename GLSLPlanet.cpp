@@ -226,7 +226,7 @@ int main()
 	double g = 9.81;
 	double R = g / (cal*cal);*/
 
-	GeoSphere *pSphere = new GeoSphere();
+	TerrainMesh *pSphere = new TerrainMesh();
 	checkGLError();
 
 	////////////////////////////////////////////////////////////////

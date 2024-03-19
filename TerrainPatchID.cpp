@@ -6,7 +6,7 @@
 #include "TerrainPatchID.h"
 
 static const uint32_t MAX_PATCH_DEPTH = 30;
-uint64_t GeoPatchID::NextPatchID(const int depth, const int idx) const
+uint64_t TerrainPatchID::NextPatchID(const int depth, const int idx) const
 {
 	assert(idx>=0 && idx<4);
 	assert(depth<=MAX_PATCH_DEPTH);
@@ -16,7 +16,7 @@ uint64_t GeoPatchID::NextPatchID(const int depth, const int idx) const
 	return uint64_t( mPatchID | (idx64<<shiftDepth64) );
 }
 
-int GeoPatchID::GetPatchIdx(const int depth) const
+int TerrainPatchID::GetPatchIdx(const int depth) const
 {
 	assert(depth<=MAX_PATCH_DEPTH);
 	const uint64_t shiftDepth64 = depth*2ULL;
@@ -25,7 +25,7 @@ int GeoPatchID::GetPatchIdx(const int depth) const
 	return int(idx64);
 }
 
-int GeoPatchID::GetPatchFaceIdx() const
+int TerrainPatchID::GetPatchFaceIdx() const
 {
 	const int res = (mPatchID & (7i64 << MAX_SHIFT_DEPTH)) >> MAX_SHIFT_DEPTH;
 	assert(res>=0 && res<6);

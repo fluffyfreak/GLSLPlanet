@@ -17,14 +17,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-GeoSphere::GeoSphere() : mGeoPatchContext(nullptr)
+TerrainMesh::TerrainMesh() : mGeoPatchContext(nullptr)
 {
 	for (int i=0; i<NUM_PATCHES; i++) {
 		mGeoPatches[i] = nullptr;
 	}
 }
 
-GeoSphere::~GeoSphere()
+TerrainMesh::~TerrainMesh()
 {
 	for (int i=0; i<NUM_PATCHES; i++) {
 		delete mGeoPatches[i];
@@ -35,7 +35,7 @@ GeoSphere::~GeoSphere()
 	mGeoPatchContext = nullptr;
 }
 
-void GeoSphere::Update(const glm::vec3 &campos)
+void TerrainMesh::Update(const glm::vec3 &campos)
 {
 	if(nullptr==mGeoPatches[0]) {
 		BuildFirstPatches();
@@ -49,7 +49,7 @@ void GeoSphere::Update(const glm::vec3 &campos)
 	}
 }
 
-void GeoSphere::Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix, const glm::mat4 &MVP)
+void TerrainMesh::Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix, const glm::mat4 &MVP)
 {
 	// setup the basics for the patch shader,
 	// individual patches will change settings to match their own parameters
@@ -66,7 +66,7 @@ void GeoSphere::Render(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix
 #endif
 }
 
-bool GeoSphere::AddSplitRequest(SSplitRequestDescription *desc)
+bool TerrainMesh::AddSplitRequest(SSplitRequestDescription *desc)
 {
 	if(mSplitRequestDescriptions.size()<MAX_SPLIT_REQUESTS) {
 		mSplitRequestDescriptions.push_back(desc);
@@ -75,7 +75,7 @@ bool GeoSphere::AddSplitRequest(SSplitRequestDescription *desc)
 	return false;
 }
 
-void GeoSphere::ProcessSplitRequests()
+void TerrainMesh::ProcessSplitRequests()
 {
 	std::deque<SSplitRequestDescription*>::const_iterator iter = mSplitRequestDescriptions.begin();
 	while (iter!=mSplitRequestDescriptions.end())
@@ -140,7 +140,7 @@ void GeoSphere::ProcessSplitRequests()
 	mSplitRequestDescriptions.clear();
 }
 
-void GeoSphere::ProcessSplitResults()
+void TerrainMesh::ProcessSplitResults()
 {
 	std::deque<SSplitResult*>::const_iterator iter = mSplitResult.begin();
 	while(iter!=mSplitResult.end())
@@ -170,13 +170,13 @@ static const int geo_sphere_edge_friends[6][4] = {
 	{ 1, 4, 3, 2 }
 };
 
-void GeoSphere::BuildFirstPatches()
+void TerrainMesh::BuildFirstPatches()
 {
 	assert(nullptr==mGeoPatchContext);
 #if TEST_CASE
-	mGeoPatchContext = new GeoPatchContext(9);
+	mGeoPatchContext = new TerrainPatchContext(9);
 #else
-	mGeoPatchContext = new GeoPatchContext(29);
+	mGeoPatchContext = new TerrainPatchContext(29);
 #endif
 	assert(nullptr!=mGeoPatchContext);
 
@@ -190,14 +190,14 @@ void GeoSphere::BuildFirstPatches()
 	static const glm::vec3 p7 = glm::normalize(glm::vec3(-1,-1,-1));
 	static const glm::vec3 p8 = glm::normalize(glm::vec3( 1,-1,-1));
 
-	const uint64_t maxShiftDepth = GeoPatchID::MAX_SHIFT_DEPTH;
+	const uint64_t maxShiftDepth = TerrainPatchID::MAX_SHIFT_DEPTH;
 
-	mGeoPatches[0] = new GeoPatch(*mGeoPatchContext, this, p1, p2, p3, p4, 0, (0i64 << maxShiftDepth));
-	mGeoPatches[1] = new GeoPatch(*mGeoPatchContext, this, p4, p3, p7, p8, 0, (1i64 << maxShiftDepth));
-	mGeoPatches[2] = new GeoPatch(*mGeoPatchContext, this, p1, p4, p8, p5, 0, (2i64 << maxShiftDepth));
-	mGeoPatches[3] = new GeoPatch(*mGeoPatchContext, this, p2, p1, p5, p6, 0, (3i64 << maxShiftDepth));
-	mGeoPatches[4] = new GeoPatch(*mGeoPatchContext, this, p3, p2, p6, p7, 0, (4i64 << maxShiftDepth));
-	mGeoPatches[5] = new GeoPatch(*mGeoPatchContext, this, p8, p7, p6, p5, 0, (5i64 << maxShiftDepth));
+	mGeoPatches[0] = new TerrainPatch(*mGeoPatchContext, this, p1, p2, p3, p4, 0, (0i64 << maxShiftDepth));
+	mGeoPatches[1] = new TerrainPatch(*mGeoPatchContext, this, p4, p3, p7, p8, 0, (1i64 << maxShiftDepth));
+	mGeoPatches[2] = new TerrainPatch(*mGeoPatchContext, this, p1, p4, p8, p5, 0, (2i64 << maxShiftDepth));
+	mGeoPatches[3] = new TerrainPatch(*mGeoPatchContext, this, p2, p1, p5, p6, 0, (3i64 << maxShiftDepth));
+	mGeoPatches[4] = new TerrainPatch(*mGeoPatchContext, this, p3, p2, p6, p7, 0, (4i64 << maxShiftDepth));
+	mGeoPatches[5] = new TerrainPatch(*mGeoPatchContext, this, p8, p7, p6, p5, 0, (5i64 << maxShiftDepth));
 
 	for (int i=0; i<NUM_PATCHES; i++) {
 		for (int j=0; j<4; j++) {

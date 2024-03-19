@@ -24,7 +24,7 @@
 #include "shader_heightmap.h"
 #endif
 
-int GeoPatchContext::getIndices(std::vector<unsigned short> &pl, const unsigned int edge_hi_flags,
+int TerrainPatchContext::getIndices(std::vector<unsigned short> &pl, const unsigned int edge_hi_flags,
 	unsigned short *midIndices, unsigned short *loEdgeIndices[4], unsigned short *hiEdgeIndices[4]) const
 {
 	// calculate how many tri's there are
@@ -61,7 +61,7 @@ int GeoPatchContext::getIndices(std::vector<unsigned short> &pl, const unsigned 
 }
 
 // constructor
-GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) : 
+TerrainPatchContext::TerrainPatchContext(const uint32_t edgeLen) : 
 	mEdgeLen(edgeLen), mHalfEdgeLen(edgeLen>>1), 
 	mQuad(false, true), mFBO(edgeLen,edgeLen)//, mVBO(nullptr)
 {
@@ -338,14 +338,14 @@ GeoPatchContext::GeoPatchContext(const uint32_t edgeLen) :
 }
 
 // destructor
-GeoPatchContext::~GeoPatchContext() {
+TerrainPatchContext::~TerrainPatchContext() {
 	delete [] mVertexs;
 	delete [] mNormals;
 	delete [] mUVs;
 }
 
 // render the heightmap to a framebuffer
-void GeoPatchContext::renderHeightmap(
+void TerrainPatchContext::renderHeightmap(
 	const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, const glm::vec3 &v3, 
 	const uint32_t targetTex) const
 {
@@ -412,13 +412,13 @@ void GeoPatchContext::renderHeightmap(
 #endif
 }
 
-void GeoPatchContext::renderQuad() const
+void TerrainPatchContext::renderQuad() const
 {
 	mQuad.Render();
 	checkGLError();
 }
 
-void GeoPatchContext::UsePatchShader(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix, const glm::mat4 &MVP) const {
+void TerrainPatchContext::UsePatchShader(const glm::mat4 &ViewMatrix, const glm::mat4 &ModelMatrix, const glm::mat4 &MVP) const {
 	assert(patch_prog!=UINT_MAX);
 	glUseProgram(patch_prog);
 	checkGLError();

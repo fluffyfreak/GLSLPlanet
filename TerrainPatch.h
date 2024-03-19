@@ -9,26 +9,26 @@
 // fwd decl's
 class CGLvbo;
 
-class GeoPatch
+class TerrainPatch
 {
 private:
 	////////////////////////////////////////////////////////////////
 	// private members
 	static const uint32_t NUM_EDGES = 4;
-	GeoPatch *edgeFriend[NUM_EDGES];
+	TerrainPatch *edgeFriend[NUM_EDGES];
 
 	static const uint32_t NUM_KIDS = NUM_EDGES;
-	GeoPatch *kids[NUM_KIDS];
+	TerrainPatch *kids[NUM_KIDS];
 
-	const GeoPatchContext &mContext;
-	GeoSphere *mpGeoSphere;
+	const TerrainPatchContext &mContext;
+	TerrainMesh *mpTerrainMesh;
 	const glm::vec3 mV0, mV1, mV2, mV3;	// corner vertices for the patch
 	const glm::vec3 mClipCentroid;
 	glm::vec3 mCentroid;
 	const uint32_t mDepth;
 	float mClipRadius;
 	float mRoughLength;
-	const GeoPatchID mPatchID;
+	const TerrainPatchID mPatchID;
 
 	CGLvbo *mVBO;
 	GLuint mHeightmap;
@@ -37,18 +37,18 @@ private:
 public:
 	////////////////////////////////////////////////////////////////
 	// public members
-	GeoPatch *parent;
+	TerrainPatch *parent;
 
 	////////////////////////////////////////////////////////////////
 	// public methods
 
 	// constructor
-	GeoPatch(const GeoPatchContext &context_, GeoSphere *pGeoSphere_, 
+	TerrainPatch(const TerrainPatchContext &context_, TerrainMesh *pTerrainMesh_, 
 		const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, 
-		const uint32_t depth_, const GeoPatchID &ID_);
+		const uint32_t depth_, const TerrainPatchID &ID_);
 
 	// destructor
-	~GeoPatch();
+	~TerrainPatch();
 
 	// in patch surface coords, [0,1]
 	inline glm::vec3 GetSpherePoint(const float x, const float y) const {
@@ -61,11 +61,11 @@ public:
 	void ReceiveHeightmaps(const SSplitResult *psr);
 	void ReceiveHeightmapTex(const GLuint tex);
 
-	inline void OnEdgeFriendChanged(const int edge, GeoPatch *e) {
+	inline void OnEdgeFriendChanged(const int edge, TerrainPatch *e) {
 		edgeFriend[edge] = e;
 	}
 
-	inline void NotifyEdgeFriendSplit(GeoPatch *e) {
+	inline void NotifyEdgeFriendSplit(TerrainPatch *e) {
 		if (!kids[0]) {
 			return;
 		}
@@ -76,13 +76,13 @@ public:
 		kids[(idx+1)%4]->OnEdgeFriendChanged(idx, e->kids[we_are]);
 	}
 
-	inline void NotifyEdgeFriendDeleted(const GeoPatch *e) {
+	inline void NotifyEdgeFriendDeleted(const TerrainPatch *e) {
 		const int idx = GetEdgeIdxOf(e);
 		assert(idx>=0 && idx<4);
 		edgeFriend[idx] = nullptr;
 	}
 
-	inline int GetEdgeIdxOf(const GeoPatch *e) const {
+	inline int GetEdgeIdxOf(const TerrainPatch *e) const {
 		for (int i=0; i<4; i++) {
 			if (edgeFriend[i] == e) {
 				return i;
@@ -92,8 +92,8 @@ public:
 		return -1;
 	}
 
-	inline GeoPatch *GetEdgeFriendForKid(const int kid, const int edge) const {
-		const GeoPatch *e = edgeFriend[edge];
+	inline TerrainPatch *GetEdgeFriendForKid(const int kid, const int edge) const {
+		const TerrainPatch *e = edgeFriend[edge];
 		if (!e) {
 			return nullptr;
 		}
@@ -133,7 +133,7 @@ public:
 	//	return glm::normalize(C);
 	//}
 
-	static void PopulateNormalisedPosMap(const GeoPatch* e, glm::vec3 *posMap, const uint32_t texDim)
+	static void PopulateNormalisedPosMap(const TerrainPatch* e, glm::vec3 *posMap, const uint32_t texDim)
 	{
 		////////////////////////////////////////////////////////////////
 		glm::vec3 *vts = &posMap[0];
@@ -151,7 +151,7 @@ public:
 		assert(vts == &posMap[texDim*texDim]);
 	}
 
-	static void GenerateEdgeHeights(const uint32_t edge, const GeoPatch* e, glm::vec3 *pEv, const uint32_t texDim, const float fracStep)
+	static void GenerateEdgeHeights(const uint32_t edge, const TerrainPatch* e, glm::vec3 *pEv, const uint32_t texDim, const float fracStep)
 	{
 		uint32_t x=0, y=0;
 		switch(edge)

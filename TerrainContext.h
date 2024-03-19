@@ -20,7 +20,7 @@
 #define GEOPATCH_MAX_DEPTH  10
 #endif
 
-class GeoPatchContext
+class TerrainPatchContext
 {
 private:
 	////////////////////////////////////////////////////////////////
@@ -47,8 +47,8 @@ private:
 	inline int VBO_COUNT_HI_EDGE() const { return 3*(mEdgeLen-1); }
 	inline int VBO_COUNT_MID_IDX() const { return (4*3*(mEdgeLen-3)) + 2*(mEdgeLen-3)*(mEdgeLen-3)*3; }
 
-	// private copy ctor, done to prevent copying/cloning of GeoPatchContext.
-	GeoPatchContext(const GeoPatchContext &ref) : mEdgeLen(ref.mEdgeLen), mHalfEdgeLen(ref.mHalfEdgeLen), mQuad(false, true), mFBO(mEdgeLen,mEdgeLen) {};
+	// private copy ctor, done to prevent copying/cloning of TerrainPatchContext.
+	TerrainPatchContext(const TerrainPatchContext &ref) : mEdgeLen(ref.mEdgeLen), mHalfEdgeLen(ref.mHalfEdgeLen), mQuad(false, true), mFBO(mEdgeLen,mEdgeLen) {};
 
 public:
 	////////////////////////////////////////////////////////////////
@@ -64,10 +64,10 @@ public:
 		unsigned short *midIndices, unsigned short *loEdgeIndices[4], unsigned short *hiEdgeIndices[4]) const;
 
 	// constructor
-	GeoPatchContext(const uint32_t edgeLen);
+	TerrainPatchContext(const uint32_t edgeLen);
 
 	// destructor
-	~GeoPatchContext();
+	~TerrainPatchContext();
 
 	glm::vec3 * vertexs()	const { return mVertexs; }
 	glm::vec3 * normals()	const { return mNormals; }

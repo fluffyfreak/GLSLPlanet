@@ -19,10 +19,10 @@
 #include <algorithm>
 
 // constructor
-GeoPatch::GeoPatch(const GeoPatchContext &context_, GeoSphere *pGeoSphere_, 
+TerrainPatch::TerrainPatch(const TerrainPatchContext &context_, TerrainMesh *pTerrainMesh_, 
 	const glm::vec3 &v0_, const glm::vec3 &v1_, const glm::vec3 &v2_, const glm::vec3 &v3_, 
-	const uint32_t depth_, const GeoPatchID &ID_)
-	: mContext(context_), mpGeoSphere(pGeoSphere_), mV0(v0_), mV1(v1_), mV2(v2_), mV3(v3_), 
+	const uint32_t depth_, const TerrainPatchID &ID_)
+	: mContext(context_), mpTerrainMesh(pTerrainMesh_), mV0(v0_), mV1(v1_), mV2(v2_), mV3(v3_), 
 	mClipCentroid((v0_+v1_+v2_+v3_) * 0.25f), mCentroid(glm::normalize(mClipCentroid)), mDepth(depth_), mClipRadius(0.0f), mRoughLength(0.0f), 
 	mPatchID(ID_), mHeightmap(0), mVBO(nullptr), mHasSplitRequest(false), parent(nullptr)
 {
@@ -42,7 +42,7 @@ GeoPatch::GeoPatch(const GeoPatchContext &context_, GeoSphere *pGeoSphere_,
 }
 
 // destructor
-GeoPatch::~GeoPatch() 
+TerrainPatch::~TerrainPatch() 
 {
 	for (int i=0; i<4; i++) {
 		if (edgeFriend[i]) {
@@ -68,7 +68,7 @@ GeoPatch::~GeoPatch()
 }
 
 // Generates full-detail vertices, and also non-edge normals and colors
-void GeoPatch::GenerateMesh() {
+void TerrainPatch::GenerateMesh() {
 	////////////////////////////////////////////////////////////////
 	// Create the base mesh that the heightmap will modify
 	glm::vec3 *vts = mContext.vertexs();
@@ -95,7 +95,7 @@ void GeoPatch::GenerateMesh() {
 	mVBO = new CGLvbo( mContext.NUM_MESH_VERTS(), &mContext.vertexs()[0], nullptr, mContext.uvs() );
 }
 
-void GeoPatch::ReceiveHeightmaps(const SSplitResult *psr)
+void TerrainPatch::ReceiveHeightmaps(const SSplitResult *psr)
 {
 	if (mDepth < psr->depth) {
 		// this should work because each depth should have a common history
@@ -105,7 +105,7 @@ void GeoPatch::ReceiveHeightmaps(const SSplitResult *psr)
 		const int nD = mDepth+1;
 		for (int i=0; i<4; i++)
 		{
-			kids[i] = new GeoPatch(mContext, mpGeoSphere, 
+			kids[i] = new TerrainPatch(mContext, mpTerrainMesh, 
 				psr->data[i].v0, psr->data[i].v1, psr->data[i].v2, psr->data[i].v3, 
 				nD, mPatchID.NextPatchID(nD,i));
 		}
@@ -146,12 +146,12 @@ void GeoPatch::ReceiveHeightmaps(const SSplitResult *psr)
 	}
 }
 
-void GeoPatch::ReceiveHeightmapTex(const GLuint tex)
+void TerrainPatch::ReceiveHeightmapTex(const GLuint tex)
 {
 	mHeightmap = tex;
 }
 
-void GeoPatch::Render()
+void TerrainPatch::Render()
 {
 	if (kids[0]) {
 		for (int i=0; i<4; i++) {
@@ -204,7 +204,7 @@ void GeoPatch::Render()
 	}
 }
 
-void GeoPatch::LODUpdate(const glm::vec3 &campos) {
+void TerrainPatch::LODUpdate(const glm::vec3 &campos) {
 	// there should be no LODUpdate'ing when we have active split requests
 	if(mHasSplitRequest)
 		return;
@@ -235,7 +235,7 @@ void GeoPatch::LODUpdate(const glm::vec3 &campos) {
 		if (!kids[0]) {
 			mHasSplitRequest = true;
 			SSplitRequestDescription *desc = new SSplitRequestDescription(mV0, mV1, mV2, mV3, mCentroid, mDepth, mPatchID);
-			mpGeoSphere->AddSplitRequest(desc);
+			mpTerrainMesh->AddSplitRequest(desc);
 		} else {
 			for (int i=0; i<4; i++) {
 				kids[i]->LODUpdate(campos);
